@@ -1,7 +1,7 @@
 var RequireJs = require('requirejs'), 
 	build = require('./cores/libs/require_opt').build;
 
-build.out = 'basbosa.client-0.0.1.js';
+build.out = 'basbosa.client.js';
 build.name = 'app';
 build.baseUrl = './corec/';
 build.optimize = 'none';

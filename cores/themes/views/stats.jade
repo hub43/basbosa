@@ -1,0 +1,42 @@
+extends ./layout
+
+block content
+	script(type='text/javascript', src='corec/vendors/require-2.0.4.js')
+	script(type='text/javascript', src='corec/vendors/jade_runtime.js')
+	script(type='text/javascript', src='cores/themes/jquery.mousewheel-3.0.6.pack.js')
+	script(type='text/javascript', src='cores/themes/jquery.fancybox.js?v=2.1.0')
+	link(rel='stylesheet', type='text/css', href='cores/themes/css/jquery.fancybox.css?v=2.1.0', media='screen')
+	script(type ='text/javascript', src ='cores/themes/stats.js')
+	script(type ='text/javascript', src ='cores/themes/visits_log.js')
+	.navigation-bar 
+		a.analytics-page(href='/analytics') Analytics Page
+		a.states-page(href='/stats') States Page
+		a.users-page(href='/search') Search On Users
+	h1= title
+	p Welcome to the Stats page!
+	- for (var sectorIndex in sectors)
+		- sector = sectors[sectorIndex]
+		#socket
+			|Socket Id : #{sector.self._id}
+			|Number Of Users : #{sector.self.usersCount - 1}
+			|Turn On User Id : #{sector.self.turnOnUserId}
+			|Turn On Index : #{sector.self.turnOnIndex}
+		- for (var userIndex in sector.users)
+			- user = sector.users[userIndex]
+			- if(user._id != 'wagdanId')
+				div(id=userIndex)
+					img(src='#{user.photo}',alt='Profile Photo')
+					b  Name : 
+					u #{user.username}
+					div
+						b Profile link : 
+						- var originalLink =user.photo
+						- var index = originalLink.lastIndexOf("p")
+						- var linkWithoutPic = originalLink.substr(0 , index - 1)
+						- var indexGroup = linkWithoutPic.lastIndexOf("h")
+						- var profileLink = linkWithoutPic.substr(14 , index-indexGroup)
+						a(href="https://"+profileLink) https://#{profileLink}
+						b  Id : 
+						i #{user._id} 
+						a.history(href='#'+'#{user._id}',data-id='#{user._id}', title='#{user.username}') #{user.username} vistis
+						.fancy(id='#{user._id}')							

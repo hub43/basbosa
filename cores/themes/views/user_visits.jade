@@ -1,0 +1,37 @@
+table(border='1')
+	tr
+		th Visit Number
+		th	Start Time
+		th	End Time
+		th	Duration/hr min sec
+		th	User Agent
+	- var totalDuration = 0
+	- var maxDuration = 0
+	- var Duration = 0
+	- for (var index in visits)
+		tr.d0
+			td #{parseInt(index) + 1}
+			- var sDate =new Date(visits[index].stime).toUTCString()
+			td	#{sDate}
+			- var eDate =new Date(visits[index].etime).toUTCString()
+			td #{eDate}
+			- Duration =  visits[index].duration
+			- var bSeconds = Duration / 1000
+			- var min = Math.floor(Duration / 60000)
+			- var hours = Math.floor(min / 60)
+			- var seconds = Math.floor(bSeconds % 60)
+			td #{hours} : #{min} : #{seconds}
+			td #{visits[index].uagent}
+	table(border='1')
+		tr
+			td Registration Date
+			- var rdate =new Date(registrationDate).toUTCString()
+			td #{rdate}
+			td Total Visit
+			td #{visitsLog.totalVisits}
+			td Average Visits
+			td #{visitsLog.averageVisits.hours} : #{visitsLog.averageVisits.min} : #{visitsLog.averageVisits.seconds}
+			td Minimum Visit
+			td #{visitsLog.minDuration.hours} : #{visitsLog.minDuration.min} : #{visitsLog.minDuration.seconds}
+			td Max Visit
+			td #{visitsLog.maxDuration.hours} : #{visitsLog.maxDuration.min} : #{visitsLog.maxDuration.seconds}

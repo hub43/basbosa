@@ -1,0 +1,25 @@
+extends ./layout
+
+block content
+	script(type = 'text/javascript', src = 'cores/themes/analytics.js')
+	.navigation-bar
+		a.analytics-page(href='/analytics') Analytics Page
+		a.states-page(href='/stats') States Page
+		a.users-page(href='/search') Search On Users
+	h1= title
+	p Welcome to the Analytics page!
+	.chart-container
+		span Start Date
+		input.start-date
+		span End Date
+		input.end-date
+		span Stats Type
+		select.stats-type
+			option(value='0') getActiveUsers
+			option(value='1') getSessionLengths
+			option(value='2') getVisitStats
+		input.get-users(type='button', value='Get Users')
+		#chart
+		div
+			input.new-container(type='button', value='New Container')
+		

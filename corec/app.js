@@ -27,7 +27,7 @@ require.config({
 	  socketio		: 'corec/vendors/socket.io-0.9.10',
 	  underscore	: 'corec/vendors/underscore-1.3.1',
 	  backbone		: 'corec/vendors/backbone-0.9.2',
-		basbosa 		: 'app'
+		basbosa 		: 'corec/app'
 	}
 });
 

@@ -14,7 +14,8 @@ commander = function() {
 	  .option('-m, --min', 'use minifed client, default: ' + Config.min)
 	  .option('-a, --app <app>', 'set default app to load, defaut: ' + Config.app)
 	  .option('-l, --logging <level>', 'set logging level, defaut: ' + Config.logging)
-	  .option('-s, --skip-opt', 'skip client optimization using uglify, defaut: ' + Config.skipOpt);
+	  .option('-s, --skip-opt', 'skip client optimization using uglify, defaut: ' + Config.skipOpt)
+		.option('-es, --enableSurvey', 'enableSurvey option, default' + Config.enableSurvey);
 	
 	// Populate extra options
 	/*
@@ -26,7 +27,7 @@ commander = function() {
 	// Parse command lines
 	program.parse(process.argv);
 	
-	_.each(['port', 'env', 'test', 'min', 'app', 'logging', 'skipOpt'], function(key) {
+	_.each(['port', 'env', 'test', 'min', 'app', 'logging', 'skipOpt', 'enableSurvey'], function(key) {
 		//Logger.debug('key: '+ key + ' value :' + program[key]);
 		program[key] !== undefined && (Config[key] = program[key]);
 	});

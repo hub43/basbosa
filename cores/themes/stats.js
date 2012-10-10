@@ -27,7 +27,7 @@ function getVisits(id) {
 	  	var registrationDate = data.registrationDate
 	  	, visits = data.visits
 	  	, visitsLog = extractVisitsLog(visits);
-	  	require(['cores/themes/views/user_visits.jade'], function(template) {
+	  	require(['node_modules/basbosa/cores/themes/views/user_visits.jade'], function(template) {
 	  		$('.fancy').append(template({visits : visits , registrationDate : registrationDate, visitsLog : visitsLog}));
 	  	});
   });

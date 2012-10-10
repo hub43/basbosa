@@ -23,6 +23,7 @@ define(['path', 'underscore'], function(Path, _) {
 		GLOBAL.PUBLIC_DIR				= 'appc';
 		GLOBAL.PUBLIC_PATH 			= APP_PATH  + '/' + PUBLIC_DIR;
 		GLOBAL.SERVER_PATH 			= APP_PATH  + '/apps';
+		GLOBAL.CORES						= APP_PATH + '/node_modules/basbosa/cores';
 
 		GLOBAL.SERVER 					= true;
 		GLOBAL.Basbosa					= require('../../corec/libs/basbosa');

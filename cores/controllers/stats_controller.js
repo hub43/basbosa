@@ -4,5 +4,5 @@ exports.index = function (req, res) {
 	j.group.sectors.each(function(sector) {
 		sectors.push(sector.prepareForStats());
 	});
-	res.render(SERVER_PATH + '/themes/views/stats', { title: 'Stats', sectors : sectors});
+	res.render(CORES + '/themes/views/stats', { title: 'Stats', sectors : sectors});
 };

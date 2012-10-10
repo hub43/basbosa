@@ -6,7 +6,7 @@ define([
 		
 		defaults		: {
 			options : {
-				pingInterval	: 2000,
+				pingInterval	: 20000,
 				monitorInterval : 2000,
 				idleTimeOut			: 10000,
 				idleServerDown	: 15000,

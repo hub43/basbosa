@@ -16,7 +16,7 @@ define([
 	});
 	
 	j.lon('ui.*', 'last', function(e) {
-		SocketClient.send(e.name.replace('ui.', ''), e.message);
+		SocketClient.sendPacket(e.name.replace('ui.', ''), e.message);
 	});
 	
 	return null;

@@ -38,8 +38,8 @@ define(['require', './logging_module', './basbosa'], function( require, LoggingM
 			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
 			// Add wild handlers to this event then fire it again
 			Logger.info('Attaching wild handlers to ' + message.eventName);
-			self.lon(message.eventName, function(e, result, next) { next(); });
-			self.ltrigger(message.eventName, message);
+			this.lon(message.eventName, function(e, result, next) { next(); });
+			this.ltrigger(message.eventName, message);
 			
 			return;
 		}

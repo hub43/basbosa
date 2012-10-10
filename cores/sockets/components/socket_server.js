@@ -71,11 +71,11 @@ SocketServer.prototype.init = function(App) {
 				Logger.info('DISCONNECTED a user with no session');
 			}		
 		});
+
+		clientSocket.on('message', function(message) {
+			this.ltrigger(message.eventName, message);
+		});
 		
 	});
-	
-	
-	
-
 };
 module.exports = new SocketServer(); 

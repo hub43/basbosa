@@ -14,10 +14,11 @@ define([
 
 	_.extend(SocketClient, new LeveledEvents());
 	
-	SocketClient.send = function(eventName, message) {
+	SocketClient.sendPacket = function(eventName, message) {
 		Logger.debug('Sending ' + eventName, message);
 		message.eventName = eventName;
-		SocketClient.emit(eventName, message);
+		//SocketClient.emit(eventName, message);
+		SocketClient.json.send(message);
 	};
 	Basbosa && Basbosa.add('SocketClient', SocketClient);
 	return SocketClient;

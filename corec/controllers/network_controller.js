@@ -27,7 +27,7 @@ define([
 		
 		j.network.on('requestPing', function() {
   		Logger.debug('sending network ping');
-  		SocketClient.send('network.ping', j.network.genPing());
+  		SocketClient.sendPacket('network.ping', j.network.genPing());
 		});
 		
 		var monitor = setInterval(function() {

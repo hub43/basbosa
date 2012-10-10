@@ -5697,6 +5697,11 @@ define('libs/leveled_events',['require', './logging_module', './basbosa'], funct
 		Logger.debug('got message ' + message.eventName, message);
 		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
 			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
+			// Add wild handlers to this event then fire it again
+			Logger.info('Attaching wild handlers to ' + message.eventName);
+			this.lon(message.eventName, function(e, result, next) { next(); });
+			this.ltrigger(message.eventName, message);
+			
 			return;
 		}
 		new EventObject(message, this._fHandlers[message.eventName], this);
@@ -5714,8 +5719,6 @@ define('libs/leveled_events',['require', './logging_module', './basbosa'], funct
 					self.__buildFlat(e);
 				}
 			});
-			//self._hHandlers[eWild]= self._hHandlers[eWild] || [];
-			//self._hHandlers[eWild][level.toString()] = self._hHandlers[eWild][level.toString()] || [];
 		});
 	};
 
@@ -5758,7 +5761,7 @@ define('libs/leveled_events',['require', './logging_module', './basbosa'], funct
     	_.each(wildHandlers, function(wEventHandler, eWild) {
 				// Check if the wild event name matches the event name
 				var str = eWild.replace('*', '');
-				if (str == '' || eWild.indexOf(str) > -1) {
+				if (str == '' || event.indexOf(str) > -1) {
 					self.addWildHandlerToEvent(eWild, event);
 				}
 			});
@@ -5809,10 +5812,11 @@ define('controllers/components/socket_client',[
 
 	_.extend(SocketClient, new LeveledEvents());
 	
-	SocketClient.send = function(eventName, message) {
+	SocketClient.sendPacket = function(eventName, message) {
 		Logger.debug('Sending ' + eventName, message);
 		message.eventName = eventName;
-		SocketClient.emit(eventName, message);
+		//SocketClient.emit(eventName, message);
+		SocketClient.json.send(message);
 	};
 	Basbosa && Basbosa.add('SocketClient', SocketClient);
 	return SocketClient;
@@ -7601,7 +7605,7 @@ define('controllers/authn_controller',[
 					//$.extend(j.user, res);
 					if (j.user.has('_id')) {
 						// Once our user has an id and socket is open, lets authenticate the socket
-						SocketClient.send('authn.socket', {
+						SocketClient.sendPacket('authn.socket', {
 								userId	:	j.user.id
 						});
 					}
@@ -7614,7 +7618,7 @@ define('controllers/authn_controller',[
 		authUser();
 		//  only try to authenticate the socket if the user has a valid id and is not authenticated
 		if (j.user.has('_id')) {
-			SocketClient.send('authn.socket', { userId : j.user.id });
+			SocketClient.sendPacket('authn.socket', { userId : j.user.id });
 		}
 	});
 	
@@ -7860,6 +7864,7 @@ define('libs/index',[
 define('themes/fps',[
 		'require'
 	,	'backbone'
+	, '../libs/basbosa'
 	], function(require) {
 	var FpsView = Backbone.View.extend({
 		initialize : function() {
@@ -7925,6 +7930,7 @@ define('themes/fps',[
 define('themes/screen_size',[
     'jquery'
    ,'backbone'
+   , '../libs/basbosa'
 	], function() {
 	var ScreenSizeView = Backbone.View.extend({
 		id	: 'screen-size',
@@ -8154,7 +8160,7 @@ define('models/network',[
 		
 		defaults		: {
 			options : {
-				pingInterval	: 2000,
+				pingInterval	: 20000,
 				monitorInterval : 2000,
 				idleTimeOut			: 10000,
 				idleServerDown	: 15000,
@@ -8245,7 +8251,7 @@ define('controllers/network_controller',[
 		
 		j.network.on('requestPing', function() {
   		Logger.debug('sending network ping');
-  		SocketClient.send('network.ping', j.network.genPing());
+  		SocketClient.sendPacket('network.ping', j.network.genPing());
 		});
 		
 		var monitor = setInterval(function() {
@@ -8281,7 +8287,7 @@ define('controllers/default_controller',[
 	});
 	
 	j.lon('ui.*', 'last', function(e) {
-		SocketClient.send(e.name.replace('ui.', ''), e.message);
+		SocketClient.sendPacket(e.name.replace('ui.', ''), e.message);
 	});
 	
 	return null;

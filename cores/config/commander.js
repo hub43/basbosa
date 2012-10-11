@@ -15,7 +15,7 @@ commander = function() {
 	  .option('-a, --app <app>', 'set default app to load, defaut: ' + Config.app)
 	  .option('-l, --logging <level>', 'set logging level, defaut: ' + Config.logging)
 	  .option('-s, --skip-opt', 'skip client optimization using uglify, defaut: ' + Config.skipOpt)
-		.option('-es, --enableSurvey', 'enableSurvey option, default' + Config.enableSurvey);
+		.option('--enableSurvey', 'enableSurvey option, default' + Config.enableSurvey);
 	
 	// Populate extra options
 	/*

@@ -45,9 +45,7 @@ function getData (parent) {
 		  	var dataArray = [ ['Date', parentObj.find('.stats-type option:selected').text()] ],
 		  		dataTable, options, chart;
 		  		if (parentObj.find('.stats-type option:selected').text() == 'getActiveUsers') {
-			  			data.forEach (function (entry) {
-			  				dataArray.push ( [ new Date(entry.stime).toLocaleDateString(), entry.count ]);
-			  			});
+			  				dataArray = data;
   	  		} else {
   	  				var counters = [], ranges = [];
   	  				ranges = data[0];

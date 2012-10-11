@@ -40,19 +40,36 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 		 * @param {Function} callback A callback function on the Analytics object
 		 */
 	  getActiveUsers : function(startTime, endTime, callback) {
-	  	var milliSecondsInADay = 86400000;
-	  	var Db = DbClass.getDb();
+	  	var milliSecondsInADay = 86400000
+	  	, numberOfDays = ((endTime + milliSecondsInADay) - startTime)/milliSecondsInADay
+	  	, SecondInDay = 86399000, Db = DbClass.getDb();
+	  	var dataArray = [ ['Date', 'getActiveUsers'] ];
 	  	Db.collection('visits', function(err,collection) {
 	  		 if (err) {
 		      	Logger.warn('Error while get active users ', err);
 		      } else {
 						collection.group(
-						   {stime : true}
+						   {userId : true, stime: true}
 						   ,{stime: {$gte : parseInt(startTime), $lt: parseInt(endTime + milliSecondsInADay)}}
 						   ,{ count: 0}
 						   ,function(doc, out){ out.count++; }
 						   ,function(err, results) {
-						  	 callback(err, results);
+						  	 Logger.info(numberOfDays);
+						  	 for (var j = 0; j < numberOfDays; j++) {
+						  		 var count = 0;
+						  		 var previousId = 0;
+						  		 for(var i = 0; i < results.length; i++) {
+						  			 if(previousId != results[i].userId) {
+								  		 if (results[i].stime >= startTime && results[i].stime <= (startTime + SecondInDay)) {
+								  				 	count += 1;
+								  		 }
+						  			 }
+							  		 previousId = results[i].userId;
+							  	 }
+						  		 dataArray.push ( [ new Date(startTime).toLocaleDateString(), count]);
+						  		 startTime = (startTime + milliSecondsInADay);
+						  	 }
+						  	 callback(err, dataArray);
 						   }
 					   );
 		      }

@@ -66,7 +66,8 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 						  			 }
 							  		 previousId = results[i].userId;
 							  	 }
-						  		 dataArray.push ( [ new Date(startTime).toLocaleDateString(), count]);
+						  		 dataArray.push ( [new Date(startTime).getDate() + '/' + (new Date(startTime).getMonth() + 1) + '/' + 
+						  		                   new Date(startTime).getFullYear() , count]);
 						  		 startTime = (startTime + milliSecondsInADay);
 						  	 }
 						  	 callback(err, dataArray);
@@ -89,9 +90,8 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 			  startTime = 0;
 			  endTime = new Date().getTime;
 		  }
-		  var milliSecondsInADay = 86400000,
-  		getMinutes = 3600000;
-			var Db = DbClass.getDb();
+		  var milliSecondsInADay = 86400000, unit = 60000 // the unit that need to relate to it.
+			, Db = DbClass.getDb();
 			Db.collection('visits', function(err,collection) {
 				 if (err) {
 		      	Logger.warn('Error while get session lengths ', err);
@@ -107,9 +107,9 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 						  	 		 dataArray = [ ];
 						  	 results.forEach (function (entry) {
 						  		 for (i = 0; i < ranges.length; ++i) {
-						  			 	if (ranges[i].length == 2 && (entry.duration/getMinutes) >= ranges[i][0] && (entry.duration/getMinutes) <= ranges[i][1]) {
+						  			 	if (ranges[i].length == 2 && (entry.duration/unit) >= ranges[i][0] && (entry.duration/unit) <= ranges[i][1]) {
 										  	countInRanges[i] = countInRanges[i] + entry.count;
-										  } else if (ranges[i].length == 1 && (entry.duration/getMinutes) >= ranges[i][0]) {
+										  } else if (ranges[i].length == 1 && (entry.duration/unit) >= ranges[i][0]) {
 										  	countInRanges[i] = countInRanges[i] + entry.count;
 										  }
 									  }

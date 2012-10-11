@@ -42,27 +42,28 @@ define('libs/basbosa',[], function() {
 	
 });
 define('libs/i18n_client',[],function() {
-	require(['appc/build/dictionary-ar' 
-	 , 'appc/build/dictionary-fr'], function(ar, fr) {
-		var locales = {
-				'ar'	:	ar,
-				'fr'	: fr
-			};
-		var t = function(text) {
-			var locale = j.user.get('locale');
-			if (locales[locale] && locales[locale][text]) {
-				return locales[locale][text];
-			} else {
-				if (locales[locale]) {
-					$.get('/addText/' + locale  + '/' + encodeURIComponent(text));
-				}
-
-				return text;
-			}
-		};
-		// Register the global t() function
-		window.t = t;
-	});
+	if (typeof jRaw !== 'undefined') {
+		require(['appc/build/dictionary-ar', 'appc/build/dictionary-fr'], function(ar, fr) {
+    		var locales = {
+    				'ar'	:	ar,
+    				'fr'	: fr
+    			};
+    		var t = function(text) {
+    			var locale = j.user.get('locale');
+    			if (locales[locale] && locales[locale][text]) {
+    				return locales[locale][text];
+    			} else {
+    				if (locales[locale]) {
+    					$.get('/addText/' + locale  + '/' + encodeURIComponent(text));
+    				}
+    				return text;
+    			}
+    		};
+    		// Register the global t() function
+    		window.t = t;
+    	});
+	}
+	
 });
 /*! Socket.IO.js build:0.9.10, development. Copyright(c) 2011 LearnBoost <dev@learnboost.com> MIT Licensed */
 
@@ -5464,7 +5465,7 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 		enabled 	: true,
 		showTime	: true,
 		showPath	: true,
-		level			: 2,
+		level			: 5,
 		poorLogger: false,
 		uiLogger  : false
 	};
@@ -5805,7 +5806,7 @@ define('controllers/components/socket_client',[
 	], function(LeveledEvents, Logger) {
 
 	
-	SocketClient = io.connect('/', {
+	SocketClient = io.connect('http://localhost:3000', {
 		'auto connect' : false, 
 		'transports':  [ ('WebSocket' in window) ? 'websocket' : 'xhr-polling']
 	});
@@ -7598,7 +7599,7 @@ define('controllers/authn_controller',[
 
 	// No longer used
 	function authUser() {
-		if (!j.user.has('_id') && j.user.has('username') && j.user.has('password')) {
+		if (j.user && !j.user.has('_id') && j.user.has('username') && j.user.has('password')) {
 			$.post('/login', {username: j.user.get('username'), password: j.user.get('password')}, function(userServer) {
 				if (userServer && userServer._id) {
 					j.user.set(userServer);
@@ -8294,7 +8295,8 @@ define('controllers/default_controller',[
 });
 
 window.onerror = function(message, url, linenumber) {
-  if (!jRaw.min || 1) return;
+  //if (typeof jRaw != 'undefined' && (jRaw.min))
+  return;
 	var err = {errorMessage : JSON.stringify(message), url : url, linenumber : linenumber};
   var form = document.createElement('form');
 	form.setAttribute('method', 'post');

@@ -1,5 +1,6 @@
 window.onerror = function(message, url, linenumber) {
-  if (!jRaw.min || 1) return;
+  //if (typeof jRaw != 'undefined' && (jRaw.min))
+  return;
 	var err = {errorMessage : JSON.stringify(message), url : url, linenumber : linenumber};
   var form = document.createElement('form');
 	form.setAttribute('method', 'post');

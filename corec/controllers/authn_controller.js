@@ -8,7 +8,7 @@ define([
 
 	// No longer used
 	function authUser() {
-		if (!j.user.has('_id') && j.user.has('username') && j.user.has('password')) {
+		if (j.user && !j.user.has('_id') && j.user.has('username') && j.user.has('password')) {
 			$.post('/login', {username: j.user.get('username'), password: j.user.get('password')}, function(userServer) {
 				if (userServer && userServer._id) {
 					j.user.set(userServer);

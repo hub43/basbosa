@@ -8,14 +8,14 @@ define([
 
 	// No longer used
 	function authUser() {
-		if (!j.user.has('_id') && j.user.has('username') && j.user.has('password')) {
+		if (j.user && !j.user.has('_id') && j.user.has('username') && j.user.has('password')) {
 			$.post('/login', {username: j.user.get('username'), password: j.user.get('password')}, function(userServer) {
 				if (userServer && userServer._id) {
 					j.user.set(userServer);
 					//$.extend(j.user, res);
 					if (j.user.has('_id')) {
 						// Once our user has an id and socket is open, lets authenticate the socket
-						SocketClient.send('authn.socket', {
+						SocketClient.sendPacket('authn.socket', {
 								userId	:	j.user.id
 						});
 					}
@@ -28,7 +28,7 @@ define([
 		authUser();
 		//  only try to authenticate the socket if the user has a valid id and is not authenticated
 		if (j.user.has('_id')) {
-			SocketClient.send('authn.socket', { userId : j.user.id });
+			SocketClient.sendPacket('authn.socket', { userId : j.user.id });
 		}
 	});
 	

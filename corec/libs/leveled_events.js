@@ -36,6 +36,11 @@ define(['require', './logging_module', './basbosa'], function( require, LoggingM
 		Logger.debug('got message ' + message.eventName, message);
 		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
 			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
+			// Add wild handlers to this event then fire it again
+			Logger.info('Attaching wild handlers to ' + message.eventName);
+			this.lon(message.eventName, function(e, result, next) { next(); });
+			this.ltrigger(message.eventName, message);
+			
 			return;
 		}
 		new EventObject(message, this._fHandlers[message.eventName], this);
@@ -53,8 +58,6 @@ define(['require', './logging_module', './basbosa'], function( require, LoggingM
 					self.__buildFlat(e);
 				}
 			});
-			//self._hHandlers[eWild]= self._hHandlers[eWild] || [];
-			//self._hHandlers[eWild][level.toString()] = self._hHandlers[eWild][level.toString()] || [];
 		});
 	};
 
@@ -97,7 +100,7 @@ define(['require', './logging_module', './basbosa'], function( require, LoggingM
     	_.each(wildHandlers, function(wEventHandler, eWild) {
 				// Check if the wild event name matches the event name
 				var str = eWild.replace('*', '');
-				if (str == '' || eWild.indexOf(str) > -1) {
+				if (str == '' || event.indexOf(str) > -1) {
 					self.addWildHandlerToEvent(eWild, event);
 				}
 			});

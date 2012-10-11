@@ -1,3 +1,11 @@
+/**
+ * User Model provide the core of handling all operation that related 
+ * to the users {authentication, getDummy, update , set and get to/from data base "users collection" } 
+ * @module Cores
+ * @submodule CoresModels
+ * @class User
+ * @property collectionName hold the name of the collection.
+ **/
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 define([
 		'../../corec/models/user'
@@ -8,29 +16,35 @@ define([
 	, 'https'
 	, 'http'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http) {
+	], function(User, j, DummyUsers, DbClass, Country, https, http) { //user Model inherent from user and j in corec.
 	
 	
 	var UserServer = {
-		collectionName 	: 'users',
-		
-	
+		collectionName 	: 'users',  																		//define the collection that this class will deal with it.
+		/**
+		 * initCoreS is a method called directly when defined an instance from user model
+		 * @method initCoreS
+		 */
 		initCoreS	:	function () {
 			this.sectors = new Backbone.Collection();
 			this.on('change:points', this.pointsChanged, this);
 		},
-		
-		
+		 /**
+		 * AuthFbUser is a method responsible on authenticate the Facebock user
+		 * and check if the user is exist in data base else insert he/she to data base.
+		 * @method authFbUser
+		 * @param {Object} fbUserData user data  {ID , username , photo,...}
+		 * @param {Function} authCb(error, userJson) A callback function on the User object
+		 */
 		authFbUser : function(fbUserData, accessToken, authCb) {
 			var self = this;
-			this.findOne({fb_user_id: fbUserData.id}, function(err, userJson) {
+			this.findOne({fb_user_id: fbUserData.id}, function(error, userJson) {
 				if (!userJson) { // if user does not exist in db
 					var locationArray = ['', ''], country = new Country(),	user, userData, friends, dataJson, options;
 					// Check if the name exist
 					if (fbUserData._json.location && fbUserData._json.location.name) {
-						locationArray = fbUserData._json.location.name.split(', ')
+						locationArray = fbUserData._json.location.name.split(', ');
 					}
-					
 					// get user's Facebook friends
 					options = {
 						host: 'graph.facebook.com',
@@ -39,101 +53,96 @@ define([
 
 					https.get(options, function (http_res) {
 						dataJson = '';
-					    // this event fires many times, each time collecting another piece of the response
-					    http_res.on('data', function (chunk) {
-					        // append this chunk to our growing `data` var
-					        dataJson += chunk;
-					    });
-
-					    // this event fires *one* time, after all the `data` events/chunks have been gathered
-					    http_res.on('end', function () {
-					    	dataJson = eval('(' + dataJson + ')');
-					    	friends = _.map(dataJson.data, function(item) {
-					    		var friend = {};
-					    		friend.fb_user_id = item.id;
-					    		return friend;
-					    	});
-					    	Logger.debug('Facebook friends:', friends);					    	
-					    	url = 'http://graph.facebook.com/' + fbUserData.id + '/picture';
-					    	//self.getUserPhoto(url, function(val) {
-					    		 var photo = url;					    										    						  
-						    	// prepare user data to write to db
-						    	userData = {
-										fb_user_id 		: fbUserData.id,
-										username		:	fbUserData._json.name ,
-										emails			: [fbUserData._json.email],
-										photo				: photo,
-										group				: 'visitors',
-										location		: {
-											city			:	locationArray[0],
-											country		:	locationArray[1]
-										},
-										friends			: friends,
-										lastEntryTime 	: 0,
-										registrationDate : (new Date).getTime()
-								}; 
-					    	
-								// add user to users collection
-						    	// for some reason this function handling the 'end' event is called multiple
-						    	//		times, so we need to check if the user has already been written to db
-						    	//		before calling user.create(...)
-						    	self.findOne({fb_user_id: fbUserData.id}, function(err, userJsonInternal) {
-						    		if (!userJsonInternal) {
-						    			Logger.debug('writing user to db - users collection');
-						    			user =  new User(userData);
-										user.create(function(err) {
-											Logger.debug(err);
-											authCb(err, user.toJSON());
-										});
-						    		}
-						    	});
-						    	
-						    	// if country does not exist, add country to countries collection
-								// if country exists and city does not exist, add city to cities
-								//		array in country doc in countries collection
-								country.findOne ({country : userData.location.country}, function (err, countryJson) {
-									if (err) {
-										Logger.error(err);
-										return;
-									}
-									
-									if (!countryJson) {
-										country.set('country', userData.location.country);
-										country.set('cities', [userData.location.city]);
-										country.create();
-									} else if (countryJson.cities.indexOf(userData.location.city) == -1) {
-										country.addCity(countryJson.country, userData.location.city);
-									}
-								});
-								http_res.on('end', function () {});
+				    // this event fires many times, each time collecting another piece of the response
+				    http_res.on('data', function (chunk) {
+				        // append this chunk to our growing `data`
+				        dataJson += chunk;
+				    });
+				    // this event fires *one* time, after all the `data` events/chunks have been gathered
+				    http_res.on('end', function () {
+				    	dataJson = eval('(' + dataJson + ')');
+				    	friends = _.map(dataJson.data, function(item) {
+				    		var friend = {};
+				    		friend.fb_user_id = item.id;
+				    		return friend;
+				    	});
+				    	Logger.debug('Facebook friends:', friends);					    	
+				    	url = 'http://graph.facebook.com/' + fbUserData.id + '/picture';
+		    		 	var photo = url;					    										    						  
+				    	// prepare user data to write to db
+				    	userData = {
+								fb_user_id 		: fbUserData.id,
+								username		:	fbUserData._json.name ,
+								emails			: [fbUserData._json.email],
+								photo				: photo,
+								group				: 'visitors',
+								location		: {
+									city			:	locationArray[0],
+									country		:	locationArray[1]
+								},
+								friends			: friends,
+								lastEntryTime 	: 0,
+								registrationDate : (new Date).getTime()
+							}; 
+							// add user to users collection
+				    	// for some reason this function handling the 'end' event is called multiple
+				    	// times, so we need to check if the user has already been written to db
+				    	// before calling user.create(...)
+				    	self.findOne({fb_user_id: fbUserData.id}, function(error, userJsonInternal) {
+				    		if (!userJsonInternal) {
+				    			Logger.debug('writing user to db - users collection');
+				    			user =  new User(userData);
+									user.create(function(error) {
+										Logger.debug(error);
+										authCb(error, user.toJSON());
+									});
+				    		}
+				    	});
+				    	// if country does not exist, add country to countries collection
+							// if country exists and city does not exist, add city to cities
+							// array in country doc in countries collection
+							country.findOne ({country : userData.location.country}, function (error, countryJson) {
+								if (error) {
+									Logger.error(error);
+									return;
+								}
+								if (!countryJson) {
+									country.set('country', userData.location.country);
+									country.set('cities', [userData.location.city]);
+									country.create();
+								} else if (countryJson.cities.indexOf(userData.location.city) == -1) {
+									country.addCity(countryJson.country, userData.location.city);
+								}
 							});
-						}).on('error', function(e) {
-							  Logger.error(e.message);
-						});;
-						
-					} else {
-						authCb(null, userJson);
-					}			
+							http_res.on('end', function () {});
+						});
+					}).on('error', function(e) {
+						  Logger.error(e.message);
+					});
+				} else {
+					authCb(null, userJson);
+				}			
 			});
 		},
 		
 		/**
-		 * @param removeFirst Set to true to get dummy user from beginning of dummy users array
+		 * @method getDummy is a method Authenticate dummy users
+		 * @param {Boolean} removeFirst Set to true to get dummy user from beginning of dummy users array
 		 * 				useful when stress testing on dev servers to prevent username collision between
 		 * 				robot users and dummy auth users 
-		 * @param cb called when dummy user has been created
+		 * @param {Function} callback(error, user) called when dummy user has been created
 		 */
-		getDummy : function(removeFirst, cb) {
+		getDummy : function(removeFirst, callback) {
 			var self = this;
-			if (!cb) {
-				cb = removeFirst;
+			if (!callback) {
+				callback = removeFirst;
 				removeFirst = false;
 			};
 			dummyUser = removeFirst ? DummyUsers.splice(0,1)[0] : DummyUsers.pop();
 			// check if such a dummy user already exists in the group
 			if (j.group.users.where({username : dummyUser.name}).length) {
 				// A user with this name exists, search for another one
-				this.getDummy(removeFirst, cb);
+				this.getDummy(removeFirst, callback);
 				return ;
 			}
 			self.set({
@@ -142,106 +151,85 @@ define([
 				group				: 'visitors',
 				lastEntryTime : 0,
 				registrationDate : (new Date).getTime()
-
 			});
-			self.create(function(err) {
-				cb(null, self.toJSON());
+			self.create(function(error) {
+				callback(null, self.toJSON());
 			});
 		},
+		/**
+		 * @method visitsUpdate is a method called for the first time of user's entering 
+		 * create visits collection to hold all visits log of this user ,set last entering time.
+		 * @param {String} userAgent hold user agent information like 
+		 * {"family":"Chrome","major":"22","minor":"0","patch":"1229","os":"Windows 7"}
+		 * @param {String} id hold user id .
+		 * @param {Function} callback(error, user) called when dummy user has been created.
+		 */
 		visitsUpdate : function (id, userAgent) {
-				var self = this,
-				ObjectID = require('mongodb').ObjectID,
-				date = (new Date).getTime();
-				var Db = DbClass.getDb();
-				Db.collection('users', function(err,collection) {
-	 	  		 if (err) {
-	 		      	Logger.warn('Error while updating lastEntryTime  for user ' + userId, err);
-	 		      } else {
-	 		      	collection.update({_id: new ObjectID(id)}, {$set : {lastEntryTime : date}},{}, function(err) {});
-	 		      }
-      	});
-      	Db.collection('visits', function(err,collection) {
- 	  		 if (err) {
- 		      	Logger.warn('Error while updating visits for user ' + userId, err);
- 		      } else {
- 		      	var document = {userId : new ObjectID(id), stime : date, uagent:JSON.stringify(userAgent), etime: 0, duration : 0};
- 		      	collection.insert(document);
- 		      }
-      	});
+			var self = this,
+			ObjectID = require('mongodb').ObjectID,
+			date = (new Date).getTime();
+			var Db = DbClass.getDb();
+			Db.collection('users', function(error,collection) {
+  		 if (error) {
+	      	Logger.warn('Error while updating lastEntryTime  for user ' + userId, error);
+	      } else {
+	      	collection.update({_id: new ObjectID(id)}, {$set : {lastEntryTime : date}},{}, function(err) {});
+	      }
+    	});
+    	Db.collection('visits', function(error,collection) {
+  		 if (error) {
+	      	Logger.warn('Error while updating visits for user ' + userId, error);
+	      } else {
+	      	var document = {userId : new ObjectID(id), stime : date, uagent:JSON.stringify(userAgent), etime: 0, duration : 0};
+	      	collection.insert(document);
+	      }
+    	});
 		},
-		setEndVisitTime : function (userId,lastEntryTime) {
-				var model = this;
-				var ObjectID = require('mongodb').ObjectID;
-				var Db = DbClass.getDb();
-				Db.collection('visits', function(err,collection) {
-	      if (err) {
-	      	Logger.warn('Error while setEnd Visit Time for user ' + userId, err);
+		/**
+		 * @method setEndVisitTime is a method used to set end time attribute in visits collection
+		 * create visits collection to hold all visits log of this user ,set last entering time.
+		 * @param {String} userId hold user id.
+		 * @param {TimeStamp} lastEntryTime hold user's last entering time, 
+		 * used to search on the user that has start time equal lastEntryTime.
+		 */
+		setEndVisitTime : function (userId, lastEntryTime) {
+			var ObjectID = require('mongodb').ObjectID
+				, Db = DbClass.getDb();
+			Db.collection('visits', function(error,collection) {
+	      if (error) {
+	      	Logger.warn('Error while setEnd Visit Time for user ' + userId, error);
 	      } else {
 					collection.update({userId: new ObjectID(userId), stime: lastEntryTime}, 
 									  { $set : {etime :  (new Date).getTime(), duration : ((new Date).getTime() - lastEntryTime)}},
-									  {}, function(err) {}
-									  );
-	      }
-	    });
-		},
-		getVisits : function(Id , callback) {
-			var ObjectID = require('mongodb').ObjectID,
-					Db = DbClass.getDb(), visits = {}, data = {};
-			Db.collection('visits', function(err,collection) {
-	      if (err) {
-	      	Logger.warn('Error while get Visits for user ', err);
-	      } else {
-	      	collection.group(
-					   {stime: true, uagent: true, etime:true , duration: true}
-					   ,{userId: new ObjectID(Id) }
-					   ,{}
-					   ,function(doc, out){}
-					   ,function(err, results) {
-					  	 visits = results;
-					  	 Db.collection('users', function(err,collection) {
-						      if (err) {
-						      	Logger.warn('Error while get Visits for user ', err);
-						      } else {
-						      	collection.group(
-										   {registrationDate: true}
-										   ,{_id: new ObjectID(Id) }
-										   ,{}
-										   ,function(doc, out){}
-										   ,function(err, results) {
-										  	 data.visits = visits;
-										  	 data.registrationDate = results[0].registrationDate;
-										  	 callback(err, data);
-										   }
-						      	);
-						      }
-								});
-					   }
-	      	);
+									  {}, function(error) {}
+				  );
 	      }
 			});
-			
-			
-		},
+		},		
 		/**
-		 * to get real path of fb user's photo after mapping
+		 * @method getUserPhoto is a method used to get real path of fb user's photo after mapping.
+		 * @param {String} url hold user's photo url that redirect to the real url.
+		 * @param {Function} callback(realURL) callback function return the real url.
 		 */
-		getUserPhoto : function(url,cb) {									
+		getUserPhoto : function(url,callback) {									
 			http.get(url, function(res) {
 				realURL = res['headers']['location'];
-				realURL = realURL.substring(5,realURL.length)
-				cb(realURL);
+				realURL = realURL.substring(5, realURL.length)
+				callback(realURL);
 			});
 		},
-		
-
+		/**
+		 * @method pointsChanged is a method used to update the users points in data base.
+		 */
 		pointsChanged : function() {
 			var model = this;
 			// Do not write dummy users to db
 			if (this.get('isDummy')) return;
 			var ObjectID = require('mongodb').ObjectID;
-			this._withCollection(function(err, collection) {
-	      if (err) ;
-	      else {
+			this._withCollection(function(error, collection) {
+	      if (error) {
+	      	Logger.warn('Error while changing users points ', error);
+	      } else {
 	        var appLog = 'pointsLog', $push = {};
 	        $push[appLog] = {	t: (new Date).getTime(), p : model.get('points'), s : new ObjectID(model._lastSectorId)};
 	        Logger.debug('before update');
@@ -249,27 +237,35 @@ define([
 	        		{ _id: new ObjectID(model.id.toString()) }, 
 	        		{ $set : {points :  model.get('points')},	$push: $push },
 	        		//{ $push: $push },
-	        		{}, function(err) {}
-	        );
-	        
+	        		{}, function(error) {}
+	        ); 
 	      }
 	    });
 		},
-		
-		getLeaders : function(cb, startTime, endTime, sectorId, fbUserId, country, city) {
+		/**
+		 * @method getLeaders is a method used to get all users and his/her points/score in order.
+		 * @param {Function} callback(error, data/results) callback function return users's usernames and scores ordered.
+		 * @param {TimeStamp} startTime hold the start of the range time that users entered in it.
+		 * @param {TimeStamp} endTime hold the end of the range time that users entered in it.
+		 * @param {String} sectorId hold sector id that the user we need joined to it.
+		 * @param {String} fbUserId hold Facebook user ID
+		 * @param {String} country hold country that the users we need from it
+		 * @param {String} city hold city that the users we need from it
+		 */
+		getLeaders : function(callback, startTime, endTime, sectorId, fbUserId, country, city) {
 			startTime = startTime || 0;
 			endTime = endTime || (new Date).getTime();
-			var ObjectID = require('mongodb').ObjectID;
-			var Db = DbClass.getDb();
+			var ObjectID = require('mongodb').ObjectID
+				, Db = DbClass.getDb();
+			//map function that indicate which attribute will group by it.
+			// used to order the users related to his/her scores.
 			var mapFn = function() {
-				var maxTime = { t : 0, p : 0}, minTime ={t : (new Date).getTime(), p : 0};
-				
+			var maxTime = { t : 0, p : 0}, minTime ={t : (new Date).getTime(), p : 0};
 				this.pointsLog.forEach(function(log) {
 					if (log.t < reqStartTime || log.t > reqEndTime) return;
 					log.t > maxTime.t && (maxTime = log);
 					log.t < minTime.t && (minTime = log);
 				});
-				          
 				emit(this._id,  {
 					username 	: this.username,
 					photo		: this.photo,
@@ -280,11 +276,10 @@ define([
 					points		: maxTime.p - minTime.p + 1,
 				});
 			};
-
 			var reduceFn = function(key, values) {
 				return {_id : key, values : values};
 			};
-	  
+			//condition of search in data base.
 		  var query = {};
 		  query['pointsLog' + '.t'] =  {$gt : parseInt(startTime), $lt : parseInt(endTime)}; 
 		  if (sectorId) {
@@ -294,9 +289,9 @@ define([
 			  if (country == 'friends') {
 				  Logger.info('in Friends');
 				  var friendsIds;
-				  this.findOne({fb_user_id: fbUserId}, function(err, userJson) {
-					  if (err) {
-						  Logger.error(err);
+				  this.findOne({fb_user_id: fbUserId}, function(error, userJson) {
+					  if (error) {
+						  Logger.error(error);
 						  return;
 					  }
 					  if (!userJson) {
@@ -309,7 +304,6 @@ define([
 					  });
 					  friendsIds.push(fbUserId);
 					  query['fb_user_id'] = {$in : friendsIds};
-					  
 					  Logger.debug(query);
 					  var mr = {
 					      mapreduce		: 'users', 
@@ -319,11 +313,10 @@ define([
 					      query 		: query,
 					      scope 		: {reqStartTime : startTime, reqEndTime : endTime} 
 					  };
-				
-					  Db.executeDbCommand(mr, function(err, dbres) {
+					  Db.executeDbCommand(mr, function(error, dbres) {
 					      var results = dbres.documents[0].results;
-					      Logger.debug(err, dbres);
-					      cb(err, JSON.stringify(results));
+					      Logger.debug(error, dbres);
+					      callback(error, JSON.stringify(results));
 					  });
 					  
 				  });
@@ -335,26 +328,24 @@ define([
 				  }
 			  }
 		  }
-		  
 		  if (country != 'friends') {
 			  Logger.debug(query);
 			  var mr = {
-			      mapreduce		: 'users', 
-			      map			: mapFn.toString(),
-			      out 			: {inline : 1},
-			      reduce		: reduceFn.toString(),
-			      query 		: query,
-			      scope 		: {reqStartTime : startTime, reqEndTime : endTime}
+		      mapreduce		: 'users', 
+		      map			: mapFn.toString(),
+		      out 			: {inline : 1},
+		      reduce		: reduceFn.toString(),
+		      query 		: query,
+		      scope 		: {reqStartTime : startTime, reqEndTime : endTime}
 			  };
-		
-			  Db.executeDbCommand(mr, function(err, dbres) {
+			  Db.executeDbCommand(mr, function(error, dbres) {
 			  	var results = dbres.documents[0].results,
-		      	data = _.sortBy(results, function (entry) {
-			      // sort result
-		      	if (!entry || !entry.value) return 0;
-		      		return entry.value.points;
-		      	}).reverse();
-			  	cb(err, JSON.stringify(data));
+		      		data = _.sortBy(results, function (entry) {	
+			      		// sort result
+			      		if (!entry || !entry.value) return 0;
+			      		return entry.value.points;
+		      		}).reverse();
+			  	callback(error, JSON.stringify(data));
 			  });
 		  }
 		}

@@ -11,4 +11,10 @@ SocketServer.on('connection', function(socket) {
 	  };
 		next();
 	});
+	
+	socket.lon('*', function(e, message, next) {
+		var user = j.group.users.get(message.senderUserId);
+		user && user.set('lastOnline', (new Date).getTime());
+		next();
+	});
 });

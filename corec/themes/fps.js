@@ -1,6 +1,7 @@
 define([
 		'require'
 	,	'backbone'
+	, '../libs/basbosa'
 	], function(require) {
 	var FpsView = Backbone.View.extend({
 		initialize : function() {

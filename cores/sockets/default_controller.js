@@ -14,6 +14,7 @@ SocketServer.on('connection', function(socket) {
 			next();
 			return;
 		}
+
 		if (e.result && e.result.message) {
 			e.result.message.eventName = e.result.eventName;
 			if (e.result.broadcast) {
@@ -29,10 +30,7 @@ SocketServer.on('connection', function(socket) {
 					socket.broadcast.to(sector).emit(e.result.eventName, e.result.message);
 				});
 				
-				if (e.result.broadcastToSelf) {
-					Logger.debug("Emitting to socket");
-					socket.emit(e.result.eventName, e.result.message);
-				} 				
+							
 			} else if (e.result.sockets) {
 				_.each(e.result.sockets, function(userSocket) {
 					Logger.debug("Sending to socekts" , userSocket.id);
@@ -44,6 +42,12 @@ SocketServer.on('connection', function(socket) {
 				Logger.debug("Emitting to socket");
 				socket.emit(e.result.eventName, e.result.message);
 			}
+			
+			if (e.result.broadcastToSelf) {
+				Logger.debug("Emitting to socket");
+				socket.emit(e.result.eventName, e.result.message);
+			} 	
+			
 			Logger.debug(e.result.eventName);
 		}
 		next();
@@ -64,4 +68,17 @@ SocketServer.on('connection', function(socket) {
 			socket.broadcast.to('sector' + params.sectorId).emit(message.eventName, message);
 		}
 	});
+	
+	socket.lon('public.*',  function(e, message, next) {
+		e.result = {
+  	    eventName : message.eventName + '_result',
+  	    message   : message,
+  	    broadcast : true,
+  	    broadcastToSelf : true
+  	    
+  	};
+		Logger.info('Public.* was caled');
+		next();
+	});
+	
 });

@@ -1,5 +1,6 @@
 window.onerror = function(message, url, linenumber) {
-  if (!jRaw.min || 1) return;
+  //if (typeof jRaw != 'undefined' && (jRaw.min))
+  return;
 	var err = {errorMessage : JSON.stringify(message), url : url, linenumber : linenumber};
   var form = document.createElement('form');
 	form.setAttribute('method', 'post');
@@ -27,7 +28,7 @@ require.config({
 	  socketio		: 'corec/vendors/socket.io-0.9.10',
 	  underscore	: 'corec/vendors/underscore-1.3.1',
 	  backbone		: 'corec/vendors/backbone-0.9.2',
-		basbosa 		: 'app'
+		basbosa 		: 'corec/app'
 	}
 });
 

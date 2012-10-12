@@ -1,5 +1,5 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
-define([], function() {
+define(['./config'], function(Config) {
 	var Basbosa = function Basbosa(className) {
 		if (!className) return Basbosa;
 		if (Basbosa.classes[className]) {
@@ -14,6 +14,6 @@ define([], function() {
 		Basbosa.classes[className] = instance;
 	};
 	if (typeof window !== 'undefined') window.Basbosa = Basbosa;
+	Basbosa.add('Config', Config);
 	return Basbosa;
-	
 });

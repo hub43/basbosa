@@ -43,6 +43,5 @@ define([
 	, 'jquery'
 	, 'underscore'
 	], function() {
-		
 
 });

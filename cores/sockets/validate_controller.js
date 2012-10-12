@@ -34,7 +34,11 @@ SocketServer.on('connection', function(socket){
 		if (message.internalMessage || Validations.validateWith(validator, message)) {
 			validated[message.eventName] = _.extend({}, message);
 			if (!message.internalMessage && message.eventName != 'authn.socket' && !socket.handshake.userId) {
-				Logger.warn('Socket is not authenticated');
+				if (Config.skipSocketAuth) {
+					next();
+				} else {
+					Logger.warn('Socket is not authenticated');
+				}
 			} else {
 				next();
 			}

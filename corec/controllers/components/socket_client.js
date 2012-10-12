@@ -5,12 +5,16 @@ define([
 	,	'socketio'
 	
 	], function(LeveledEvents, Logger) {
-
 	
-	SocketClient = io.connect('/', {
+	SocketClient = {};
+	
+	var url = Basbosa('Config').read('socketUrl');
+	
+	SocketClient = io.connect(url, {
 		'auto connect' : false, 
 		'transports':  [ ('WebSocket' in window) ? 'websocket' : 'xhr-polling']
 	});
+	
 
 	_.extend(SocketClient, new LeveledEvents());
 	

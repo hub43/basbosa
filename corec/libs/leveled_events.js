@@ -34,6 +34,9 @@ define(['require', './logging_module', './basbosa'], function( require, LoggingM
 
 	LeveledEvents.prototype.localEventHandler = function(message) {
 		Logger.debug('got message ' + message.eventName, message);
+		if (typeof message.eventName == 'undefined') {
+			Logger.warn('Malformed message' + message);
+		}
 		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
 			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
 			// Add wild handlers to this event then fire it again

@@ -289,8 +289,8 @@ define(['underscore', 'require', './basbosa'], function( _ , require) {
 		
 	});
 	
-	instance = new Logger;
-	if (!SERVER) window.Logger = new Logger;
+	if (typeof instance === 'undefined') instance = new Logger;
+	if (!SERVER) window.Logger = instance;
 	Basbosa && Basbosa.add('Logger', instance);
 	return instance;
 	

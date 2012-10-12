@@ -6,7 +6,7 @@ define([
 		j.network = new NetworkModel();
 		
 		var networkPing = setInterval(function(){
-			SocketClient.send('network.ping', j.network.genPing());
+			SocketClient.sendPacket('network.ping', j.network.genPing());
 		}, j.network.get('options').pingInterval);
 		
 		SocketClient.lon('network.ping_result', function(e, message, next) {

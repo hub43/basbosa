@@ -22,25 +22,6 @@ define('models/behaviours/uuid',[],function(){
 	};
 	return Uuid;
 });
-
-define('libs/basbosa',[], function() {
-	var Basbosa = function Basbosa(className) {
-		if (!className) return Basbosa;
-		if (Basbosa.classes[className]) {
-			return Basbosa.classes[className];
-		} else {
-			new Error('Class ' + className + ' not defined or loaded yet');
-		}
-	};
-
-	Basbosa.add = function(className, instance) {
-		Basbosa.classes = Basbosa.classes || [];
-		Basbosa.classes[className] = instance;
-	};
-	if (typeof window !== 'undefined') window.Basbosa = Basbosa;
-	return Basbosa;
-	
-});
 define('libs/i18n_client',[],function() {
 	if (typeof jRaw !== 'undefined') {
 		require(['appc/build/dictionary-ar', 'appc/build/dictionary-fr'], function(ar, fr) {
@@ -5363,6 +5344,57 @@ CSS_SELECTOR_METHOD:"Check your method name.",CSS_SELECTOR_STRING:"Check your cs
 }).call(this);
 
 
+define('libs/config',['underscore'], function(_) {
+	var config, defaults = {
+			socketUrl : '/'
+	};
+	if (typeof BasbosaConfig !== 'undefined') {
+		config = BasbosaConfig;
+	} else if (typeof jRaw !== 'undefined') {
+		config = jRaw;
+	} else {
+		config = {};
+	}
+	config = _.extend(defaults, config);
+	
+	var Config = {
+			__config : config,
+			read	: function(index) {
+				if (typeof this.__config[index] !== 'undefined') {
+					return this.__config[index];
+				} else {
+					Logger.warn('The value ' + val + ' is not defined in Config yet');
+					return 'undefined';
+				}
+			},
+			write : function(index) {
+				this.__config[index] = value;
+				return this;
+			}		
+	};
+	
+	return Config;
+});
+
+define('libs/basbosa',['./config'], function(Config) {
+	var Basbosa = function Basbosa(className) {
+		if (!className) return Basbosa;
+		if (Basbosa.classes[className]) {
+			return Basbosa.classes[className];
+		} else {
+			new Error('Class ' + className + ' not defined or loaded yet');
+		}
+	};
+
+	Basbosa.add = function(className, instance) {
+		Basbosa.classes = Basbosa.classes || [];
+		Basbosa.classes[className] = instance;
+	};
+	if (typeof window !== 'undefined') window.Basbosa = Basbosa;
+	Basbosa.add('Config', Config);
+	return Basbosa;
+});
+
 define('libs/logging_module',['underscore', 'require', './basbosa'], function( _ , require) {
 	
 	/**
@@ -5465,7 +5497,7 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 		enabled 	: true,
 		showTime	: true,
 		showPath	: true,
-		level			: 5,
+		level			: 2,
 		poorLogger: false,
 		uiLogger  : false
 	};
@@ -5653,8 +5685,8 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 		
 	});
 	
-	instance = new Logger;
-	if (!SERVER) window.Logger = new Logger;
+	if (typeof instance === 'undefined') instance = new Logger;
+	if (!SERVER) window.Logger = instance;
 	Basbosa && Basbosa.add('Logger', instance);
 	return instance;
 	
@@ -5696,6 +5728,11 @@ define('libs/leveled_events',['require', './logging_module', './basbosa'], funct
 
 	LeveledEvents.prototype.localEventHandler = function(message) {
 		Logger.debug('got message ' + message.eventName, message);
+		if (typeof message.eventName == 'undefined') {
+			debugger;
+			console.trace();
+			Logger.warn((new Error()).stack);
+		}
 		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
 			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
 			// Add wild handlers to this event then fire it again
@@ -5804,12 +5841,16 @@ define('controllers/components/socket_client',[
 	,	'socketio'
 	
 	], function(LeveledEvents, Logger) {
-
 	
-	SocketClient = io.connect('http://localhost:3000', {
+	SocketClient = {};
+	
+	var url = Basbosa('Config').read('socketUrl');
+	
+	SocketClient = io.connect(url, {
 		'auto connect' : false, 
 		'transports':  [ ('WebSocket' in window) ? 'websocket' : 'xhr-polling']
 	});
+	
 
 	_.extend(SocketClient, new LeveledEvents());
 	
@@ -7618,7 +7659,7 @@ define('controllers/authn_controller',[
 	SocketClient.on('connect', function() {
 		authUser();
 		//  only try to authenticate the socket if the user has a valid id and is not authenticated
-		if (j.user.has('_id')) {
+		if (j.user && j.user.has('_id')) {
 			SocketClient.sendPacket('authn.socket', { userId : j.user.id });
 		}
 	});
@@ -8339,6 +8380,5 @@ define('app',[
 	, 'jquery'
 	, 'underscore'
 	], function() {
-		
 
 });

@@ -5729,9 +5729,7 @@ define('libs/leveled_events',['require', './logging_module', './basbosa'], funct
 	LeveledEvents.prototype.localEventHandler = function(message) {
 		Logger.debug('got message ' + message.eventName, message);
 		if (typeof message.eventName == 'undefined') {
-			debugger;
-			console.trace();
-			Logger.warn((new Error()).stack);
+			Logger.warn('Malformed message' + message);
 		}
 		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
 			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
@@ -8272,7 +8270,7 @@ define('controllers/network_controller',[
 		j.network = new NetworkModel();
 		
 		var networkPing = setInterval(function(){
-			SocketClient.send('network.ping', j.network.genPing());
+			SocketClient.sendPacket('network.ping', j.network.genPing());
 		}, j.network.get('options').pingInterval);
 		
 		SocketClient.lon('network.ping_result', function(e, message, next) {

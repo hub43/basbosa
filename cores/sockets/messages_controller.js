@@ -7,7 +7,6 @@ SocketServer.on('connection', function (socket) {
 		msg = _.extend({}, message);
 		next();
 		if (!msg.internalMessage) {
-			Logger.info();
 			if(msg.eventName != 'network.ping') {
 				messages = new Messages;
 				messages.set("message", msg);

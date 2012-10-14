@@ -9,7 +9,7 @@
 var Analytics = require('../models/analytics'), analytics = new Analytics;
 
 /**
- * AllowedAccess is a method used to check if the user is Administrator
+ * AllowedAccess is used to check if the user is Administrator
  * or he/she is just visitor and allow Access to the Admin only. 
  * @method allowedAccess
  * @param {String} req hold the request that come from the client,
@@ -29,7 +29,7 @@ function allowedAccess (req, res) {
 };
 
 /**
- * Index is a method used to load/route Analytics page as a response on calling analytics url '/analytics'.
+ * Index is used to load/route Analytics page as a response on calling analytics url '/analytics'.
  * @method index
  * @param {String} req hold the request that come from the client. 
  * @param {String} res the response that will hold the message to the client.
@@ -41,7 +41,7 @@ exports.index = function (req, res) {
 };
 
 /**
- * GetData is a method used to call the desired function that related 
+ * GetData is used to call the desired function that related 
  * to the client request from Analytics model.
  * @method getData
  * @param {String} req hold the request that come from the client. 

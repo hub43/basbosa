@@ -27,7 +27,7 @@ define([
 	SocketClient.on('connect', function() {
 		authUser();
 		//  only try to authenticate the socket if the user has a valid id and is not authenticated
-		if (j.user.has('_id')) {
+		if (j.user && j.user.has('_id')) {
 			SocketClient.sendPacket('authn.socket', { userId : j.user.id });
 		}
 	});

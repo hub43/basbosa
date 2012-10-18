@@ -1,3 +1,11 @@
+/**
+ * AuthController is responsible on control the communication between Error Model 
+ * in the server side and the client side. 
+ * @module Cores
+ * @submodule CoresControllers
+ * @class AuthController
+ **/
+//define instance from passport model.
 var passport = require('./components/passport').passport
 	,	settings = { successRedirect: '/',  failureRedirect: '/login' }; 
 

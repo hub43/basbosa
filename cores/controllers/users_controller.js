@@ -12,7 +12,7 @@ var User = require('./../models/index').User;
  * @method login
  * @param {String} req hold the request that come from the client. 
  * @param {String} res the response that will hold the message to the client.
- * @param {Fanction} next it is used to go next. 
+ * @param {Fanction} next is used to go next. 
  */
 exports.login = function(req, res, next) {
 	 res.view = j.user.theme + '/views/index';

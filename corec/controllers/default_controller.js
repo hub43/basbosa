@@ -1,6 +1,6 @@
 define([
 		'./components/socket_client'
-	,	'../models/j'
+	,	'./../models/j'
 	, './index'
 	], function(SocketClient, j) {
 	// handle the special message group.udate_result

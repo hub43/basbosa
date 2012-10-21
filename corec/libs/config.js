@@ -18,7 +18,7 @@ define(['underscore'], function(_) {
 				if (typeof this.__config[index] !== 'undefined') {
 					return this.__config[index];
 				} else {
-					Logger.warn('The value ' + val + ' is not defined in Config yet');
+					Logger.warn('The value ' + index + ' is not defined in Config yet');
 					return 'undefined';
 				}
 			},
@@ -27,6 +27,7 @@ define(['underscore'], function(_) {
 				return this;
 			}		
 	};
-	
+	Config.get = Config.read;
+	Config.set = Config.write;
 	return Config;
 });

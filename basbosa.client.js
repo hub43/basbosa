@@ -5363,7 +5363,7 @@ define('libs/config',['underscore'], function(_) {
 				if (typeof this.__config[index] !== 'undefined') {
 					return this.__config[index];
 				} else {
-					Logger.warn('The value ' + val + ' is not defined in Config yet');
+					Logger.warn('The value ' + index + ' is not defined in Config yet');
 					return 'undefined';
 				}
 			},
@@ -5372,7 +5372,8 @@ define('libs/config',['underscore'], function(_) {
 				return this;
 			}		
 	};
-	
+	Config.get = Config.read;
+	Config.set = Config.write;
 	return Config;
 });
 
@@ -7834,7 +7835,7 @@ define('libs/app_backbone',['backbone'], function() {
 	
   return Backbone;
 });
-define('libs/assets',['backbone', 'jquery'], function() {
+define('libs/assets',['backbone', 'jquery', './basbosa'], function() {
 	var Assets = Backbone.Model.extend({
 		
 		defaults : {
@@ -8101,10 +8102,37 @@ define('themes/sound',[
 		
 		
 
+define('themes/feedback',[
+		'require'
+	,	'backbone'
+	, '../libs/basbosa'
+	], function(require) {
+	var FeedbackView = Backbone.View.extend({
+		initialize : function() {
+			this.render();						
+		},
+		
+		render : function() {
+			var feedback = $('<div>').attr('id', 'feedback-box');
+			var link = $('<a>')
+				.attr({'href' : Basbosa('Config').get('feedbackUrl'), 'target' : '_blank'})
+				.html(t('Feedback'));
+			feedback.append(link);
+			$('body').append(feedback);
+		}
+	});
+			
+	Basbosa && Basbosa.add('FeedbackView', FeedbackView);
+	return FeedbackView;
+});
+		
+		
+
 define('themes/index',[
   './fps'
   , './screen_size'
   , './sound'
+  , './feedback'
 ]);
 
 define('models/private_chat',[
@@ -8200,10 +8228,10 @@ define('models/network',[
 		
 		defaults		: {
 			options : {
-				pingInterval	: 20000,
+				pingInterval	: 25000,
 				monitorInterval : 2000,
 				idleTimeOut			: 10000,
-				idleServerDown	: 15000,
+				idleServerDown	: 20000,
 				autoStart			: true
 			},
 			countSent				: 0,
@@ -8277,10 +8305,6 @@ define('controllers/network_controller',[
 			j.network.processPing(message);
 			next();
 		});
-
-		j.lon('ui.network.stop', function(e, messaga, next) {
-			clearInterval(networkPing);
-		});
 		
 		//Monitor the server
 		SocketClient.lon('*', function(e, message, next) {
@@ -8297,7 +8321,12 @@ define('controllers/network_controller',[
 		var monitor = setInterval(function() {
 				j.network.monitor();
 		}, j.network.get('options').monitorInterval);
-	return null;
+		
+		j.lon('ui.network.stop', function(e, messaga, next) {
+			clearInterval(networkPing);
+			clearInterval(monitor);
+		});
+		return null;
 });
 
 define('controllers/index',[
@@ -8311,7 +8340,7 @@ define('controllers/index',[
 ]);
 define('controllers/default_controller',[
 		'./components/socket_client'
-	,	'../models/j'
+	,	'./../models/j'
 	, './index'
 	], function(SocketClient, j) {
 	// handle the special message group.udate_result
@@ -8334,25 +8363,11 @@ define('controllers/default_controller',[
 });
 
 window.onerror = function(message, url, linenumber) {
-  //if (typeof jRaw != 'undefined' && (jRaw.min))
-  return;
-	var err = {errorMessage : JSON.stringify(message), url : url, linenumber : linenumber};
-  var form = document.createElement('form');
-	form.setAttribute('method', 'post');
-	form.setAttribute('action', window.location);
-
-	for (var key in err) {
-		if(err.hasOwnProperty(key)) {
-			var hiddenField = document.createElement('input');
-				hiddenField.setAttribute('type', 'hidden');
-				hiddenField.setAttribute('name', key);
-				hiddenField.setAttribute('value', err[key]);
-				form.appendChild(hiddenField);
-		}
-	}
-
-  document.body.appendChild(form);
-  form.submit();
+	$.post(window.location, {
+		errorMessage : JSON.stringify(message), 
+		url : url, 
+		linenumber : linenumber
+	});
 };
 
 window.SERVER = false;
@@ -8378,5 +8393,5 @@ define('app',[
 	, 'jquery'
 	, 'underscore'
 	], function() {
-
+	
 });

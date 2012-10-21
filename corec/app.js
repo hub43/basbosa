@@ -1,23 +1,9 @@
 window.onerror = function(message, url, linenumber) {
-  //if (typeof jRaw != 'undefined' && (jRaw.min))
-  return;
-	var err = {errorMessage : JSON.stringify(message), url : url, linenumber : linenumber};
-  var form = document.createElement('form');
-	form.setAttribute('method', 'post');
-	form.setAttribute('action', window.location);
-
-	for (var key in err) {
-		if(err.hasOwnProperty(key)) {
-			var hiddenField = document.createElement('input');
-				hiddenField.setAttribute('type', 'hidden');
-				hiddenField.setAttribute('name', key);
-				hiddenField.setAttribute('value', err[key]);
-				form.appendChild(hiddenField);
-		}
-	}
-
-  document.body.appendChild(form);
-  form.submit();
+	$.post(window.location, {
+		errorMessage : JSON.stringify(message), 
+		url : url, 
+		linenumber : linenumber
+	});
 };
 
 window.SERVER = false;
@@ -43,5 +29,5 @@ define([
 	, 'jquery'
 	, 'underscore'
 	], function() {
-
+	
 });

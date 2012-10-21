@@ -13,10 +13,6 @@ define([
 			j.network.processPing(message);
 			next();
 		});
-
-		j.lon('ui.network.stop', function(e, messaga, next) {
-			clearInterval(networkPing);
-		});
 		
 		//Monitor the server
 		SocketClient.lon('*', function(e, message, next) {
@@ -33,5 +29,10 @@ define([
 		var monitor = setInterval(function() {
 				j.network.monitor();
 		}, j.network.get('options').monitorInterval);
-	return null;
+		
+		j.lon('ui.network.stop', function(e, messaga, next) {
+			clearInterval(networkPing);
+			clearInterval(monitor);
+		});
+		return null;
 });

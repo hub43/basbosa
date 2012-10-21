@@ -106,9 +106,7 @@ exports.index = function(req, res, next) {
 	}
 	// If we are live, and not on mobile and not on facebook, redirect to facebook
 	if (!isMobile && req.headers.host.indexOf('hawks.hub43.com') > -1 && !req.body.signed_request) {
-		//res.redirect('//apps.facebook.com/112420018771592');
-		//next();
-		//return;
+		j.redirect = '//apps.facebook.com/112420018771592';
 	}
 	
 	// Load defaults for group

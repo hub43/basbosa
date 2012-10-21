@@ -15,7 +15,7 @@ commander = function() {
 	  .option('-a, --app <app>', 'set default app to load, defaut: ' + Config.app)
 	  .option('-l, --logging <level>', 'set logging level, defaut: ' + Config.logging)
 	  .option('-s, --skip-opt', 'skip client optimization using uglify, defaut: ' + Config.skipOpt)
-		.option('--enableSurvey', 'enableSurvey option, default' + Config.enableSurvey);
+		.option('--enableFeedback', 'enableFeedback option, default' + Config.enableFeedback);
 	
 	// Populate extra options
 	/*
@@ -27,7 +27,7 @@ commander = function() {
 	// Parse command lines
 	program.parse(process.argv);
 	
-	_.each(['port', 'env', 'test', 'min', 'app', 'logging', 'skipOpt', 'enableSurvey'], function(key) {
+	_.each(['port', 'env', 'test', 'min', 'app', 'logging', 'skipOpt', 'enableFeedback'], function(key) {
 		//Logger.debug('key: '+ key + ' value :' + program[key]);
 		program[key] !== undefined && (Config[key] = program[key]);
 	});

@@ -1,4 +1,4 @@
-define(['backbone', 'jquery'], function() {
+define(['backbone', 'jquery', './basbosa'], function() {
 	var Assets = Backbone.Model.extend({
 		
 		defaults : {

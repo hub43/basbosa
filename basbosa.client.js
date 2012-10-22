@@ -22,30 +22,31 @@ define('models/behaviours/uuid',[],function(){
 	};
 	return Uuid;
 });
-define('libs/i18n_client',[],function() {
-	if (typeof jRaw !== 'undefined') {
-		require(['appc/build/dictionary-ar', 'appc/build/dictionary-fr'], function(ar, fr) {
-    		var locales = {
-    				'ar'	:	ar,
-    				'fr'	: fr
-    			};
-    		var t = function(text) {
-    			var locale = j.user.get('locale');
-    			if (locales[locale] && locales[locale][text]) {
-    				return locales[locale][text];
-    			} else {
-    				if (locales[locale]) {
-    					$.get('/addText/' + locale  + '/' + encodeURIComponent(text));
-    				}
-    				return text;
-    			}
-    		};
-    		// Register the global t() function
-    		window.t = t;
-    	});
+define("libs/i18n_client", BasbosaConfig ? (BasbosaConfig.dictionaries || []) : [], function() {
+	var locales = {}, dictionaries = BasbosaConfig ? (BasbosaConfig.dictionaries || []) : [];
+	
+	for (var i = 0; i < dictionaries.length ; i++) {
+		lang = dictionaries[i].split('-')[1];
+		locales[lang] = arguments[i];
 	}
 	
+	var t = function(text) {
+		var locale = j.user.get('locale');
+		if (locales[locale] && locales[locale][text]) {
+			return locales[locale][text];
+		} else {
+			if (locales[locale]) {
+				$.get('/addText/' + locale  + '/' + encodeURIComponent(text));
+			}
+			return text;
+		}
+	};
+
+	// Register the global t() function
+	window.t = t;
 });
+define("libs/i18n_client", function(){});
+
 /*! Socket.IO.js build:0.9.10, development. Copyright(c) 2011 LearnBoost <dev@learnboost.com> MIT Licensed */
 
 var io = ('undefined' === typeof module ? {} : module.exports);
@@ -5346,8 +5347,10 @@ CSS_SELECTOR_METHOD:"Check your method name.",CSS_SELECTOR_STRING:"Check your cs
 
 define('libs/config',['underscore'], function(_) {
 	var config, defaults = {
-			socketUrl : '/'
+			socketUrl : '/',
+			dictionaries : []
 	};
+	
 	if (typeof BasbosaConfig !== 'undefined') {
 		config = BasbosaConfig;
 	} else if (typeof jRaw !== 'undefined') {
@@ -5355,6 +5358,7 @@ define('libs/config',['underscore'], function(_) {
 	} else {
 		config = {};
 	}
+	
 	config = _.extend(defaults, config);
 	
 	var Config = {
@@ -5376,493 +5380,6 @@ define('libs/config',['underscore'], function(_) {
 	Config.set = Config.write;
 	return Config;
 });
-
-define('libs/basbosa',['./config'], function(Config) {
-	var Basbosa = function Basbosa(className) {
-		if (!className) return Basbosa;
-		if (Basbosa.classes[className]) {
-			return Basbosa.classes[className];
-		} else {
-			new Error('Class ' + className + ' not defined or loaded yet');
-		}
-	};
-
-	Basbosa.add = function(className, instance) {
-		Basbosa.classes = Basbosa.classes || [];
-		Basbosa.classes[className] = instance;
-	};
-	if (typeof window !== 'undefined') window.Basbosa = Basbosa;
-	Basbosa.add('Config', Config);
-	return Basbosa;
-});
-
-define('libs/logging_module',['underscore', 'require', './basbosa'], function( _ , require) {
-	
-	/**
-	 * SERVER: true if this code is running server-side, false if client-side
-	 */
-	var SERVER = typeof (exports) != 'undefined', instance;
-	
-	
-	/**
-	 * Log levels.
-	 */
-
-	var levels = [
-		'error'
-		, 'warn'
-		, 'info'
-		, 'debug'
-		, 'trace'
-	];
-
-	/**
-	 * Colors for log levels.
-	 */
-
-	var colors = [
-		31
-		, 33
-		, 36
-		, 90
-		, 90
-	];
-
-	/**
-	 * Converts an enumerable to an array.
-	 *
-	 * @api public
-	 */ 
-	 
-	 
-	var toArray = function (enu) {
-	  var arr = [];
-
-	  for (var i = 0, l = enu.length; i < l; i++)
-		arr.push(enu[i]);
-
-	  return arr;
-	};
-	
-	/**
-	 * Pads the nice output to the longest log level.
-	 */
-
-	function pad (str) {
-		var max = 0;
-
-		for (var i = 0, l = levels.length; i < l; i++)
-			max = Math.max(max, levels[i].length);
-
-		if (str.length < max)
-			return str + new Array(max - str.length + 1).join(' ');
-
-		return str;
-	};
-
-	/**
-	 * Logger class
-	 *
-	 * @api public
-	 */
-	
-	// optional argument to constructor (if not included, defaults options are applied):
-	// opts {
-		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
-		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
-		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
-		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
-		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
-	// }
-	
-	var Logger = function (opts) {
-		this.setOptions(opts);
-	};
-	
-	/**
-	 * setOptions method
-	 *
-	 */
-	
-	// optional argument(if not included, defaults options are applied):
-	// opts {
-		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
-		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
-		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
-		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
-		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
-	// }
-	
-	var defaultOptions = {
-		colors 		: SERVER ? true : false,
-		enabled 	: true,
-		showTime	: true,
-		showPath	: true,
-		level			: 2,
-		poorLogger: false,
-		uiLogger  : false
-	};
-	
-	Logger.prototype.setOptions = function (opts) {
-		// Auto populate logging level
-		typeof Config != 'undefined' && Config.logging != 'undefined' &&	(defaultOptions.level = Config.logging);
-	
-		opts = opts || {}; // make this argument optional
-		// Client side settings
-		if (typeof jRaw != 'undefined') {
-			jRaw.logging != 'undefined' &&	(defaultOptions.level = jRaw.logging);
-			// on iphone, no support for multiple arguments to consol fnctions
-			if (jRaw.agent.family == 'iPhone') {
-				opts.poorLogger = true;
-			}
-		}
-
-		_.extend(this, defaultOptions, opts);
-	};
-	
-	/**
-	 * log method.
-	 *
-	 * @api public
-	 */
-	var isFirstTime = null;
-	Logger.prototype.log = function (type) {
-		var index = _(levels).indexOf(type), self = this;
-
-		if (index > this.level 
-				|| !this.enabled
-				|| typeof console == 'undefined' 
-				|| typeof console.log == 'undefined')
-			return this;
-		
-		// Logger that do not support multiple parameters
-		if (this.poorLogger) {
-			for (var i = 1; i < arguments.length ; i++) {								
-				console.log.call(console, JSON.stringify(arguments[i]));
-			
-			}
-			
-			return ;
-		}				
-		var date = new Date();
-		
-		function checkTime (i) {
-			return i < 10 ? '0' + i : i + '';
-		}
-		
-		var timeStamp = checkTime(date.getHours()) + ':'
-			+ checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
-			
-		var filePath = '';
-		var lineNumber = -1;
-		var traceDetails = '';
-		
-		// Works only for V8 (i.e. Chrome & nodejs)
-		Error.prepareStackTrace = function (error, frames) {
-			var frame, i;
-			for (i = 0; i < frames.length; ++i) {
-				// if this is not the path to logging_module.js, assign this frame to the var 'frame'
-				if (frames[i].getFileName().indexOf('logging_module') == -1) {
-					frame = frames[i];
-					break;
-				}
-			}
-			filePath = frame.getFileName();
-			// Exclude app root from logged file path
-			(typeof APP_PATH != 'undefined') ? filePath = filePath.replace(APP_PATH, '')
-				: (!SERVER) ? filePath = filePath.replace(window.location.origin, '') : '';
-			lineNumber = frame.getLineNumber();
-			return '';
-		};
-		
-		try {
-			throw (new Error());
-		}
-		
-		catch (e) {
-			var frames, i;
-			// if in V8, this will change filePath and lineNumber to the expected values
-			// thanks to Error.prepareStackTrace = ... above
-			e.stack;
-			// if in V8
-			if (!(filePath == '' && lineNumber == -1))
-				traceDetails = '[@' + filePath + ':' + lineNumber + ']';
-			// else (i.e. Firefox)
-			else if (e.stack) {
-				frames = e.stack.split('\n');
-				for (i = 0; i < frames.length; ++i) {
-					// if this is not the path to logging_module.js, assign this frame to the var 'traceDetails'
-					if (frames[i].indexOf('logging_module') == -1) {
-						traceDetails = frames[i];
-						break;
-					}
-				}
-				traceDetails = '[' + traceDetails.substring(traceDetails.indexOf('@')).replace(window.location.protocol + '//' + window.location.host, '') + ']';
-			}
-		}
-	
-		function getMyConsoleArgs (inputConsoleArgs, context) {
-			var outputConsoleArgs = new Array();
-			context.showTime ? outputConsoleArgs.push(timeStamp) : '';
-			outputConsoleArgs.push(context.colors ? '\033[' + colors[index] + 'm' + pad(type) + ' -\033[39m' : type + ':');
-			//var inputs = toArray(inputConsoleArgs).slice(1);
-			for (var i = 1; i < inputConsoleArgs.length; ++i) {
-				if(inputConsoleArgs[i]=='[object Object]') 
-					outputConsoleArgs.push(JSON.stringify(inputConsoleArgs[i]));
-				else
-					outputConsoleArgs.push(inputConsoleArgs[i]);
-			
-			}
-			context.showPath ? outputConsoleArgs.push(traceDetails) : '';		
-			
-			if (!SERVER && self.uiLogger) {
-				require(['jquery'], function() {					
-					if (isFirstTime == null) {
-						$('body').append($('<div>').addClass('logger-div')					   
-		    			.css({'position': 'fixed', 'top': '0', 'opacity': '0.8', 'display': 'block'
-		    			, 'width': '100%', 'height': '100px', 'background-color': 'white', 'z-index': '1001','overflow': 'scroll'}));
-			    			
-						//$('.logger-div').append($('<input id = "max-min" value = '+'  type = "button" '/>  <input id = "close" value = "x" type = "button"/>'));
-						var buttonMax = $('<input>').attr({id : 'max-min',	type	: 'button',	value	: '+'}),
-						buttonClose = $('<input>').attr({id : 'close',	type	: 'button',	value	: 'x'});
-							
-						$('.logger-div').append(buttonMax, buttonClose);
-						
-						$('#close').css({'right': '15px','position': 'fixed'});
-						$('#max-min').css({'right': '45px','position': 'fixed'});						
-						
-						/**
-						 * add functionality to the buttons 
-						 */
-						$('#close').click(function() {			
-								$('.logger-div').slideToggle('slow');	
-						});						
-						$('#max-min').click(function() {			
-							if ($('.logger-div').css('height') == '100px') {
-								$('.logger-div').animate({'height': '100%'}, 1000);	
-							} else {	
-								$('.logger-div').animate({'height': '100px'}, 1000);
-							}
-						});						
-						/**
-						 * 		append new log 
-						 */						
-						$('.logger-div').append($('<div>').addClass(type).html(outputConsoleArgs+'<hr/>'));
-						isFirstTime = 1;
-					}	else {										
-						$loggerRow = $('<div>').addClass(type).html(outputConsoleArgs+'<hr/>');
-						$('.logger-div').append($loggerRow);																									
-					}
-					/**
-					 * show the div at the case it was hiden 
-					*/
-					if ($('.logger-div').hide()) $('.logger-div').show();
-					
-					/**
-					 * style the fonts each type with specific color 
-					 */
-					$('.debug').css({ 'color': '#3333FF'});
-					$('.trace').css({ 'color': '#333366'});
-					$('.erroe').css({ 'color': 'red'});
-					$('.info').css({ 'color': '#66CC00'});
-			});
-		}	
-			
-			return outputConsoleArgs;
-		}
-		
-		console.log && console.log.apply && console.log.apply (console, getMyConsoleArgs(arguments, this));
-		return this;
-	};
-
-	/**
-	 * Generate methods for each log level.
-	 */
-
-	_.forEach(levels, function (name) {				
-		Logger.prototype[name] = function () {			
-			this.log.apply(this, [name].concat(toArray(arguments)));			
-		};
-		
-	});
-	
-	if (typeof instance === 'undefined') instance = new Logger;
-	if (!SERVER) window.Logger = instance;
-	Basbosa && Basbosa.add('Logger', instance);
-	return instance;
-	
-});
-
-
-
-define('libs/leveled_events',['require', './logging_module', './basbosa'], function( require, LoggingModule) {
- 	// Can add more complex checks here
-	var SERVER = typeof(exports) !== 'undefined';
-	var Logger = LoggingModule;
-	var levels = {
-			'afterLast'			: 3,
-			'last'					: 2,
-			'normal'				: 1,
-			'first'					: 0,	
-	};
-
-
-	function EventObject(message, handlers, context) {
-		this.name 			= message.eventName;
-		this.result			= {eventName : message.eventName + '_result', message : {}};
-		this.message		= message;
-		this.handlers		= handlers;
-		var count				= 0;
-		var self 				= this;
-		next();
-
-		function next() {
-			Logger.trace("Calling handler number " + count + " for event " +  message.eventName);
-			handlers && handlers[count] && handlers[count++].call(context, self, message, next);
-		}
-	}
-
-
-	function LeveledEvents() {
-
-	};
-
-	LeveledEvents.prototype.localEventHandler = function(message) {
-		Logger.debug('got message ' + message.eventName, message);
-		if (typeof message.eventName == 'undefined') {
-			Logger.warn('Malformed message' + message);
-		}
-		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
-			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
-			// Add wild handlers to this event then fire it again
-			Logger.info('Attaching wild handlers to ' + message.eventName);
-			this.lon(message.eventName, function(e, result, next) { next(); });
-			this.ltrigger(message.eventName, message);
-			
-			return;
-		}
-		new EventObject(message, this._fHandlers[message.eventName], this);
-	};
-
-
-	LeveledEvents.prototype.addWildHandlerToEvent = function(eWild, e) {
-		var self = this;
-		_.each(this._wildHandlers[eWild], function(wildHandlerLevel, level) {
-			self._handlers[e][level] = self._handlers[e][level] || [];
-			 _.each(self._wildHandlers[eWild][level], function(wildHandler, handler) {
-				// Only add handler if it does not exist
-				if (self._handlers[e][level].toString().indexOf(self._wildHandlers[eWild][level][handler]) == -1) {
-					self._handlers[e][level].push(self._wildHandlers[eWild][level][handler]);
-					self.__buildFlat(e);
-				}
-			});
-		});
-	};
-
-
-	LeveledEvents.prototype.lon = function(event, level, handler) {
-		if (typeof level === 'function') {
-			handler = level;
-			level = levels.normal; 
-		} else {
-			level = levels[level];
-		}
-				
-		var self = this;
-		var wildHandlers = self._wildHandlers || (self._wildHandlers = {});
-		var handlers = self._handlers || (self._handlers = {});
-		self._fHandlers || (self._fHandlers = {});
-		//self._hHandlers || (self._hHandlers = {});
-    
-		if (event.indexOf('*') > -1) {
-      wildHandlers[event] = wildHandlers[event] || [];
-			wildHandlers[event][level] = wildHandlers[event][level] || [];
-      wildHandlers[event][level].push(handler);
-      // Add wild Handler to all existing events
-      _.each(handlers, function(eventHandler, existingEvent) {
-				//Logger.debug(e);
-				// Check if the wild event name matches the event name
-				var str = event.replace('*', '');
-				if (str == '' || existingEvent.indexOf(str) > -1) {
-					self.addWildHandlerToEvent(event, existingEvent);
-
-				}
-			});
-    } else {
-			// Check queue & add *
-      handlers[event] = handlers[event] || [];
-      handlers[event][level] = handlers[event][level] || [];
-      handlers[event][level].push(handler);
-
-      // Add any wild handler already existing to the new added event
-    	_.each(wildHandlers, function(wEventHandler, eWild) {
-				// Check if the wild event name matches the event name
-				var str = eWild.replace('*', '');
-				if (str == '' || event.indexOf(str) > -1) {
-					self.addWildHandlerToEvent(eWild, event);
-				}
-			});
-
-			// To prevent listening to the same event more than once
-			self.removeListener && self.removeListener(event, this.localEventHandler);
-			self.on && self.on(event, this.localEventHandler);
-			Logger.debug('Listeneing to ' + event);
-			self.__buildFlat(event);
-    }
-  };
-
-	LeveledEvents.prototype.__buildFlat = function(event) {
-		var self = this;
-		var handlers = self._handlers;
-		// generate the flatten handlers array
-		self._fHandlers[event] = [];
-		_.each(handlers[event], function(handlersAtLevel, level) {
-			_.each(handlers[event][level], function(handlerFunction, handler){
-				self._fHandlers[event].push(handlers[event][level][handler]);
-			});
-		});
-	};
-
-	LeveledEvents.prototype.ltrigger = function(eventName, message) {
-		message = message || {};
-		message.eventName = eventName;
-		this.localEventHandler(message);
-	};
-
-
-  return LeveledEvents;
-
-});
-define('controllers/components/socket_client',[
-		'../../libs/leveled_events'
-	, '../../libs/logging_module'
-	, 'underscore'
-	,	'socketio'
-	
-	], function(LeveledEvents, Logger) {
-	
-	SocketClient = {};
-	
-	var url = Basbosa('Config').read('socketUrl');
-	
-	SocketClient = io.connect(url, {
-		'auto connect' : false, 
-		'transports':  [ ('WebSocket' in window) ? 'websocket' : 'xhr-polling']
-	});
-	
-
-	_.extend(SocketClient, new LeveledEvents());
-	
-	SocketClient.sendPacket = function(eventName, message) {
-		Logger.debug('Sending ' + eventName, message);
-		message.eventName = eventName;
-		//SocketClient.emit(eventName, message);
-		SocketClient.json.send(message);
-	};
-	Basbosa && Basbosa.add('SocketClient', SocketClient);
-	return SocketClient;
-});
-
 //     Backbone.js 0.9.2
 
 //     (c) 2010-2012 Jeremy Ashkenas, DocumentCloud Inc.
@@ -7309,6 +6826,57 @@ define('collections/activities',[
 
 });
 
+define('models/message',[
+   'backbone'
+	], function() {
+	var MessageModel = Backbone.Model.extend({
+
+
+
+  });
+
+  return MessageModel;
+
+});
+
+define('collections/messages',[
+		'../models/message'
+	, 'backbone'
+	], function(Message) {
+	var MessagesList = Backbone.Collection.extend({
+			model 				: Message
+
+  });
+
+  return MessagesList;
+
+});
+
+define('libs/basbosa',['./config', 'require', 'backbone'], function(Config, require) {
+	var Basbosa = function Basbosa(className) {
+		if (!className) return Basbosa;
+		if (Basbosa.classes[className]) {
+			return Basbosa.classes[className];
+		} else {
+			new Error('Class ' + className + ' not defined or loaded yet');
+		}
+	};
+
+	_.extend(Basbosa, Backbone.Events);
+	Basbosa.add = function(className, instance) {
+		Basbosa.classes = Basbosa.classes || [];
+		Basbosa.classes[className] = instance;
+	};
+	if (typeof window !== 'undefined') window.Basbosa = Basbosa;
+	Basbosa.add('Config', Config);
+	 
+	if (typeof 'exports' === 'undefined') {
+		window.Basbosa = window.Basbosa || Basbosa;
+		require(['./i18n_client']);
+	}
+	return Basbosa;
+});
+
 define('models/user',[
 		'../collections/activities'
 	, './behaviours/uuid'
@@ -7359,32 +6927,6 @@ define('models/user',[
 	_.extend(UserModel.prototype, Uuid);
 	Basbosa && Basbosa.add('User', UserModel);
   return UserModel;
-});
-
-define('models/message',[
-   'backbone'
-	], function() {
-	var MessageModel = Backbone.Model.extend({
-
-
-
-  });
-
-  return MessageModel;
-
-});
-
-define('collections/messages',[
-		'../models/message'
-	, 'backbone'
-	], function(Message) {
-	var MessagesList = Backbone.Collection.extend({
-			model 				: Message
-
-  });
-
-  return MessagesList;
-
 });
 
 define('collections/users',[
@@ -7452,7 +6994,6 @@ define('models/sector',[
 		messages		: null,
 		
 		initCoreC : function() {
-			Logger.info('init corec');
 			this.users 		= new UsersList();
 			this.messages = new MessagesList();
 			this.users.on('add', this.updateUsersCount, this);
@@ -7587,6 +7128,443 @@ define('collections/groups',[
 
 });
 
+define('libs/logging_module',['underscore', 'require', './basbosa'], function( _ , require) {
+	
+	/**
+	 * SERVER: true if this code is running server-side, false if client-side
+	 */
+	var SERVER = typeof (exports) != 'undefined', instance;
+	
+	
+	/**
+	 * Log levels.
+	 */
+
+	var levels = [
+		'error'
+		, 'warn'
+		, 'info'
+		, 'debug'
+		, 'trace'
+	];
+
+	/**
+	 * Colors for log levels.
+	 */
+
+	var colors = [
+		31
+		, 33
+		, 36
+		, 90
+		, 90
+	];
+
+	/**
+	 * Converts an enumerable to an array.
+	 *
+	 * @api public
+	 */ 
+	 
+	 
+	var toArray = function (enu) {
+	  var arr = [];
+
+	  for (var i = 0, l = enu.length; i < l; i++)
+		arr.push(enu[i]);
+
+	  return arr;
+	};
+	
+	/**
+	 * Pads the nice output to the longest log level.
+	 */
+
+	function pad (str) {
+		var max = 0;
+
+		for (var i = 0, l = levels.length; i < l; i++)
+			max = Math.max(max, levels[i].length);
+
+		if (str.length < max)
+			return str + new Array(max - str.length + 1).join(' ');
+
+		return str;
+	};
+
+	/**
+	 * Logger class
+	 *
+	 * @api public
+	 */
+	
+	// optional argument to constructor (if not included, defaults options are applied):
+	// opts {
+		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
+		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
+		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
+		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
+		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
+	// }
+	
+	var Logger = function (opts) {
+		this.setOptions(opts);
+	};
+	
+	/**
+	 * setOptions method
+	 *
+	 */
+	
+	// optional argument(if not included, defaults options are applied):
+	// opts {
+		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
+		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
+		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
+		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
+		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
+	// }
+	
+	var defaultOptions = {
+		colors 		: SERVER ? true : false,
+		enabled 	: true,
+		showTime	: true,
+		showPath	: true,
+		level			: 2,
+		poorLogger: false,
+		uiLogger  : false
+	};
+	
+	Logger.prototype.setOptions = function (opts) {
+		// Auto populate logging level
+		typeof Config != 'undefined' && Config.logging != 'undefined' &&	(defaultOptions.level = Config.logging);
+	
+		opts = opts || {}; // make this argument optional
+		// Client side settings
+		if (typeof jRaw != 'undefined') {
+			jRaw.logging != 'undefined' &&	(defaultOptions.level = jRaw.logging);
+			// on iphone, no support for multiple arguments to consol fnctions
+			if (jRaw.agent.family == 'iPhone') {
+				opts.poorLogger = true;
+			}
+		}
+
+		_.extend(this, defaultOptions, opts);
+	};
+	
+	/**
+	 * log method.
+	 *
+	 * @api public
+	 */
+	var isFirstTime = null;
+	Logger.prototype.log = function (type) {
+		var index = _(levels).indexOf(type), self = this;
+
+		if (index > this.level 
+				|| !this.enabled
+				|| typeof console == 'undefined' 
+				|| typeof console.log == 'undefined')
+			return this;
+		
+		// Logger that do not support multiple parameters
+		if (this.poorLogger) {
+			for (var i = 1; i < arguments.length ; i++) {								
+				console.log.call(console, JSON.stringify(arguments[i]));
+			
+			}
+			
+			return ;
+		}				
+		var date = new Date();
+		
+		function checkTime (i) {
+			return i < 10 ? '0' + i : i + '';
+		}
+		
+		var timeStamp = checkTime(date.getHours()) + ':'
+			+ checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
+			
+		var filePath = '';
+		var lineNumber = -1;
+		var traceDetails = '';
+		
+		// Works only for V8 (i.e. Chrome & nodejs)
+		Error.prepareStackTrace = function (error, frames) {
+			var frame, i;
+			for (i = 0; i < frames.length; ++i) {
+				// if this is not the path to logging_module.js, assign this frame to the var 'frame'
+				if (frames[i].getFileName().indexOf('logging_module') == -1) {
+					frame = frames[i];
+					break;
+				}
+			}
+			filePath = frame.getFileName();
+			// Exclude app root from logged file path
+			(typeof APP_PATH != 'undefined') ? filePath = filePath.replace(APP_PATH, '')
+				: (!SERVER) ? filePath = filePath.replace(window.location.origin, '') : '';
+			lineNumber = frame.getLineNumber();
+			return '';
+		};
+		
+		try {
+			throw (new Error());
+		}
+		
+		catch (e) {
+			var frames, i;
+			// if in V8, this will change filePath and lineNumber to the expected values
+			// thanks to Error.prepareStackTrace = ... above
+			e.stack;
+			// if in V8
+			if (!(filePath == '' && lineNumber == -1))
+				traceDetails = '[@' + filePath + ':' + lineNumber + ']';
+			// else (i.e. Firefox)
+			else if (e.stack) {
+				frames = e.stack.split('\n');
+				for (i = 0; i < frames.length; ++i) {
+					// if this is not the path to logging_module.js, assign this frame to the var 'traceDetails'
+					if (frames[i].indexOf('logging_module') == -1) {
+						traceDetails = frames[i];
+						break;
+					}
+				}
+				traceDetails = '[' + traceDetails.substring(traceDetails.indexOf('@')).replace(window.location.protocol + '//' + window.location.host, '') + ']';
+			}
+		}
+	
+		function getMyConsoleArgs (inputConsoleArgs, context) {
+			var outputConsoleArgs = new Array();
+			context.showTime ? outputConsoleArgs.push(timeStamp) : '';
+			outputConsoleArgs.push(context.colors ? '\033[' + colors[index] + 'm' + pad(type) + ' -\033[39m' : type + ':');
+			//var inputs = toArray(inputConsoleArgs).slice(1);
+			for (var i = 1; i < inputConsoleArgs.length; ++i) {
+				if(inputConsoleArgs[i]=='[object Object]') 
+					outputConsoleArgs.push(JSON.stringify(inputConsoleArgs[i]));
+				else
+					outputConsoleArgs.push(inputConsoleArgs[i]);
+			
+			}
+			context.showPath ? outputConsoleArgs.push(traceDetails) : '';		
+			
+			if (!SERVER && self.uiLogger) {
+				require(['jquery'], function() {					
+					if (isFirstTime == null) {
+						$('body').append($('<div>').addClass('logger-div')					   
+		    			.css({'position': 'fixed', 'top': '0', 'opacity': '0.8', 'display': 'block'
+		    			, 'width': '100%', 'height': '100px', 'background-color': 'white', 'z-index': '1001','overflow': 'scroll'}));
+			    			
+						//$('.logger-div').append($('<input id = "max-min" value = '+'  type = "button" '/>  <input id = "close" value = "x" type = "button"/>'));
+						var buttonMax = $('<input>').attr({id : 'max-min',	type	: 'button',	value	: '+'}),
+						buttonClose = $('<input>').attr({id : 'close',	type	: 'button',	value	: 'x'});
+							
+						$('.logger-div').append(buttonMax, buttonClose);
+						
+						$('#close').css({'right': '15px','position': 'fixed'});
+						$('#max-min').css({'right': '45px','position': 'fixed'});						
+						
+						/**
+						 * add functionality to the buttons 
+						 */
+						$('#close').click(function() {			
+								$('.logger-div').slideToggle('slow');	
+						});						
+						$('#max-min').click(function() {			
+							if ($('.logger-div').css('height') == '100px') {
+								$('.logger-div').animate({'height': '100%'}, 1000);	
+							} else {	
+								$('.logger-div').animate({'height': '100px'}, 1000);
+							}
+						});						
+						/**
+						 * 		append new log 
+						 */						
+						$('.logger-div').append($('<div>').addClass(type).html(outputConsoleArgs+'<hr/>'));
+						isFirstTime = 1;
+					}	else {										
+						$loggerRow = $('<div>').addClass(type).html(outputConsoleArgs+'<hr/>');
+						$('.logger-div').append($loggerRow);																									
+					}
+					/**
+					 * show the div at the case it was hiden 
+					*/
+					if ($('.logger-div').hide()) $('.logger-div').show();
+					
+					/**
+					 * style the fonts each type with specific color 
+					 */
+					$('.debug').css({ 'color': '#3333FF'});
+					$('.trace').css({ 'color': '#333366'});
+					$('.erroe').css({ 'color': 'red'});
+					$('.info').css({ 'color': '#66CC00'});
+			});
+		}	
+			
+			return outputConsoleArgs;
+		}
+		
+		console.log && console.log.apply && console.log.apply (console, getMyConsoleArgs(arguments, this));
+		return this;
+	};
+
+	/**
+	 * Generate methods for each log level.
+	 */
+
+	_.forEach(levels, function (name) {				
+		Logger.prototype[name] = function () {			
+			this.log.apply(this, [name].concat(toArray(arguments)));			
+		};
+		
+	});
+	
+	if (typeof instance === 'undefined') instance = new Logger;
+	if (!SERVER) window.Logger = instance;
+	Basbosa && Basbosa.add('Logger', instance);
+	return instance;
+	
+});
+
+
+define('libs/leveled_events',['require', './logging_module'], function( require, LoggingModule) {
+ 	// Can add more complex checks here
+	var SERVER = typeof(exports) !== 'undefined';
+	var Logger = LoggingModule;
+	var levels = {
+			'afterLast'			: 3,
+			'last'					: 2,
+			'normal'				: 1,
+			'first'					: 0,	
+	};
+
+
+	function EventObject(message, handlers, context) {
+		this.name 			= message.eventName;
+		this.result			= {eventName : message.eventName + '_result', message : {}};
+		this.message		= message;
+		this.handlers		= handlers;
+		var count				= 0;
+		var self 				= this;
+		next();
+
+		function next() {
+			Logger.trace("Calling handler number " + count + " for event " +  message.eventName);
+			handlers && handlers[count] && handlers[count++].call(context, self, message, next);
+		}
+	}
+
+
+	function LeveledEvents() {
+
+	};
+
+	LeveledEvents.prototype.localEventHandler = function(message) {
+		Logger.debug('got message ' + message.eventName, message);
+		if (typeof message.eventName == 'undefined') {
+			Logger.warn('Malformed message' + message);
+		}
+		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
+			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
+			// Add wild handlers to this event then fire it again
+			Logger.info('Attaching wild handlers to ' + message.eventName);
+			this.lon(message.eventName, function(e, result, next) { next(); });
+			this.ltrigger(message.eventName, message);
+			
+			return;
+		}
+		new EventObject(message, this._fHandlers[message.eventName], this);
+	};
+
+
+	LeveledEvents.prototype.addWildHandlerToEvent = function(eWild, e) {
+		var self = this;
+		_.each(this._wildHandlers[eWild], function(wildHandlerLevel, level) {
+			self._handlers[e][level] = self._handlers[e][level] || [];
+			 _.each(self._wildHandlers[eWild][level], function(wildHandler, handler) {
+				// Only add handler if it does not exist
+				if (self._handlers[e][level].toString().indexOf(self._wildHandlers[eWild][level][handler]) == -1) {
+					self._handlers[e][level].push(self._wildHandlers[eWild][level][handler]);
+					self.__buildFlat(e);
+				}
+			});
+		});
+	};
+
+
+	LeveledEvents.prototype.lon = function(event, level, handler) {
+		if (typeof level === 'function') {
+			handler = level;
+			level = levels.normal; 
+		} else {
+			level = levels[level];
+		}
+				
+		var self = this;
+		var wildHandlers = self._wildHandlers || (self._wildHandlers = {});
+		var handlers = self._handlers || (self._handlers = {});
+		self._fHandlers || (self._fHandlers = {});
+		//self._hHandlers || (self._hHandlers = {});
+    
+		if (event.indexOf('*') > -1) {
+      wildHandlers[event] = wildHandlers[event] || [];
+			wildHandlers[event][level] = wildHandlers[event][level] || [];
+      wildHandlers[event][level].push(handler);
+      // Add wild Handler to all existing events
+      _.each(handlers, function(eventHandler, existingEvent) {
+				//Logger.debug(e);
+				// Check if the wild event name matches the event name
+				var str = event.replace('*', '');
+				if (str == '' || existingEvent.indexOf(str) > -1) {
+					self.addWildHandlerToEvent(event, existingEvent);
+
+				}
+			});
+    } else {
+			// Check queue & add *
+      handlers[event] = handlers[event] || [];
+      handlers[event][level] = handlers[event][level] || [];
+      handlers[event][level].push(handler);
+
+      // Add any wild handler already existing to the new added event
+    	_.each(wildHandlers, function(wEventHandler, eWild) {
+				// Check if the wild event name matches the event name
+				var str = eWild.replace('*', '');
+				if (str == '' || event.indexOf(str) > -1) {
+					self.addWildHandlerToEvent(eWild, event);
+				}
+			});
+
+			// To prevent listening to the same event more than once
+			self.removeListener && self.removeListener(event, this.localEventHandler);
+			self.on && self.on(event, this.localEventHandler);
+			Logger.debug('Listeneing to ' + event);
+			self.__buildFlat(event);
+    }
+  };
+
+	LeveledEvents.prototype.__buildFlat = function(event) {
+		var self = this;
+		var handlers = self._handlers;
+		// generate the flatten handlers array
+		self._fHandlers[event] = [];
+		_.each(handlers[event], function(handlersAtLevel, level) {
+			_.each(handlers[event][level], function(handlerFunction, handler){
+				self._fHandlers[event].push(handlers[event][level][handler]);
+			});
+		});
+	};
+
+	LeveledEvents.prototype.ltrigger = function(eventName, message) {
+		message = message || {};
+		message.eventName = eventName;
+		this.localEventHandler(message);
+	};
+
+
+  return LeveledEvents;
+
+});
+
 define('models/j',[
 		'./user'
 	,	'./group'
@@ -7629,6 +7607,36 @@ define('models/j',[
 	
   
 });
+define('controllers/components/socket_client',[
+		'../../libs/leveled_events'
+	, '../../libs/logging_module'
+	, 'underscore'
+	,	'socketio'
+	
+	], function(LeveledEvents, Logger) {
+	
+	SocketClient = {};
+	
+	var url = Basbosa('Config').read('socketUrl');
+	
+	SocketClient = io.connect(url, {
+		'auto connect' : false, 
+		'transports':  [ ('WebSocket' in window) ? 'websocket' : 'xhr-polling']
+	});
+	
+
+	_.extend(SocketClient, new LeveledEvents());
+	
+	SocketClient.sendPacket = function(eventName, message) {
+		Logger.debug('Sending ' + eventName, message);
+		message.eventName = eventName;
+		//SocketClient.emit(eventName, message);
+		SocketClient.json.send(message);
+	};
+	Basbosa && Basbosa.add('SocketClient', SocketClient);
+	return SocketClient;
+});
+
 define('controllers/authn_controller',[
 		'../models/user'
 	, './components/socket_client'
@@ -7898,9 +7906,10 @@ define('libs/assets',['backbone', 'jquery', './basbosa'], function() {
 define('libs/index',[
   './app_backbone'
   , './assets'
-  , './i18n_client'
   , './leveled_events'
-  , './logging_module' 
+  , './logging_module'
+  , './i18n_client'
+  , './basbosa'
 ]);
 define('themes/fps',[
 		'require'
@@ -8013,6 +8022,7 @@ define('themes/sound',[
 	'backbone', 
 	'jquery',
 	'./../vendors/jquery.jplayer.min'
+	, '../libs/basbosa'
 ], function(require) {
 	var SoundView = Backbone.View.extend({
 		
@@ -8034,6 +8044,7 @@ define('themes/sound',[
 			
 			$('#jplayer-music').jPlayer({
 				ready: function () {
+					return;
 					$(this).jPlayer('setMedia', {
 						mp3: jRaw.themeBase + '/sounds/magic.mp3',
 						ogg: jRaw.themeBase + '/sounds/magic.ogg',

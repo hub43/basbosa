@@ -82,7 +82,8 @@ exports.index = function(req, res, next) {
 		user 			: {
 			//group_id 	: group._id,
 			group_id : Config.defaultGroup
-		}
+		},
+		dictionaries : ['appc/build/dictionary-ar', 'appc/build/dictionary-fr']
 	};
 
 	Logger.debug('Connected user agent', j.agent);

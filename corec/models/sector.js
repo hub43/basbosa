@@ -16,7 +16,6 @@ define([
 		messages		: null,
 		
 		initCoreC : function() {
-			Logger.info('init corec');
 			this.users 		= new UsersList();
 			this.messages = new MessagesList();
 			this.users.on('add', this.updateUsersCount, this);

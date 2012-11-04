@@ -1,0 +1,86 @@
+var Config = {
+	// Read from environment variable NODE_ENV
+	env : process.env.NODE_ENV || 'development',
+	min : false,
+	logging : 4,
+	skipSocketAuth : true,
+	port : 3000,
+	defaultGroup : '4fb212dd6c379e2810000000',
+	
+	enableFeedback : true,
+	feedbackUrl : 'https://docs.google.com/a/hub43.com/spreadsheet/viewform?pli=1&formkey=dFBqaTRDSGZyR2pfU1k1WGdXUWU3ekE6MQ#gid=0',
+	recordClientErros : false,
+	app : 'apps',
+	serverName : 'localhost',
+	
+	// Testing config
+	test : false,
+	testUsers : 5,
+	skipOpt : false,
+	//The configurations that are available to client 
+	clientConfig : ['debug', 'min', 'build', 'logging' ,'enableFeedback', 'feedbackUrl'],
+	// Populated after client app is minified for each theme
+	build : {},
+	languages : {
+		
+	},
+
+	db : {
+		host : 'localhost',
+		port : 27017,
+		database : 'basbosa',
+		username : '',
+		password : ''
+	},
+
+	dialect : {
+		current_locale : 'a',
+		base_locale : '',
+		locales : [ ],
+		store : {
+			mongodb : {
+				database : 'hawks',
+			}
+		}
+	},
+
+	dialectHttp : {
+		users : [ {
+			username : 'admin',
+			password : 'jeeadmin'
+		} ]
+	},
+	
+	
+	
+	requireOpt : {
+		baseUrl : APP_PATH,
+	
+		name : './appc/app',
+		out : PUBLIC_PATH + '/build/app-opt',
+		digest : '',
+		optimize : 'uglify',
+		
+		// Gets populated after build
+		currentApp					: 'none',
+		currentTheme 				: 'none'
+	}
+};
+
+
+
+
+Config.dynamic = function() {
+	//Dynamic config values
+	process.env.NODE_ENV = Config.env;
+	Config.debug = Config.env == 'development';
+	Config.webRoot = 'http://' + Config.serverName + ':' + Config.port;
+	Config.dialectHttp.port = Config.port + 1;
+	Config.dialectHttp.dialect = Config.dialect;
+	Config.test && (Config.skipSocketAuth = true);
+	Config.testServer = 'http://' + Config.serverName + ':' + Config.port;
+	Config.requireOpt.optimize = Config.skipOpt ? 'none' : 'uglify';
+};
+
+
+module.exports = Config;

@@ -1,5 +1,5 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
-define(['path', 'underscore'], function(Path, _) {
+define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 	/**
 	 * The globals class register certain global vairables that
 	 * can be accessed from anywhere on the server side
@@ -30,7 +30,13 @@ define(['path', 'underscore'], function(Path, _) {
 		GLOBAL._ 								= require('../../corec/vendors/underscore-1.3.1');
 		_.str						=	require('../../corec/vendors/underscore.string-2.1.1.js');
 		
-		GLOBAL.Config 					= require(SERVER_PATH + '/config');
+		// Load config
+		if (Fs.existsSync(SERVER_PATH + '/config/index.js')) {
+			GLOBAL.Config = _.extend(require('./default_config', require(SERVER_PATH + '/config/index.js')));
+		} else {
+			GLOBAL.Config = require('./default_config');
+		}
+		
 		_.mixin(_.str.exports());
 		_.str.include('Underscore.string', 'string'); 
 
@@ -56,10 +62,10 @@ define(['path', 'underscore'], function(Path, _) {
 		Config.dynamic();
 		GLOBAL.Logger						= require('../../corec/libs/logging_module');
 
-		//Config
-		//GLOBAL.Config = require('./index');
+		// Config
+		// GLOBAL.Config = require('./index');
 		// Reload options to populate from config
-		//Logger.setOptions();
+		// Logger.setOptions();
 
 		// To load all modules in a directory
 		GLOBAL.AppDirLoad	= function(path, loadOptions) {

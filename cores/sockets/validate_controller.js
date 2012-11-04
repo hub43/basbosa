@@ -5,12 +5,14 @@
 
 var SocketServer		= require('./components/socket_server'),
 		Validations			= require('./../libs').Validations,
-		MessageTypes		= require(APP_PATH + '/apps/config/messages'),
+		MessageTypes		= {},
 		validated 			= {},
 		unvalidated 		= {};
 
 // Load Application sepecific messages
-_.extend(MessageTypes, require(APP_PATH + '/apps/config/messages'));
+if (require('fs').existsSync(APP_PATH + '/apps/config/messages')) {
+	_.extend(MessageTypes, require(APP_PATH + '/apps/config/messages'));
+}
 
 /**
  * All external messages should have a senderUserId that holds 

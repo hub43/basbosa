@@ -5,7 +5,11 @@ require('../corec/libs/app_backbone');
 // Extend backbone at server side with mongodb function
 require('./libs/mongodb_backbone');
 require('./models');
-AppDirLoad(APP_PATH + '/appc/models');
+// Load client models if they exsist
+if (require('fs').existsSync(APP_PATH + '/appc/models')) {
+	AppDirLoad(APP_PATH + '/appc/models');
+}
+
 /* Loading express and Creating the main server instance */
 var App =  require('express')();
 App.server = require('http').createServer(App);
@@ -72,6 +76,7 @@ initServer = function(App) {
 			return /json|text|javascript|xml/.test(res.getHeader('Content-Type'));
 		}}));
 		
+		// Allow to server static files both from APP_PATH and from node_modules/basbosa
 		App.use(Express.static(APP_PATH)); // can't find a matching route, tell express where our statics live
 		App.use(Express.static(Path.dirname(Path.dirname(__filename)))); // can't find a matching route, tell express where our statics live
 	});	

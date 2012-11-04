@@ -67,6 +67,12 @@ exports.index = function(req, res, next) {
 		res.redirect(r);
 		return;
 	}
+	
+	// Check if the client is creating his own models, if not, the client should handles the requests
+	if (typeof J.group == 'undefined') {
+		next();
+		return;
+	}
 	var group = J.group.toJSON();
 	// Hawk to remove reference to group from sectors 
 	_.each(group.sectors, function(sector) {

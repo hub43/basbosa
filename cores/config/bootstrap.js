@@ -32,7 +32,7 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		
 		// Load config
 		if (Fs.existsSync(SERVER_PATH + '/config/index.js')) {
-			GLOBAL.Config = _.extend(require('./default_config', require(SERVER_PATH + '/config/index.js')));
+			GLOBAL.Config = _.extend(require('./default_config'), require(SERVER_PATH + '/config/index.js'));
 		} else {
 			GLOBAL.Config = require('./default_config');
 		}

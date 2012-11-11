@@ -25,10 +25,8 @@ define([
 	, './controllers/default_controller'
 	, './vendors/viewporter'
 	, './vendors/jade_runtime'
+	, 'jquery'	, 'underscore'
 	, 'backbone'
-	, 'jquery'
-	, 'underscore'
 	], function() {
 	
 });
-if (typeof Basbosa == 'undefined') require('app');

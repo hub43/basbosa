@@ -6,8 +6,6 @@ build.out = 'basbosa.client.js';
 build.name = 'app';
 build.baseUrl = './corec/';
 build.optimize = 'none';
-build.include = ['./vendors/require-2.0.4'];
-build.namespace = 'BasbosaJs';
 
 Fs.readFile('package.json', function(err, data) {
 	// Build without require-js, with almond)
@@ -22,7 +20,10 @@ Fs.readFile('package.json', function(err, data) {
 	build.name = './../almond';
 	build.include = ['app'];
 	build.out = 'basbosa.client-' + packaheJson.version + '.js';
-	
+	build.wrap = {
+		start : '//',
+		end : 'require(\'app\');'
+	};
 	RequireJs.optimize(build, function(buildResponse) {
 		console.log(build);
 		console.log(buildResponse);

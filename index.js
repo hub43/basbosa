@@ -2,8 +2,12 @@
 require('./cores/app');
 // Build client app
 require('./cores/libs/require_opt');
-// Start Application backend server
-require('../../apps/app')();
+
+// Start Application backend server if it exists
+if (require('fs').existsSync(SERVER_PATH + '/app.js')) {
+	require('../../apps/app')();
+}
+
 
 // Start translation server
 var DialectHttp = require('dialect-http');

@@ -31,3 +31,4 @@ define([
 	], function() {
 	
 });
+if (typeof Basbosa == 'undefined') require('app');

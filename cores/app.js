@@ -103,6 +103,7 @@ initServer = function(App) {
 	App.get('/stats', Http.StatsController.index);
 	App.get('/search', Http.SearchController.index);
 	App.get('/countries', Http.CountriesController.getCountries);	
+	
 	_.each(Config.auth, function(data, provider){
 		App.get('/auth/' + provider, Http.AuthController.storeUrl);
 		App.get('/auth/' + provider, Http.AuthController[provider]);

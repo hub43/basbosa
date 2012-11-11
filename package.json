@@ -22,7 +22,7 @@
 		, "passport-yahoo-oauth"	: "0.1.2"
 		, "passport-windowslive"	: "0.1.1"
 		, "passport-dummy"			: "0.0.1"
-		, "requirejs" 				: "1.0.7"
+		, "requirejs" 				: "2.0.4"
 		, "amdefine" 				: "0.0.2"
 		, "commander"		: "0.6.0"
 		, "dialect"			: "https://github.com/ygaras/dialect/tarball/master"

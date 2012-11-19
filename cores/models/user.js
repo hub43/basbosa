@@ -139,11 +139,13 @@ define([
 				removeFirst = false;
 			};
 			dummyUser = removeFirst ? DummyUsers.splice(0,1)[0] : DummyUsers.pop();
-			// check if such a dummy user already exists in the group
-			if (j.group.users.where({username : dummyUser.name}).length) {
-				// A user with this name exists, search for another one
-				this.getDummy(removeFirst, callback);
-				return ;
+			if(j.group !== undefined) {
+				// check if such a dummy user already exists in the group
+				if (j.group.users.where({username : dummyUser.name}).length) {
+					// A user with this name exists, search for another one
+					this.getDummy(removeFirst, callback);
+					return ;
+				}
 			}
 			self.set({
 				username		    : dummyUser.name,

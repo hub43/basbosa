@@ -13,10 +13,9 @@ SocketServer.on('connection', function(socket) {
 	});
 	
 	socket.lon('*', function(e, message, next) {
-		if(j.group !== undefined) {
-			var user = j.group.users.get(message.senderUserId);
-			user && user.set('lastOnline', (new Date).getTime());
-		}
+		if(j.group === undefined) next();
+		var user = j.group.users.get(message.senderUserId);
+		user && user.set('lastOnline', (new Date).getTime());
 		next();	
 	});
 });

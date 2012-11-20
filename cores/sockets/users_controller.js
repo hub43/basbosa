@@ -5,10 +5,9 @@ var SocketServer		= require('./components/socket_server'),
 
 SocketServer.on('connection', function(socket) {
 	socket.lon('users.getMe', function(e, message, next) {
+		if(socket.handshake === undefined) next();
 		var userId = socket.handshake.userId.toString();
-		Logger.info('the user Id that we need to check on it :'+ userId);
 		var user = new User(), ObjectID = require('mongodb').ObjectID;
-		
 		user.findById(userId, function(error, user) {
 			if(error) {
 				Logger.info('error through check on userId :' + userId + 'in userAuthentication method');
@@ -20,7 +19,6 @@ SocketServer.on('connection', function(socket) {
 			} else {
 				Logger.debug('this userId :' + userId + ' is exist in the db', user);
 				e.result.message.user  =  user;
-				Logger.info('dddddddddddd');
 			}
 			next();
 	  });  

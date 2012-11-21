@@ -5,7 +5,7 @@ var SocketServer		= require('./components/socket_server'),
 
 SocketServer.on('connection', function(socket) {
 	socket.lon('users.getMe', function(e, message, next) {
-		if(socket.handshake !== undefined) {
+		if(socket.handshake.userId === undefined) next();
 			var userId = socket.handshake.userId.toString();
 			var user = new User(), ObjectID = require('mongodb').ObjectID;
 			user.findById(userId, function(error, user) {
@@ -22,7 +22,7 @@ SocketServer.on('connection', function(socket) {
 				}
 				next();
 		  });  
-		}
+		
 		
 	});
 

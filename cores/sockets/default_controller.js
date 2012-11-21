@@ -53,8 +53,8 @@ SocketServer.on('connection', function(socket) {
 		next();
 	});
 	
-	if(j.group !== undefined) {
-		// To prevent multiple calls when each user connects, make sure we only bind once
+	// To prevent multiple calls when each user connects, make sure we only bind once
+	if(j.group !==undefined) {
 		j.group.off('groupUpdate');
 		j.group.on('groupUpdate', function(params) {
 			_.each(params.updateArgs, function(updateArg) {

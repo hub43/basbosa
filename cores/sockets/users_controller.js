@@ -5,23 +5,25 @@ var SocketServer		= require('./components/socket_server'),
 
 SocketServer.on('connection', function(socket) {
 	socket.lon('users.getMe', function(e, message, next) {
-		if(socket.handshake === undefined) next();
-		var userId = socket.handshake.userId.toString();
-		var user = new User(), ObjectID = require('mongodb').ObjectID;
-		user.findById(userId, function(error, user) {
-			if(error) {
-				Logger.info('error through check on userId :' + userId + 'in userAuthentication method');
-			}
-			if(!user) {
-				Logger.debug('this userId :' + userId + ' not exist in the db', user);
-				e.result.eventName = 'users.getMe_result';
-				e.result.message.user = false;
-			} else {
-				Logger.debug('this userId :' + userId + ' is exist in the db', user);
-				e.result.message.user  =  user;
-			}
-			next();
-	  });  
+		if(socket.handshake !== undefined) {
+			var userId = socket.handshake.userId.toString();
+			var user = new User(), ObjectID = require('mongodb').ObjectID;
+			user.findById(userId, function(error, user) {
+				if(error) {
+					Logger.info('error through check on userId :' + userId + 'in userAuthentication method');
+				}
+				if(!user) {
+					Logger.debug('this userId :' + userId + ' not exist in the db', user);
+					e.result.eventName = 'users.getMe_result';
+					e.result.message.user = false;
+				} else {
+					Logger.debug('this userId :' + userId + ' is exist in the db', user);
+					e.result.message.user  =  user;
+				}
+				next();
+		  });  
+		}
+		
 	});
 
 });

@@ -42,13 +42,15 @@ SocketServer.prototype.init = function(App) {
 					Logger.warn('No Session found', session);
 				} else {
 					// User already has an active express session
+					// Add user socket data
+					Store.socketsData.add(data, data.sessionID);
 					if (session.passport.user) {
 						data.userId = session.passport.user;
 						accept(null, true);
 					} else {
-						accept('No user found in session', false);
-						Logger.warn(session.passport);
-						
+						accept(null, true);
+						//accept('No user found in session', false);
+						Logger.warn('No user found in session');
 					}
 				}
 			});

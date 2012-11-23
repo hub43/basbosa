@@ -3,7 +3,7 @@ var Config = {
 	env : process.env.NODE_ENV || 'development',
 	min : false,
 	logging : 4,
-	skipSocketAuth : true,
+	skipSocketAuth : false,
 	port : 3000,
 	defaultGroup : '4fb212dd6c379e2810000000',
 	
@@ -51,6 +51,18 @@ var Config = {
 		} ]
 	},
 	
+	auth : {
+		facebook : {
+			clientID		: '112420018771592',
+			clientSecret: '5b3aa8efcc66e1616c835a2fbfddaef5'
+		},
+		
+		twitter: {
+			consumerKey		:	'u8LH73UmwLG46uMYPA8y5A',
+			consumerSecret: 'hcNSbu6cwJJSBOFzFDbw1jqGbZ0cG7Z50t1KbnFaLW4'
+		},
+		dummy	: null
+	},
 	
 	
 	requireOpt : {

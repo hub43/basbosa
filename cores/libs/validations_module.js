@@ -61,12 +61,33 @@ define(['underscore'], function(_) {
 			// Checks if field inside msg is a url or not
 			return _public.isPresent(msg, field) && urlPattern.test(msg[field]);
 		},
-
+		/**
+		 * @method isLargerThan used to check if the length of any string  is larger than specific number.
+		 * @param {String} msg hold the message  that contain specific string that need t check on it.
+		 * @param {String} field hold the string that need to check on it.
+		 * @param {Number} min hold the number that need to limit the length of the string by it.
+		 */
 		isLargerThan: function(msg, field, min) {
 			// Checks if field inside msg is larger than the min value
-			return _public.isPresent(msg, field) && (msg[field].length >= min);
+			if(min === undefined) {
+				min = field ;
+				field = msg;
+				msg = undefined;
+			}
+			if(msg ===undefined) {
+				return (field.length >= min);
+			} else {
+				return _public.isPresent(msg, field) && (msg[field].length >= min);
+			}
+			
 		},
-
+		/**
+		 * @method isValidMail used to check if the value valid to be email or not
+		 * @param {String} value hold the value  that need to check on it.
+		 */
+		isValidMail: function(value) {
+			return /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i.test(value)
+		},
 		isSmallerThan: function(msg, field, max) {
 			// Checks if field inside msg is smaller than the max value
 			return _public.isPresent(msg, field) && (msg[field].length <= max);

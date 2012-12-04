@@ -15,11 +15,29 @@ define([
 	, './country'
 	, 'https'
 	, 'http'
+	, '../libs/email_module'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, DbClass, Country, https, http, email) { //user Model inherent from user and j in corec.
 	
 	
 	var UserServer = {
+//		validationRules : {
+//			email : [{
+//				rule 		: Validations.isValidMail,
+//				message	: 'Pleas enter a valid email'
+//			}],
+//			password : [{
+//				rule : Validation.greater,
+//				message : 'Password must be at least 6 month'
+//			}],
+//			
+//		};
+		mailMessage : {
+			text : 'some thing',
+			from : 'someone@noone.com',
+			to 	 : 'noone@hub43.com',
+			subject : 'welcome to hub43.com'
+		},
 		collectionName 	: 'users',  																		//define the collection that this class will deal with it.
 		/**
 		 * initCoreS is a method called directly when defined an instance from user model
@@ -167,6 +185,7 @@ define([
 		 * @param {Function} callback(error, user) called when dummy user has been created.
 		 */
 		visitsUpdate : function (id, userAgent) {
+			
 			var self = this,
 			ObjectID = require('mongodb').ObjectID,
 			date = (new Date).getTime();
@@ -350,6 +369,50 @@ define([
 			  	callback(error, JSON.stringify(data));
 			  });
 		  }
+		},
+		validate : function(callback) {
+			var self = this, validationResult = {}, options = {};
+			var Validations =  Basbosa('Validations').getInstance();
+//			_.each(this.validationRules, function(rules, fieldName) {
+//				if (self.get(fieldName) !== undefined) {
+//					_.each(rules, function(rule){
+//						if (!rule.rule(self.get(fieldName))) {
+//							validationResult[fieldName] = rule.message;
+//						}
+//					});
+//				}
+//			});
+			if (self.get('email') !== undefined)  validationResult.vaildMaile = Validations.isValidMail(self.get('email'));
+			(self.get('password') !== undefined) ? validationResult.vaildPassword = Validations.isLargerThan(self.get('password'), 6) : validationResult.vaildPassword = 'undefined';
+			(self.get('confirm_password') !== undefined) ? validationResult.validConfirmPassword = Validations.isLargerThan(self.get('confirm_password'), 6) : validationResult.validConfirmPassword = 'undefined';
+			if(validationResult.validConfirmPassword && validationResult.vaildPassword) {
+				validationResult.validConfirmPassword = validationResult.validConfirmPassword && (self.get('confirm_password') === self.get('password'));
+			}
+			if(validationResult.vaildPassword && validationResult.vaildMaile && validationResult.validConfirmPassword) {
+				options.success = function (results) {
+					if(results.length == 0)  {
+						validationResult.dbValidation = true ;
+						validationResult.hashPassword = self.hash(self.get('password'));
+						email.sendMail(self.mailMessage);
+					} else {
+						validationResult.dbValidation = 'This account exist before';
+					}
+					typeof callback === 'function' && callback (null, validationResult);	
+				};
+				options.error = function (error) {
+					validationResult.dbValidation = 'There is an error through check on this data in the db' + error;
+					typeof callback === 'function' && callback (error, validationResult);
+				};
+				self.find({email: self.get('email')}, options);
+			} else {
+				Logger.debug(validationResult);
+				typeof callback === 'function' && callback(null, validationResult);
+			}
+			
+		},
+		hash : function(string) {
+			var crypto = require('crypto');
+			return crypto.createHmac('sha1', Config.salt.toString()).update(string).digest('hex');
 		}
   };
 	

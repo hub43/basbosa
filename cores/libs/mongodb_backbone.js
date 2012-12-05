@@ -49,25 +49,26 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
      // qoptions = {};
     //}
     var self = this;
-    this._withCollection(function(err, collection) {
-      if (err) { return options.error(err); }
-      else {
-        collection.find(query, qoptions).toArray(function(err, results) {
-          var _prepareResults = function(results){
-            if(!results)
-              return null;
-
-            results = _.map(results, function(result){
-              result._id = result._id.toString();
-              return result;
-            });
-            
-            return results;
-          };
-          if (_.isFunction(options)) options(err, _prepareResults(results));
-          else if (err) options.error(err);
-          else options.success(_prepareResults(results));
-        });      
+    this._withCollection(function(error, collection) {
+      if (error) { 
+      	return options.error(err); 
+      } else {
+	        collection.find(query, qoptions).toArray(function(err, results) {
+	          var _prepareResults = function(results) {
+	            if(!results)
+	              return null;
+	
+	            results = _.map(results, function(result) {
+	              result._id = result._id.toString();
+	              return result;
+	            });
+	            
+	            return results;
+	          };
+	          if (_.isFunction(options)) options(err, _prepareResults(results));
+	          else if (err) options.error(err);
+	          else options.success(_prepareResults(results));
+	        });      
       }
     });
   },
@@ -153,24 +154,65 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
 	});
   },
   /**
-   * @returns JSON
+   * @method Update used to update any model attribute ,
+   * but before update check if the model have a validate method check it else 
+   * call the anonymous function to update the attribute in the db.
+   * @returns JSON object contain the validation result if it have some thing wrong or 
+   * the model attribute if it is saved well
    */
   update: function(callback) {
-    var model = this;
-
-    this._withCollection(function(err, collection) {
-      if (err) callback(err);
-      else {
-        var attributes = model.toJSON();
-        delete attributes._id;
-        collection.update({ _id: new ObjectID(model.id) }, {$set: attributes}, {safe:true, upsert:false}, function(err) {
-        	//dbModel._id = dbModel._id.toString();
-        	typeof callback === 'function' && callback(null, model.toJSON());
-        });
-        
-      }
-    });
+    var self = this;
+    function __updateDb() {
+    	self._withCollection(function(error, collection) {
+        if(error) {
+        	typeof callback === 'function' && callback(error);
+        } else {
+          var attributes = self.toJSON();
+          delete attributes._id;
+          if(self.id === undefined) {
+          	delete attributes.enableSound;
+          	delete attributes.enableMusic;
+          	delete attributes.enableChat;
+          	delete attributes.points;
+          	delete attributes.level;
+          	delete attributes.isFirstTime;
+          	collection.insert(attributes, function(error) {
+          		if(error) {
+          			Logger.warn('there is error through insertion', error);
+          		} else {
+          			typeof callback === 'function' && callback(null, self.toJSON());
+          		}
+            });
+          } else {
+          	collection.update({ _id: new ObjectID(self.id) }, {$set: attributes}, {safe:true, upsert:false}, function(err) {
+            	typeof callback === 'function' && callback(null, self.toJSON());
+            });
+          }
+        }
+      });
+    }
+    Logger.debug('This is the model attribute : ', self);
+    if(typeof self.validate  === 'function') {
+    	self.validate(function(error, validationError) {
+    		if(error) {
+    			Logger.warn('error through validate the model attribute' , error);
+    		} else {
+    			if(validationError.vaildPassword && validationError.vaildMaile && 
+    					validationError.validConfirmPassword && (validationError.dbValidation === true)) {
+    				if(validationError.hashPassword !== undefined) {
+    					self.set('password', validationError.hashPassword);
+    				}
+    				__updateDb();
+    			} else {
+    				typeof callback === 'function' && callback(null, validationError);
+    			}
+    		}
+    	});
+    } else {
+    	__updateDb();
+    }
   },
+  
   destroy : function(callback) {
     var model = this;
     

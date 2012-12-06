@@ -170,17 +170,11 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
           var attributes = self.toJSON();
           delete attributes._id;
           if(self.id === undefined) {
-          	delete attributes.enableSound;
-          	delete attributes.enableMusic;
-          	delete attributes.enableChat;
-          	delete attributes.points;
-          	delete attributes.level;
-          	delete attributes.isFirstTime;
           	collection.insert(attributes, function(error) {
           		if(error) {
           			Logger.warn('there is error through insertion', error);
           		} else {
-          			typeof callback === 'function' && callback(null, self.toJSON());
+          			typeof callback === 'function' && callback(null, {});
           		}
             });
           } else {
@@ -197,14 +191,13 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
     		if(error) {
     			Logger.warn('error through validate the model attribute' , error);
     		} else {
-    			if(validationError.vaildPassword && validationError.vaildMaile && 
-    					validationError.validConfirmPassword && (validationError.dbValidation === true)) {
+    			if(_.isEmpty(validationError.validationResult)) {
     				if(validationError.hashPassword !== undefined) {
     					self.set('password', validationError.hashPassword);
+    					__updateDb();
     				}
-    				__updateDb();
     			} else {
-    				typeof callback === 'function' && callback(null, validationError);
+    				typeof callback === 'function' && callback(null, validationError.validationResult);
     			}
     		}
     	});

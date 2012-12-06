@@ -1,5 +1,5 @@
 if(typeof define !== 'function') { var define = require('amdefine')(module); }
-define(['../../node_modules/emailjs/email'], function(email) {
+define(['emailjs'], function(email) {
 	var EmailModule = {
 		defaultServer : {
 			user:    '', 
@@ -16,11 +16,10 @@ define(['../../node_modules/emailjs/email'], function(email) {
 		},
 		sendMail : function(message , serverInfo) {
 			var self = this;
-			_.extend(self.defaultMessage, message);
-			_.extend(self.defaultServer, serverInfo);
-			var server  = email.server.connect(self.defaultServer);
-			server.send(self.defaultMessage, function(err, message) { console.log(err || message); });
-		},
+			message = _.extend({}, self.defaultMessage, message);
+			serverInfo= _.extend({}, self.defaultServer, serverInfo);
+			var server  = email.server.connect(serverInfo);
+			server.send(message, function(err, message) { console.log(err || message); });		},
 		
 	};
 	return EmailModule;

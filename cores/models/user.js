@@ -16,22 +16,22 @@ define([
 	, 'https'
 	, 'http'
 	, '../libs/email_module'
+	, '../libs/validations_module'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http, email) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations) { //user Model inherent from user and j in corec.
 	
-	
+	var Validations =  Validations.getInstance();
 	var UserServer = {
-//		validationRules : {
-//			email : [{
-//				rule 		: Validations.isValidMail,
-//				message	: 'Pleas enter a valid email'
-//			}],
-//			password : [{
-//				rule : Validation.greater,
-//				message : 'Password must be at least 6 month'
-//			}],
-//			
-//		};
+		validationRules : {
+			email : [{
+				rule 		: Validations.isValidMail,
+				message	: 'Please enter a valid email'
+			}],
+			password : [{
+				rule : Validations.isLargerThan,
+				message : 'Your password must be at least 6 characters long'
+			}],
+		},
 		mailMessage : {
 			text : 'some thing',
 			from : 'someone@noone.com',
@@ -371,41 +371,39 @@ define([
 		  }
 		},
 		validate : function(callback) {
-			var self = this, validationResult = {}, options = {};
-			var Validations =  Basbosa('Validations').getInstance();
-//			_.each(this.validationRules, function(rules, fieldName) {
-//				if (self.get(fieldName) !== undefined) {
-//					_.each(rules, function(rule){
-//						if (!rule.rule(self.get(fieldName))) {
-//							validationResult[fieldName] = rule.message;
-//						}
-//					});
-//				}
-//			});
-			if (self.get('email') !== undefined)  validationResult.vaildMaile = Validations.isValidMail(self.get('email'));
-			(self.get('password') !== undefined) ? validationResult.vaildPassword = Validations.isLargerThan(self.get('password'), 6) : validationResult.vaildPassword = 'undefined';
-			(self.get('confirm_password') !== undefined) ? validationResult.validConfirmPassword = Validations.isLargerThan(self.get('confirm_password'), 6) : validationResult.validConfirmPassword = 'undefined';
-			if(validationResult.validConfirmPassword && validationResult.vaildPassword) {
-				validationResult.validConfirmPassword = validationResult.validConfirmPassword && (self.get('confirm_password') === self.get('password'));
-			}
-			if(validationResult.vaildPassword && validationResult.vaildMaile && validationResult.validConfirmPassword) {
+			var self = this, validationResult = {}, hashPassword, options = {};
+			_.each(self.validationRules, function(rules, fieldName) {
+				if (self.get(fieldName) !== undefined) {
+					_.each(rules, function(rule) {
+						if(fieldName === 'password') {
+							if (!rule.rule(self.get(fieldName), 6)) {
+								validationResult[fieldName] = rule.message;
+							}
+						} else {
+							if (!rule.rule(self.get(fieldName))) {
+								validationResult[fieldName] = rule.message;
+							}
+						}
+						
+					});
+				}
+			});
+			if(_.isEmpty(validationResult)) {
 				options.success = function (results) {
-					if(results.length == 0)  {
-						validationResult.dbValidation = true ;
-						validationResult.hashPassword = self.hash(self.get('password'));
+					Logger.debug('The result of checking in db if this data there exsit before', results);
+					if(_.isEmpty(results))  {
+						hashPassword = self.hash(self.get('password'));
 						email.sendMail(self.mailMessage);
 					} else {
-						validationResult.dbValidation = 'This account exist before';
+						validationResult['dbValidation'] = 'This account exist before';
 					}
-					typeof callback === 'function' && callback (null, validationResult);	
+					typeof callback === 'function' && callback (null, {validationResult : validationResult, hashPassword : hashPassword});	
 				};
 				options.error = function (error) {
-					validationResult.dbValidation = 'There is an error through check on this data in the db' + error;
 					typeof callback === 'function' && callback (error, validationResult);
 				};
 				self.find({email: self.get('email')}, options);
 			} else {
-				Logger.debug(validationResult);
 				typeof callback === 'function' && callback(null, validationResult);
 			}
 			

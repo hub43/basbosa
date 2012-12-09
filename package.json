@@ -31,6 +31,6 @@
 		, "mongodb"				: "1.1.4"
 		, "connect-mongodb"			: "1.1.4"
 		, "useragent"				: "1.1.0"
-		
+		,	"emailjs"					:	"0.3.3"
     }
 }

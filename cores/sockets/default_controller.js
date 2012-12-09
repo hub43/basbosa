@@ -54,20 +54,22 @@ SocketServer.on('connection', function(socket) {
 	});
 	
 	// To prevent multiple calls when each user connects, make sure we only bind once
-	j.group.off('groupUpdate');
-	j.group.on('groupUpdate', function(params) {
-		_.each(params.updateArgs, function(updateArg) {
-			j.group.update(updateArg);
+	if(j.group !==undefined) {
+		j.group.off('groupUpdate');
+		j.group.on('groupUpdate', function(params) {
+			_.each(params.updateArgs, function(updateArg) {
+				j.group.update(updateArg);
+			});
+			
+			socket = j.group.sectors.get(params.sectorId).getSocket();
+			if (socket) {
+				message = {	eventName :  'group.update_result' };
+				_.extend(message, params);
+				socket.emit(message.eventName, message);
+				socket.broadcast.to('sector' + params.sectorId).emit(message.eventName, message);
+			}
 		});
-		
-		socket = j.group.sectors.get(params.sectorId).getSocket();
-		if (socket) {
-			message = {	eventName :  'group.update_result' };
-			_.extend(message, params);
-			socket.emit(message.eventName, message);
-			socket.broadcast.to('sector' + params.sectorId).emit(message.eventName, message);
-		}
-	});
+	}
 	
 	socket.lon('public.*',  function(e, message, next) {
 		e.result = {

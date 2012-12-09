@@ -60,8 +60,12 @@ SocketServer.on('connection', function(socket) {
 	});
 	
 	socket.lon('sectors.disconnect', function(e, message, next) {
-		var userId = socket.handshake.userId,
-		  user = j.group.users.get(socket.handshake.userId);
+		var userId = socket.handshake.userId, user;
+		  if (!j.group || !j.group.users) {
+		  	next();
+		  	return;
+		  }
+		user = j.group.users.get(socket.handshake.userId);
 		e.result.broadcastTo = [];
 		if (!user) {
 			Logger.warn('No user found in the group with userId :' + userId);

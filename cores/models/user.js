@@ -15,11 +15,29 @@ define([
 	, './country'
 	, 'https'
 	, 'http'
+	, '../libs/email_module'
+	, '../libs/validations_module'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations) { //user Model inherent from user and j in corec.
 	
-	
+	var Validations =  Validations.getInstance();
 	var UserServer = {
+		validationRules : {
+			email : [{
+				rule 		: Validations.isValidMail,
+				message	: 'Please enter a valid email'
+			}],
+			password : [{
+				rule : Validations.isLargerThan,
+				message : 'Your password must be at least 6 characters long'
+			}],
+		},
+		mailMessage : {
+			text : 'some thing',
+			from : 'someone@noone.com',
+			to 	 : 'noone@hub43.com',
+			subject : 'welcome to hub43.com'
+		},
 		collectionName 	: 'users',  																		//define the collection that this class will deal with it.
 		/**
 		 * initCoreS is a method called directly when defined an instance from user model
@@ -139,11 +157,13 @@ define([
 				removeFirst = false;
 			};
 			dummyUser = removeFirst ? DummyUsers.splice(0,1)[0] : DummyUsers.pop();
-			// check if such a dummy user already exists in the group
-			if (j.group.users.where({username : dummyUser.name}).length) {
-				// A user with this name exists, search for another one
-				this.getDummy(removeFirst, callback);
-				return ;
+			if(j.group !== undefined) {
+				// check if such a dummy user already exists in the group
+				if (j.group.users.where({username : dummyUser.name}).length) {
+					// A user with this name exists, search for another one
+					this.getDummy(removeFirst, callback);
+					return ;
+				}
 			}
 			self.set({
 				username		    : dummyUser.name,
@@ -165,6 +185,7 @@ define([
 		 * @param {Function} callback(error, user) called when dummy user has been created.
 		 */
 		visitsUpdate : function (id, userAgent) {
+			
 			var self = this,
 			ObjectID = require('mongodb').ObjectID,
 			date = (new Date).getTime();
@@ -348,6 +369,48 @@ define([
 			  	callback(error, JSON.stringify(data));
 			  });
 		  }
+		},
+		validate : function(callback) {
+			var self = this, validationResult = {}, hashPassword, options = {};
+			_.each(self.validationRules, function(rules, fieldName) {
+				if (self.get(fieldName) !== undefined) {
+					_.each(rules, function(rule) {
+						if(fieldName === 'password') {
+							if (!rule.rule(self.get(fieldName), 6)) {
+								validationResult[fieldName] = rule.message;
+							}
+						} else {
+							if (!rule.rule(self.get(fieldName))) {
+								validationResult[fieldName] = rule.message;
+							}
+						}
+						
+					});
+				}
+			});
+			if(_.isEmpty(validationResult)) {
+				options.success = function (results) {
+					Logger.debug('The result of checking in db if this data there exsit before', results);
+					if(_.isEmpty(results))  {
+						hashPassword = self.hash(self.get('password'));
+						email.sendMail(self.mailMessage);
+					} else {
+						validationResult['dbValidation'] = 'This account exist before';
+					}
+					typeof callback === 'function' && callback (null, {validationResult : validationResult, hashPassword : hashPassword});	
+				};
+				options.error = function (error) {
+					typeof callback === 'function' && callback (error, validationResult);
+				};
+				self.find({email: self.get('email')}, options);
+			} else {
+				typeof callback === 'function' && callback(null, validationResult);
+			}
+			
+		},
+		hash : function(string) {
+			var crypto = require('crypto');
+			return crypto.createHmac('sha1', Config.salt.toString()).update(string).digest('hex');
 		}
   };
 	

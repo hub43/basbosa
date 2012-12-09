@@ -34,10 +34,11 @@ define([
 		},
 		mailMessage : {
 			text : 'some thing',
-			from : 'someone@noone.com',
-			to 	 : 'noone@hub43.com',
+			from : 'nobody@hub43.com',
+			to 	 : 'nfutoam.atef@gmail.com',
 			subject : 'welcome to hub43.com'
 		},
+		status : null,
 		collectionName 	: 'users',  																		//define the collection that this class will deal with it.
 		/**
 		 * initCoreS is a method called directly when defined an instance from user model
@@ -372,6 +373,7 @@ define([
 		},
 		validate : function(callback) {
 			var self = this, validationResult = {}, hashPassword, options = {};
+			var attributes = self.toJSON();
 			_.each(self.validationRules, function(rules, fieldName) {
 				if (self.get(fieldName) !== undefined) {
 					_.each(rules, function(rule) {
@@ -393,7 +395,13 @@ define([
 					Logger.debug('The result of checking in db if this data there exsit before', results);
 					if(_.isEmpty(results))  {
 						hashPassword = self.hash(self.get('password'));
+						attributes.token = self.generateActivationToken(self.get('email'));
+						self.set(attributes);
+						self.mailMessage.text = 'Welcome in hub43.com, to activate your account, click on this link http://www.hub43.com/activate?email=' + self.get('email') + '&token=' + attributes.token;
+						self.mailMessage.to = self.get('email');
 						email.sendMail(self.mailMessage);
+						self.set('status', 'pending_activation');
+						Logger.debug('this user is :' + 'pending_activation');
 					} else {
 						validationResult['dbValidation'] = 'This account exist before';
 					}
@@ -402,6 +410,7 @@ define([
 				options.error = function (error) {
 					typeof callback === 'function' && callback (error, validationResult);
 				};
+				Logger.info('the mail is : ', self.get('email'));
 				self.find({email: self.get('email')}, options);
 			} else {
 				typeof callback === 'function' && callback(null, validationResult);
@@ -411,6 +420,10 @@ define([
 		hash : function(string) {
 			var crypto = require('crypto');
 			return crypto.createHmac('sha1', Config.salt.toString()).update(string).digest('hex');
+		},
+		generateActivationToken : function(email) {
+			var self =  this;
+			return self.hash((new Date).getTime() + email);
 		}
   };
 	

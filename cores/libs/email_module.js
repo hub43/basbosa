@@ -6,12 +6,11 @@ define(['emailjs'], function(email) {
 		  password: '', 
 		  host:    'localhost',
 		  port: 25,
-		  ssl:     true
 		},
 	 	defaultMessage : {
 		   text:    'Welcome to hub43', 
-		   from:    ' @hub43.com', 
-		   to:      'amahmoud@hub43.com',
+		   from:    'amahmoud@hub43.com', 
+		   to:      'nfutoam.atef@gmail.com',
 		   subject: 'testing emailjs'
 		},
 		sendMail : function(message , serverInfo) {
@@ -19,7 +18,8 @@ define(['emailjs'], function(email) {
 			message = _.extend({}, self.defaultMessage, message);
 			serverInfo= _.extend({}, self.defaultServer, serverInfo);
 			var server  = email.server.connect(serverInfo);
-			server.send(message, function(err, message) { console.log(err || message); });		},
+			server.send(message, function(err, message) { console.log(err || message); });
+		},
 		
 	};
 	return EmailModule;

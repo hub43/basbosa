@@ -26,7 +26,7 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		GLOBAL.CORES						= APP_PATH + '/node_modules/basbosa/cores';
 
 		GLOBAL.SERVER 					= true;
-		GLOBAL.Basbosa					= require('../../corec/libs/basbosa');
+		GLOBAL.Basbosa					= require('basbosa-registry');
 		GLOBAL._ 								= require('../../corec/vendors/underscore-1.3.1');
 		_.str						=	require('../../corec/vendors/underscore.string-2.1.1.js');
 		
@@ -60,7 +60,7 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		
 		// Populate dynamic Config values
 		Config.dynamic();
-		GLOBAL.Logger						= require('../../corec/libs/logging_module');
+		GLOBAL.Logger						= require('basbosa-logger');
 
 		// Config
 		// GLOBAL.Config = require('./index');

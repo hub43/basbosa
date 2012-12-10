@@ -1,8 +1,9 @@
 define([
 		'../../libs/leveled_events'
-	, '../../libs/logging_module'
+	, 'basbosa-logger'
 	, 'underscore'
 	,	'socketio'
+	, 'basbosa-config'
 	
 	], function(LeveledEvents, Logger) {
 	

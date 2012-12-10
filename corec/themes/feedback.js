@@ -1,7 +1,7 @@
 define([
 		'require'
 	,	'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(require) {
 	var FeedbackView = Backbone.View.extend({
 		initialize : function() {

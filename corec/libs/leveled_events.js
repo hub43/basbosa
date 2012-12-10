@@ -1,6 +1,6 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 
-define(['require', './logging_module', './basbosa'], function( require, LoggingModule) {
+define(['require', 'basbosa-logger', 'basbosa-registry'], function( require, LoggingModule) {
  	// Can add more complex checks here
 	var SERVER = typeof(exports) !== 'undefined';
 	var Logger = LoggingModule;

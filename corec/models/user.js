@@ -3,7 +3,7 @@ define([
 		'../collections/activities'
 	, './behaviours/uuid'
 	, 'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(ActivitiesList, Uuid) {
 	var UserModel = Backbone.Model.extend({
 		idAttribute 		: '_id',

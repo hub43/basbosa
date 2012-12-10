@@ -1,41 +1,3 @@
-//
-/*
- RequireJS 2.0.4 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
- Available via the MIT or new BSD license.
- see: http://github.com/jrburke/requirejs for details
-*/
-var requirejs,require,define;
-(function(Y){function x(b){return J.call(b)==="[object Function]"}function G(b){return J.call(b)==="[object Array]"}function q(b,c){if(b){var e;for(e=0;e<b.length;e+=1)if(b[e]&&c(b[e],e,b))break}}function N(b,c){if(b){var e;for(e=b.length-1;e>-1;e-=1)if(b[e]&&c(b[e],e,b))break}}function y(b,c){for(var e in b)if(b.hasOwnProperty(e)&&c(b[e],e))break}function K(b,c,e,i){c&&y(c,function(c,j){if(e||!b.hasOwnProperty(j))i&&typeof c!=="string"?(b[j]||(b[j]={}),K(b[j],c,e,i)):b[j]=c});return b}function s(b,
-c){return function(){return c.apply(b,arguments)}}function Z(b){if(!b)return b;var c=Y;q(b.split("."),function(b){c=c[b]});return c}function $(b,c,e){return function(){var i=fa.call(arguments,0),g;if(e&&x(g=i[i.length-1]))g.__requireJsBuild=!0;i.push(c);return b.apply(null,i)}}function aa(b,c,e){q([["toUrl"],["undef"],["defined","requireDefined"],["specified","requireSpecified"]],function(i){var g=i[1]||i[0];b[i[0]]=c?$(c[g],e):function(){var b=z[O];return b[g].apply(b,arguments)}})}function H(b,
-c,e,i){c=Error(c+"\nhttp://requirejs.org/docs/errors.html#"+b);c.requireType=b;c.requireModules=i;if(e)c.originalError=e;return c}function ga(){if(I&&I.readyState==="interactive")return I;N(document.getElementsByTagName("script"),function(b){if(b.readyState==="interactive")return I=b});return I}var ha=/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg,ia=/[^.]\s*require\s*\(\s*["']([^'"\s]+)["']\s*\)/g,ba=/\.js$/,ja=/^\.\//,J=Object.prototype.toString,A=Array.prototype,fa=A.slice,ka=A.splice,w=!!(typeof window!==
-"undefined"&&navigator&&document),ca=!w&&typeof importScripts!=="undefined",la=w&&navigator.platform==="PLAYSTATION 3"?/^complete$/:/^(complete|loaded)$/,O="_",S=typeof opera!=="undefined"&&opera.toString()==="[object Opera]",z={},p={},P=[],L=!1,j,t,C,u,D,I,E,da,ea;if(typeof define==="undefined"){if(typeof requirejs!=="undefined"){if(x(requirejs))return;p=requirejs;requirejs=void 0}typeof require!=="undefined"&&!x(require)&&(p=require,require=void 0);j=requirejs=function(b,c,e,i){var g=O,r;!G(b)&&
-typeof b!=="string"&&(r=b,G(c)?(b=c,c=e,e=i):b=[]);if(r&&r.context)g=r.context;(i=z[g])||(i=z[g]=j.s.newContext(g));r&&i.configure(r);return i.require(b,c,e)};j.config=function(b){return j(b)};require||(require=j);j.version="2.0.4";j.jsExtRegExp=/^\/|:|\?|\.js$/;j.isBrowser=w;A=j.s={contexts:z,newContext:function(b){function c(a,d,o){var l=d&&d.split("/"),f=l,b=k.map,c=b&&b["*"],e,g,h;if(a&&a.charAt(0)===".")if(d){f=k.pkgs[d]?l=[d]:l.slice(0,l.length-1);d=a=f.concat(a.split("/"));for(f=0;d[f];f+=
-1)if(e=d[f],e===".")d.splice(f,1),f-=1;else if(e==="..")if(f===1&&(d[2]===".."||d[0]===".."))break;else f>0&&(d.splice(f-1,2),f-=2);f=k.pkgs[d=a[0]];a=a.join("/");f&&a===d+"/"+f.main&&(a=d)}else a.indexOf("./")===0&&(a=a.substring(2));if(o&&(l||c)&&b){d=a.split("/");for(f=d.length;f>0;f-=1){g=d.slice(0,f).join("/");if(l)for(e=l.length;e>0;e-=1)if(o=b[l.slice(0,e).join("/")])if(o=o[g]){h=o;break}!h&&c&&c[g]&&(h=c[g]);if(h){d.splice(0,f,h);a=d.join("/");break}}}return a}function e(a){w&&q(document.getElementsByTagName("script"),
-function(d){if(d.getAttribute("data-requiremodule")===a&&d.getAttribute("data-requirecontext")===h.contextName)return d.parentNode.removeChild(d),!0})}function i(a){var d=k.paths[a];if(d&&G(d)&&d.length>1)return e(a),d.shift(),h.undef(a),h.require([a]),!0}function g(a,d,o,b){var f=a?a.indexOf("!"):-1,v=null,e=d?d.name:null,g=a,i=!0,j="",k,m;a||(i=!1,a="_@r"+(N+=1));f!==-1&&(v=a.substring(0,f),a=a.substring(f+1,a.length));v&&(v=c(v,e,b),m=n[v]);a&&(v?j=m&&m.normalize?m.normalize(a,function(a){return c(a,
-e,b)}):c(a,e,b):(j=c(a,e,b),k=h.nameToUrl(j)));a=v&&!m&&!o?"_unnormalized"+(O+=1):"";return{prefix:v,name:j,parentMap:d,unnormalized:!!a,url:k,originalName:g,isDefine:i,id:(v?v+"!"+j:j)+a}}function r(a){var d=a.id,o=m[d];o||(o=m[d]=new h.Module(a));return o}function p(a,d,o){var b=a.id,f=m[b];if(n.hasOwnProperty(b)&&(!f||f.defineEmitComplete))d==="defined"&&o(n[b]);else r(a).on(d,o)}function B(a,d){var b=a.requireModules,l=!1;if(d)d(a);else if(q(b,function(d){if(d=m[d])d.error=a,d.events.error&&(l=
-!0,d.emit("error",a))}),!l)j.onError(a)}function u(){P.length&&(ka.apply(F,[F.length-1,0].concat(P)),P=[])}function t(a,d,b){a=a&&a.map;d=$(b||h.require,a,d);aa(d,h,a);d.isBrowser=w;return d}function z(a){delete m[a];q(M,function(d,b){if(d.map.id===a)return M.splice(b,1),d.defined||(h.waitCount-=1),!0})}function A(a,d){var b=a.map.id,l=a.depMaps,f;if(a.inited){if(d[b])return a;d[b]=!0;q(l,function(a){if(a=m[a.id])return!a.inited||!a.enabled?(f=null,delete d[b],!0):f=A(a,K({},d))});return f}}function C(a,
-d,b){var l=a.map.id,f=a.depMaps;if(a.inited&&a.map.isDefine){if(d[l])return n[l];d[l]=a;q(f,function(f){var f=f.id,c=m[f];!Q[f]&&c&&(!c.inited||!c.enabled?b[l]=!0:(c=C(c,d,b),b[f]||a.defineDepById(f,c)))});a.check(!0);return n[l]}}function D(a){a.check()}function E(){var a=k.waitSeconds*1E3,d=a&&h.startTime+a<(new Date).getTime(),b=[],l=!1,f=!0,c,g,j;if(!T){T=!0;y(m,function(a){c=a.map;g=c.id;if(a.enabled&&!a.error)if(!a.inited&&d)i(g)?l=j=!0:(b.push(g),e(g));else if(!a.inited&&a.fetched&&c.isDefine&&
-(l=!0,!c.prefix))return f=!1});if(d&&b.length)return a=H("timeout","Load timeout for modules: "+b,null,b),a.contextName=h.contextName,B(a);f&&(q(M,function(a){if(!a.defined){var a=A(a,{}),d={};a&&(C(a,d,{}),y(d,D))}}),y(m,D));if((!d||j)&&l)if((w||ca)&&!U)U=setTimeout(function(){U=0;E()},50);T=!1}}function V(a){r(g(a[0],null,!0)).init(a[1],a[2])}function J(a){var a=a.currentTarget||a.srcElement,d=h.onScriptLoad;a.detachEvent&&!S?a.detachEvent("onreadystatechange",d):a.removeEventListener("load",d,
-!1);d=h.onScriptError;a.detachEvent&&!S||a.removeEventListener("error",d,!1);return{node:a,id:a&&a.getAttribute("data-requiremodule")}}var k={waitSeconds:7,baseUrl:"./",paths:{},pkgs:{},shim:{}},m={},W={},F=[],n={},R={},N=1,O=1,M=[],T,X,h,Q,U;Q={require:function(a){return t(a)},exports:function(a){a.usingExports=!0;if(a.map.isDefine)return a.exports=n[a.map.id]={}},module:function(a){return a.module={id:a.map.id,uri:a.map.url,config:function(){return k.config&&k.config[a.map.id]||{}},exports:n[a.map.id]}}};
-X=function(a){this.events=W[a.id]||{};this.map=a;this.shim=k.shim[a.id];this.depExports=[];this.depMaps=[];this.depMatched=[];this.pluginMaps={};this.depCount=0};X.prototype={init:function(a,d,b,l){l=l||{};if(!this.inited){this.factory=d;if(b)this.on("error",b);else this.events.error&&(b=s(this,function(a){this.emit("error",a)}));this.depMaps=a&&a.slice(0);this.depMaps.rjsSkipMap=a.rjsSkipMap;this.errback=b;this.inited=!0;this.ignore=l.ignore;l.enabled||this.enabled?this.enable():this.check()}},defineDepById:function(a,
-d){var b;q(this.depMaps,function(d,f){if(d.id===a)return b=f,!0});return this.defineDep(b,d)},defineDep:function(a,d){this.depMatched[a]||(this.depMatched[a]=!0,this.depCount-=1,this.depExports[a]=d)},fetch:function(){if(!this.fetched){this.fetched=!0;h.startTime=(new Date).getTime();var a=this.map;if(this.shim)t(this,!0)(this.shim.deps||[],s(this,function(){return a.prefix?this.callPlugin():this.load()}));else return a.prefix?this.callPlugin():this.load()}},load:function(){var a=this.map.url;R[a]||
-(R[a]=!0,h.load(this.map.id,a))},check:function(a){if(this.enabled&&!this.enabling){var d=this.map.id,b=this.depExports,c=this.exports,f=this.factory,e;if(this.inited)if(this.error)this.emit("error",this.error);else{if(!this.defining){this.defining=!0;if(this.depCount<1&&!this.defined){if(x(f)){if(this.events.error)try{c=h.execCb(d,f,b,c)}catch(g){e=g}else c=h.execCb(d,f,b,c);if(this.map.isDefine)if((b=this.module)&&b.exports!==void 0&&b.exports!==this.exports)c=b.exports;else if(c===void 0&&this.usingExports)c=
-this.exports;if(e)return e.requireMap=this.map,e.requireModules=[this.map.id],e.requireType="define",B(this.error=e)}else c=f;this.exports=c;if(this.map.isDefine&&!this.ignore&&(n[d]=c,j.onResourceLoad))j.onResourceLoad(h,this.map,this.depMaps);delete m[d];this.defined=!0;h.waitCount-=1;h.waitCount===0&&(M=[])}this.defining=!1;if(!a&&this.defined&&!this.defineEmitted)this.defineEmitted=!0,this.emit("defined",this.exports),this.defineEmitComplete=!0}}else this.fetch()}},callPlugin:function(){var a=
-this.map,d=a.id,b=g(a.prefix,null,!1,!0);p(b,"defined",s(this,function(b){var f=this.map.name,e=this.map.parentMap?this.map.parentMap.name:null;if(this.map.unnormalized){if(b.normalize&&(f=b.normalize(f,function(a){return c(a,e,!0)})||""),b=g(a.prefix+"!"+f,this.map.parentMap,!1,!0),p(b,"defined",s(this,function(a){this.init([],function(){return a},null,{enabled:!0,ignore:!0})})),b=m[b.id]){if(this.events.error)b.on("error",s(this,function(a){this.emit("error",a)}));b.enable()}}else f=s(this,function(a){this.init([],
-function(){return a},null,{enabled:!0})}),f.error=s(this,function(a){this.inited=!0;this.error=a;a.requireModules=[d];y(m,function(a){a.map.id.indexOf(d+"_unnormalized")===0&&z(a.map.id)});B(a)}),f.fromText=function(a,d){var b=L;b&&(L=!1);r(g(a));j.exec(d);b&&(L=!0);h.completeLoad(a)},b.load(a.name,t(a.parentMap,!0,function(a,d){a.rjsSkipMap=!0;return h.require(a,d)}),f,k)}));h.enable(b,this);this.pluginMaps[b.id]=b},enable:function(){this.enabled=!0;if(!this.waitPushed)M.push(this),h.waitCount+=
-1,this.waitPushed=!0;this.enabling=!0;q(this.depMaps,s(this,function(a,d){var b,c;if(typeof a==="string"){a=g(a,this.map.isDefine?this.map:this.map.parentMap,!1,!this.depMaps.rjsSkipMap);this.depMaps[d]=a;if(b=Q[a.id]){this.depExports[d]=b(this);return}this.depCount+=1;p(a,"defined",s(this,function(a){this.defineDep(d,a);this.check()}));this.errback&&p(a,"error",this.errback)}b=a.id;c=m[b];!Q[b]&&c&&!c.enabled&&h.enable(a,this)}));y(this.pluginMaps,s(this,function(a){var b=m[a.id];b&&!b.enabled&&
-h.enable(a,this)}));this.enabling=!1;this.check()},on:function(a,b){var c=this.events[a];c||(c=this.events[a]=[]);c.push(b)},emit:function(a,b){q(this.events[a],function(a){a(b)});a==="error"&&delete this.events[a]}};return h={config:k,contextName:b,registry:m,defined:n,urlFetched:R,waitCount:0,defQueue:F,Module:X,makeModuleMap:g,configure:function(a){a.baseUrl&&a.baseUrl.charAt(a.baseUrl.length-1)!=="/"&&(a.baseUrl+="/");var b=k.pkgs,c=k.shim,e=k.paths,f=k.map;K(k,a,!0);k.paths=K(e,a.paths,!0);if(a.map)k.map=
-K(f||{},a.map,!0,!0);if(a.shim)y(a.shim,function(a,b){G(a)&&(a={deps:a});if(a.exports&&!a.exports.__buildReady)a.exports=h.makeShimExports(a.exports);c[b]=a}),k.shim=c;if(a.packages)q(a.packages,function(a){a=typeof a==="string"?{name:a}:a;b[a.name]={name:a.name,location:a.location||a.name,main:(a.main||"main").replace(ja,"").replace(ba,"")}}),k.pkgs=b;y(m,function(a,b){a.map=g(b)});if(a.deps||a.callback)h.require(a.deps||[],a.callback)},makeShimExports:function(a){var b;return typeof a==="string"?
-(b=function(){return Z(a)},b.exports=a,b):function(){return a.apply(Y,arguments)}},requireDefined:function(a,b){var c=g(a,b,!1,!0).id;return n.hasOwnProperty(c)},requireSpecified:function(a,b){a=g(a,b,!1,!0).id;return n.hasOwnProperty(a)||m.hasOwnProperty(a)},require:function(a,d,c,e){var f;if(typeof a==="string"){if(x(d))return B(H("requireargs","Invalid require call"),c);if(j.get)return j.get(h,a,d);a=g(a,d,!1,!0);a=a.id;return!n.hasOwnProperty(a)?B(H("notloaded",'Module name "'+a+'" has not been loaded yet for context: '+
-b)):n[a]}c&&!x(c)&&(e=c,c=void 0);d&&!x(d)&&(e=d,d=void 0);for(u();F.length;)if(f=F.shift(),f[0]===null)return B(H("mismatch","Mismatched anonymous define() module: "+f[f.length-1]));else V(f);r(g(null,e)).init(a,d,c,{enabled:!0});E();return h.require},undef:function(a){var b=g(a,null,!0),c=m[a];delete n[a];delete R[b.url];delete W[a];if(c){if(c.events.defined)W[a]=c.events;z(a)}},enable:function(a){m[a.id]&&r(a).enable()},completeLoad:function(a){var b=k.shim[a]||{},c=b.exports&&b.exports.exports,
-e,f;for(u();F.length;){f=F.shift();if(f[0]===null){f[0]=a;if(e)break;e=!0}else f[0]===a&&(e=!0);V(f)}f=m[a];if(!e&&!n[a]&&f&&!f.inited)if(k.enforceDefine&&(!c||!Z(c)))if(i(a))return;else return B(H("nodefine","No define call for "+a,null,[a]));else V([a,b.deps||[],b.exports]);E()},toUrl:function(a,b){var e=a.lastIndexOf("."),g=null;e!==-1&&(g=a.substring(e,a.length),a=a.substring(0,e));return h.nameToUrl(c(a,b&&b.id,!0),g)},nameToUrl:function(a,b){var c,e,f,g,h,i;if(j.jsExtRegExp.test(a))g=a+(b||
-"");else{c=k.paths;e=k.pkgs;g=a.split("/");for(h=g.length;h>0;h-=1)if(i=g.slice(0,h).join("/"),f=e[i],i=c[i]){G(i)&&(i=i[0]);g.splice(0,h,i);break}else if(f){c=a===f.name?f.location+"/"+f.main:f.location;g.splice(0,h,c);break}g=g.join("/")+(b||".js");g=(g.charAt(0)==="/"||g.match(/^[\w\+\.\-]+:/)?"":k.baseUrl)+g}return k.urlArgs?g+((g.indexOf("?")===-1?"?":"&")+k.urlArgs):g},load:function(a,b){j.load(h,a,b)},execCb:function(a,b,c,e){return b.apply(e,c)},onScriptLoad:function(a){if(a.type==="load"||
-la.test((a.currentTarget||a.srcElement).readyState))I=null,a=J(a),h.completeLoad(a.id)},onScriptError:function(a){var b=J(a);if(!i(b.id))return B(H("scripterror","Script error",a,[b.id]))}}}};j({});aa(j);if(w&&(t=A.head=document.getElementsByTagName("head")[0],C=document.getElementsByTagName("base")[0]))t=A.head=C.parentNode;j.onError=function(b){throw b;};j.load=function(b,c,e){var i=b&&b.config||{},g;if(w)return g=i.xhtml?document.createElementNS("http://www.w3.org/1999/xhtml","html:script"):document.createElement("script"),
-g.type=i.scriptType||"text/javascript",g.charset="utf-8",g.async=!0,g.setAttribute("data-requirecontext",b.contextName),g.setAttribute("data-requiremodule",c),g.attachEvent&&!(g.attachEvent.toString&&g.attachEvent.toString().indexOf("[native code")<0)&&!S?(L=!0,g.attachEvent("onreadystatechange",b.onScriptLoad)):(g.addEventListener("load",b.onScriptLoad,!1),g.addEventListener("error",b.onScriptError,!1)),g.src=e,E=g,C?t.insertBefore(g,C):t.appendChild(g),E=null,g;else ca&&(importScripts(e),b.completeLoad(c))};
-w&&N(document.getElementsByTagName("script"),function(b){if(!t)t=b.parentNode;if(u=b.getAttribute("data-main")){if(!p.baseUrl)D=u.split("/"),da=D.pop(),ea=D.length?D.join("/")+"/":"./",p.baseUrl=ea,u=da;u=u.replace(ba,"");p.deps=p.deps?p.deps.concat(u):[u];return!0}});define=function(b,c,e){var i,g;typeof b!=="string"&&(e=c,c=b,b=null);G(c)||(e=c,c=[]);!c.length&&x(e)&&e.length&&(e.toString().replace(ha,"").replace(ia,function(b,e){c.push(e)}),c=(e.length===1?["require"]:["require","exports","module"]).concat(c));
-if(L&&(i=E||ga()))b||(b=i.getAttribute("data-requiremodule")),g=z[i.getAttribute("data-requirecontext")];(g?g.defQueue:P).push([b,c,e])};define.amd={jQuery:!0};j.exec=function(b){return eval(b)};j(p)}})(this);
-
-define("vendors/require-2.0.4", function(){});
 
 //     Underscore.js 1.3.1
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
@@ -2518,41 +2480,25 @@ define('models/behaviours/uuid',[],function(){
 	};
 	return Uuid;
 });
-
-define('libs/config',['underscore'], function(_) {
-	var config, defaults = {
-			socketUrl : '/'
-	};
-	if (typeof BasbosaConfig !== 'undefined') {
-		config = BasbosaConfig;
-	} else if (typeof jRaw !== 'undefined') {
-		config = jRaw;
-	} else {
-		config = {};
-	}
-	config = _.extend(defaults, config);
+(function(root, factory) {
+	// Basbosa registry should be loaded once
 	
-	var Config = {
-			__config : config,
-			read	: function(index) {
-				if (typeof this.__config[index] !== 'undefined') {
-					return this.__config[index];
-				} else {
-					Logger.warn('The value ' + index + ' is not defined in Config yet');
-					return 'undefined';
-				}
-			},
-			write : function(index) {
-				this.__config[index] = value;
-				return this;
-			}		
-	};
-	Config.get = Config.read;
-	Config.set = Config.write;
-	return Config;
-});
-
-define('libs/basbosa',['./config'], function(Config) {
+	
+	if (typeof exports !== 'undefined') {
+  	// Node.js
+    module.exports = factory(root);
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define('basbosa-registry',[],function() {
+    	if (typeof Basbosa !== 'undefined') return;
+    	root.Basbosa = factory(root);
+      return root.Basbosa;
+    });
+  } else {
+    // Browser globals
+    root.Basbosa = factory(root);
+  }
+}(this, function(root) {
 	var Basbosa = function Basbosa(className) {
 		if (!className) return Basbosa;
 		if (Basbosa.classes[className]) {
@@ -2566,16 +2512,15 @@ define('libs/basbosa',['./config'], function(Config) {
 		Basbosa.classes = Basbosa.classes || [];
 		Basbosa.classes[className] = instance;
 	};
-	if (typeof window !== 'undefined') window.Basbosa = Basbosa;
-	Basbosa.add('Config', Config);
+	
 	return Basbosa;
-});
+}));
 
 define('models/user',[
 		'../collections/activities'
 	, './behaviours/uuid'
 	, 'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(ActivitiesList, Uuid) {
 	var UserModel = Backbone.Model.extend({
 		idAttribute 		: '_id',
@@ -2668,7 +2613,7 @@ define('models/sector',[
 		'../collections/users'
 	, '../collections/messages'
 	, 'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(UsersList, MessagesList) {
 	var SectorModel = Backbone.Model.extend({
 		idAttribute	: "_id",
@@ -2847,19 +2792,51 @@ define('collections/groups',[
   return GroupsList;
 
 });
-
-define('libs/logging_module',['underscore', 'require', './basbosa'], function( _ , require) {
+(function(root, factory) {
+  if (typeof exports !== 'undefined') {
+  	// Node.js
+    module.exports = factory(root);
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define('basbosa-logger',[],function() {
+      root.Logger = factory(root);
+      return root.Logger;
+    });
+  } else {
+    // Browser globals
+    root.Logger = factory(root);
+  }
+}(this, function(root) {
 	
 	/**
 	 * SERVER: true if this code is running server-side, false if client-side
 	 */
-	var SERVER = typeof (exports) != 'undefined', instance;
+	var SERVER = typeof (exports) !== 'undefined', instance, isFirstTime = true;
 	
-	
+	/**
+	 *  
+	 *	colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
+	 *	enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
+	 *	showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
+	 *	showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
+	 *	level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
+	 *	poorLogger (boolean, default false) - On browsers without a console object
+	 *	uiLogger	(boolean, true) - Enable or disable on screen custom logger, usefull on mobile and tablets requires jquery 
+	 * 
+	 */
+	var defaultOptions = {
+			colors 		: SERVER ? true : false,
+			enabled 	: true,
+			showTime	: true,
+			showPath	: true,
+			level			: 2,
+			poorLogger: false,
+			uiLogger  : true
+	};
+		
 	/**
 	 * Log levels.
 	 */
-
 	var levels = [
 		'error'
 		, 'warn'
@@ -2871,7 +2848,6 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	/**
 	 * Colors for log levels.
 	 */
-
 	var colors = [
 		31
 		, 33
@@ -2884,9 +2860,7 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	 * Converts an enumerable to an array.
 	 *
 	 * @api public
-	 */ 
-	 
-	 
+	 */ 	 
 	var toArray = function (enu) {
 	  var arr = [];
 
@@ -2899,7 +2873,6 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	/**
 	 * Pads the nice output to the longest log level.
 	 */
-
 	function pad (str) {
 		var max = 0;
 
@@ -2914,62 +2887,70 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 
 	/**
 	 * Logger class
-	 *
+	 *  optional argument to constructor (if not included, defaults options are applied):
 	 * @api public
 	 */
-	
-	// optional argument to constructor (if not included, defaults options are applied):
-	// opts {
-		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
-		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
-		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
-		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
-		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
-	// }
-	
-	var Logger = function (opts) {
-		this.setOptions(opts);
+	 var Logger = function (opts) {
+		 this.setOptions(opts);
+		 this.initUiLogger();
 	};
 	
 	/**
-	 * setOptions method
+	 * setOptions method to update logger options after initialization
 	 *
 	 */
-	
-	// optional argument(if not included, defaults options are applied):
-	// opts {
-		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
-		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
-		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
-		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
-		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
-	// }
-	
-	var defaultOptions = {
-		colors 		: SERVER ? true : false,
-		enabled 	: true,
-		showTime	: true,
-		showPath	: true,
-		level			: 2,
-		poorLogger: false,
-		uiLogger  : false
-	};
-	
 	Logger.prototype.setOptions = function (opts) {
 		// Auto populate logging level
 		typeof Config != 'undefined' && Config.logging != 'undefined' &&	(defaultOptions.level = Config.logging);
-	
-		opts = opts || {}; // make this argument optional
-		// Client side settings
-		if (typeof jRaw != 'undefined') {
-			jRaw.logging != 'undefined' &&	(defaultOptions.level = jRaw.logging);
-			// on iphone, no support for multiple arguments to consol fnctions
-			if (jRaw.agent.family == 'iPhone') {
-				opts.poorLogger = true;
-			}
+		if (typeof BasbosaConfig  != 'undefined') {
+			if (BasbosaConfig.logging != 'undefined') defaultOptions.level = BasbosaConfig.logging;
+			
+			// on iphone, no support for multiple arguments to console.log function
+			// if (BasbosaConfig.agent.family == 'iPhone') opts.poorLogger = true;
 		}
-
-		_.extend(this, defaultOptions, opts);
+		opts = opts || {}; // make this argument optional
+		for (var optKey in defaultOptions) {
+			this[optKey] = typeof(opts[optKey]) === 'undefined' ? defaultOptions[optKey] : opts[optKey]; 
+		}
+		//_.extend(this, defaultOptions, opts);
+	};
+	
+	Logger.prototype.initUiLogger = function() {
+		var $buttonMax, $buttonClose;
+		if (typeof $ === 'undefined') return;
+		$(function() {
+			$('body').append($('<div>').addClass('basbosa-logger')					   
+	  		.css({
+	  			'position': 'fixed',
+	  			'top': '0',
+	  			'opacity': '0.8',
+	  			'display': 'block',
+	  			'width': '100%',
+	  			'height': '100px',
+	  			'background-color': 'white',
+	  			'z-index': '1001',
+	  			'overflow': 'scroll'
+	  			})
+	  	);
+	    			
+			$buttonMax = $('<input>')
+				.attr({'class' : 'basbosa-logger-max-min',	type	: 'button',	value	: '+'})
+				.css({'right': '45px','position': 'fixed'})
+				.click(function() {			
+					$('.basbosa-logger').css('height', $('.basbosa-logger').css('height') == '100px' ? '100%' : '100px');
+			});
+				
+			$buttonClose = $('<input>')
+				.attr({'claas' : 'basbosa-logger-close',	type	: 'button',	value	: 'x'})
+				.css({'right': '15px','position': 'fixed'})
+				.click(function() {			
+					$('.basbosa-logger').hide();	
+			});
+			
+			$('.basbosa-logger').append($buttonMax, $buttonClose);
+		});
+		
+		isFirstTime = false;
 	};
 	
 	/**
@@ -2977,42 +2958,25 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	 *
 	 * @api public
 	 */
-	var isFirstTime = null;
 	Logger.prototype.log = function (type) {
-		var index = _(levels).indexOf(type), self = this;
-
+		var index, consoleArgs, filePath = '', lineNumber, traceDetails;
+		
+		for (var i = 0; i < levels.length; i++) {
+			if (levels[i] == type) index = i;
+		}
+		
 		if (index > this.level 
 				|| !this.enabled
 				|| typeof console == 'undefined' 
 				|| typeof console.log == 'undefined')
 			return this;
-		
-		// Logger that do not support multiple parameters
-		if (this.poorLogger) {
-			for (var i = 1; i < arguments.length ; i++) {								
-				console.log.call(console, JSON.stringify(arguments[i]));
-			
-			}
-			
-			return ;
-		}				
-		var date = new Date();
-		
-		function checkTime (i) {
-			return i < 10 ? '0' + i : i + '';
-		}
-		
-		var timeStamp = checkTime(date.getHours()) + ':'
-			+ checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
-			
-		var filePath = '';
-		var lineNumber = -1;
-		var traceDetails = '';
+				
 		
 		// Works only for V8 (i.e. Chrome & nodejs)
 		Error.prepareStackTrace = function (error, frames) {
 			var frame, i;
 			for (i = 0; i < frames.length; ++i) {
+				if (!frames[i].getFileName()) return;
 				// if this is not the path to logging_module.js, assign this frame to the var 'frame'
 				if (frames[i].getFileName().indexOf('logging_module') == -1) {
 					frame = frames[i];
@@ -3021,8 +2985,9 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 			}
 			filePath = frame.getFileName();
 			// Exclude app root from logged file path
-			(typeof APP_PATH != 'undefined') ? filePath = filePath.replace(APP_PATH, '')
-				: (!SERVER) ? filePath = filePath.replace(window.location.origin, '') : '';
+			if (typeof APP_PATH != 'undefined')  filePath = filePath.replace(APP_PATH, '');
+			if (!SERVER) filePath = filePath.replace(window.location.origin, '');
+			
 			lineNumber = frame.getLineNumber();
 			return '';
 		};
@@ -3053,101 +3018,82 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 			}
 		}
 	
-		function getMyConsoleArgs (inputConsoleArgs, context) {
-			var outputConsoleArgs = new Array();
-			context.showTime ? outputConsoleArgs.push(timeStamp) : '';
-			outputConsoleArgs.push(context.colors ? '\033[' + colors[index] + 'm' + pad(type) + ' -\033[39m' : type + ':');
-			//var inputs = toArray(inputConsoleArgs).slice(1);
-			for (var i = 1; i < inputConsoleArgs.length; ++i) {
-				if(inputConsoleArgs[i]=='[object Object]') 
-					outputConsoleArgs.push(JSON.stringify(inputConsoleArgs[i]));
-				else
-					outputConsoleArgs.push(inputConsoleArgs[i]);
-			
-			}
-			context.showPath ? outputConsoleArgs.push(traceDetails) : '';		
-			
-			if (!SERVER && self.uiLogger) {
-				require(['jquery'], function() {					
-					if (isFirstTime == null) {
-						$('body').append($('<div>').addClass('logger-div')					   
-		    			.css({'position': 'fixed', 'top': '0', 'opacity': '0.8', 'display': 'block'
-		    			, 'width': '100%', 'height': '100px', 'background-color': 'white', 'z-index': '1001','overflow': 'scroll'}));
-			    			
-						//$('.logger-div').append($('<input id = "max-min" value = '+'  type = "button" '/>  <input id = "close" value = "x" type = "button"/>'));
-						var buttonMax = $('<input>').attr({id : 'max-min',	type	: 'button',	value	: '+'}),
-						buttonClose = $('<input>').attr({id : 'close',	type	: 'button',	value	: 'x'});
-							
-						$('.logger-div').append(buttonMax, buttonClose);
-						
-						$('#close').css({'right': '15px','position': 'fixed'});
-						$('#max-min').css({'right': '45px','position': 'fixed'});						
-						
-						/**
-						 * add functionality to the buttons 
-						 */
-						$('#close').click(function() {			
-								$('.logger-div').slideToggle('slow');	
-						});						
-						$('#max-min').click(function() {			
-							if ($('.logger-div').css('height') == '100px') {
-								$('.logger-div').animate({'height': '100%'}, 1000);	
-							} else {	
-								$('.logger-div').animate({'height': '100px'}, 1000);
-							}
-						});						
-						/**
-						 * 		append new log 
-						 */						
-						$('.logger-div').append($('<div>').addClass(type).html(outputConsoleArgs+'<hr/>'));
-						isFirstTime = 1;
-					}	else {										
-						$loggerRow = $('<div>').addClass(type).html(outputConsoleArgs+'<hr/>');
-						$('.logger-div').append($loggerRow);																									
-					}
-					/**
-					 * show the div at the case it was hiden 
-					*/
-					if ($('.logger-div').hide()) $('.logger-div').show();
-					
-					/**
-					 * style the fonts each type with specific color 
-					 */
-					$('.debug').css({ 'color': '#3333FF'});
-					$('.trace').css({ 'color': '#333366'});
-					$('.erroe').css({ 'color': 'red'});
-					$('.info').css({ 'color': '#66CC00'});
-			});
-		}	
-			
-			return outputConsoleArgs;
-		}
 		
-		console.log && console.log.apply && console.log.apply (console, getMyConsoleArgs(arguments, this));
+		consoleArgs = this.getMyConsoleArgs(arguments, this, type, traceDetails, index);
+		console.log && console.log.apply && console.log.apply(console, consoleArgs);
 		return this;
 	};
+	
+	Logger.prototype.getLogTime = function() {
+		var date = new Date()
+		function checkTime (i) {
+			return i < 10 ? '0' + i : i + '';
+		}
+		
+		return checkTime(date.getHours()) + ':'
+			+ checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
+	};
+	
+	Logger.prototype.uiLog = function(type, outputConsoleArgs) {
+		if (typeof $ === 'undefined') return;
+		$loggerRow = $('<div>').addClass('basbosa-logger-' + type).html(outputConsoleArgs + '<hr/>');
+		$('.basbosa-logger').append($loggerRow);
+		$('.basbosa-logger').scrollTop(99999999999);
+							
+		/**
+		 * style the fonts each type with specific color 
+		 */
+		$('.basbosa-logger-debug').css({ 'color': '#3333FF'});
+		$('.basbosa-logger-trace').css({ 'color': '#333366'});
+		$('.basbosa-logger-error').css({ 'color': 'red'});
+		$('.basbosa-logger-info').css({ 'color': '#66CC00'});
+	};
+	
+	Logger.prototype.getMyConsoleArgs = function (inputConsoleArgs, context, type, traceDetails, index) {
+		var outputConsoleArgs = new Array();
+		context.showTime ? outputConsoleArgs.push(context.getLogTime()) : '';
+		outputConsoleArgs.push(context.colors ? '\033[' + colors[index] + 'm' + pad(type) + ' -\033[39m' : type + ':');
+		//var inputs = toArray(inputConsoleArgs).slice(1);
+		
+		
+		for (var i = 1; i < inputConsoleArgs.length; ++i) {
+			if (inputConsoleArgs[i] == '[object Object]') 
+				outputConsoleArgs.push(JSON.stringify(inputConsoleArgs[i]));
+			else
+				outputConsoleArgs.push(inputConsoleArgs[i]);
+		}
+		
+		
+		context.showPath ? outputConsoleArgs.push(traceDetails) : '';		
+				
+		if (context.uiLogger) {					
+			context.uiLog(type, outputConsoleArgs);
+		}	
+		return outputConsoleArgs;
+	}
 
 	/**
 	 * Generate methods for each log level.
 	 */
 
-	_.forEach(levels, function (name) {				
-		Logger.prototype[name] = function () {			
-			this.log.apply(this, [name].concat(toArray(arguments)));			
-		};
+	for (var i = 0; i < levels.length; i++) {
+		var name = levels[i];
+		(function(name) {
+			Logger.prototype[name] = function () {			
+				this.log.apply(this, [name].concat(toArray(arguments)));			
+			};
+		})(name);
 		
-	});
+	}
+	
 	
 	if (typeof instance === 'undefined') instance = new Logger;
-	if (!SERVER) window.Logger = instance;
-	Basbosa && Basbosa.add('Logger', instance);
+	if (typeof Basbosa !== 'undefined') Basbosa.add('Logger', instance);
 	return instance;
-	
-});
+}));
 
 
-
-define('libs/leveled_events',['require', './logging_module', './basbosa'], function( require, LoggingModule) {
+define('libs/leveled_events',['require', 'basbosa-logger', 'basbosa-registry'], function( require, LoggingModule) {
  	// Can add more complex checks here
 	var SERVER = typeof(exports) !== 'undefined';
 	var Logger = LoggingModule;
@@ -3292,7 +3238,7 @@ define('models/j',[
 	,	'../collections/groups'
 	, '../libs/leveled_events'
 	, 'backbone'	
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(User, Group, GroupsList, LeveledEvents) {
 	
 	var JModel = Backbone.Model.extend({
@@ -3389,7 +3335,7 @@ define('libs/app_backbone',['backbone'], function() {
 	
   return Backbone;
 });
-define('libs/assets',['backbone', 'jquery', './basbosa'], function() {
+define('libs/assets',['backbone', 'jquery', 'basbosa-registry'], function() {
 	var Assets = Backbone.Model.extend({
 		
 		defaults : {
@@ -3449,6 +3395,58 @@ define('libs/assets',['backbone', 'jquery', './basbosa'], function() {
 	return Assets;
 });
 
+(function(root, factory) {
+  if (typeof exports !== 'undefined') {
+  	// Node.js
+    module.exports = factory(root);
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define('basbosa-config',[],function() {
+      return factory(root);
+    });
+  } else {
+    // Browser globals
+  	factory(root);
+  }
+}(this, function(root) {
+	var config, defaults = {
+			socketUrl : '/'
+	};
+	
+	if (typeof BasbosaConfig !== 'undefined') {
+		config = BasbosaConfig;
+	} else if (typeof jRaw !== 'undefined') {
+		config = jRaw;
+	} else {
+		config = {};
+	}
+	
+	for (var key in defaults) {
+		config[key] = typeof(config[key]) === 'undefined' ? defaults[key] : config[key]; 
+	}
+	
+	var Config = {
+			__config : config,
+			read	: function(index) {
+				if (typeof this.__config[index] !== 'undefined') {
+					return this.__config[index];
+				} else {
+					//Logger.warn('The value ' + index + ' is not defined in Config yet');
+					return 'undefined';
+				}
+			},
+			write : function(index) {
+				this.__config[index] = value;
+				return this;
+			}		
+	};
+	
+	Config.get = Config.read;
+	Config.set = Config.write;
+	//if (typeof Basbosa !== 'undefined') 
+	Basbosa.add('Config', Config);
+	return Config;
+}));
 define("libs/i18n_client", BasbosaConfig ? (BasbosaConfig.dictionaries || []) : [], function() {
 	var locales = {}, dictionaries = BasbosaConfig ? (BasbosaConfig.dictionaries || []) : [];
 	
@@ -3473,17 +3471,19 @@ define("libs/i18n_client", BasbosaConfig ? (BasbosaConfig.dictionaries || []) : 
 	window.t = t;
 });
 define('libs/index',[
-  './app_backbone'
+    'basbosa-registry'
+  , './app_backbone'
   , './assets'
   , './leveled_events'
-  , './logging_module'
+  , 'basbosa-logger'
+  , 'basbosa-config'
   , './i18n_client'
-  , './basbosa'
+  
 ]);
 define('themes/fps',[
 		'require'
 	,	'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(require) {
 	var FpsView = Backbone.View.extend({
 		initialize : function() {
@@ -3549,7 +3549,7 @@ define('themes/fps',[
 define('themes/screen_size',[
     'jquery'
    ,'backbone'
-   , '../libs/basbosa'
+   , 'basbosa-registry'
 	], function() {
 	var ScreenSizeView = Backbone.View.extend({
 		id	: 'screen-size',
@@ -3688,7 +3688,7 @@ define('themes/sound',[
 	'backbone', 
 	'jquery',
 	'./../vendors/jquery.jplayer.min'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 ], function(require) {
 	var SoundView = Backbone.View.extend({
 		
@@ -3781,7 +3781,7 @@ define('themes/sound',[
 define('themes/feedback',[
 		'require'
 	,	'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(require) {
 	var FeedbackView = Backbone.View.extend({
 		initialize : function() {
@@ -7676,9 +7676,10 @@ define("socketio", function(){});
 
 define('controllers/components/socket_client',[
 		'../../libs/leveled_events'
-	, '../../libs/logging_module'
+	, 'basbosa-logger'
 	, 'underscore'
 	,	'socketio'
+	, 'basbosa-config'
 	
 	], function(LeveledEvents, Logger) {
 	
@@ -8416,7 +8417,14 @@ require.config({
 	  socketio		: 'corec/vendors/socket.io-0.9.10',
 	  underscore	: 'corec/vendors/underscore-1.3.1',
 	  backbone		: 'corec/vendors/backbone-0.9.2',
-		basbosa 		: 'corec/app'
+		basbosa 		: 'corec/app',
+		'basbosa-config' 		: 'node_modules/basbosa-config/index',
+		'basbosa-logger' 		: 'node_modules/basbosa-logger/index',
+		'basbosa-registry' 	: 'node_modules/basbosa-registry/index',
+	},
+	shim : {
+		'basbosa-config' : ['basbosa-registry'],
+		'basbosa-logger' : ['basbosa-registry']
 	}
 });
 
@@ -8427,9 +8435,8 @@ define('app',[
 	, './controllers/default_controller'
 	, './vendors/viewporter'
 	, './vendors/jade_runtime'
-	, 'jquery'
-	, 'underscore'
+	, 'jquery'	, 'underscore'
 	, 'backbone'
 	], function() {
 	
-});require(['app']);
+});

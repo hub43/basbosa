@@ -3,7 +3,7 @@ define([
 		'../collections/users'
 	, '../collections/messages'
 	, 'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(UsersList, MessagesList) {
 	var SectorModel = Backbone.Model.extend({
 		idAttribute	: "_id",

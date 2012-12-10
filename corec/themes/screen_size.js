@@ -1,7 +1,7 @@
 define([
     'jquery'
    ,'backbone'
-   , '../libs/basbosa'
+   , 'basbosa-registry'
 	], function() {
 	var ScreenSizeView = Backbone.View.extend({
 		id	: 'screen-size',

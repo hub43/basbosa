@@ -3,7 +3,7 @@ define([
 	'backbone', 
 	'jquery',
 	'./../vendors/jquery.jplayer.min'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 ], function(require) {
 	var SoundView = Backbone.View.extend({
 		

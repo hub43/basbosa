@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', './basbosa'], function() {
+define(['backbone', 'jquery', 'basbosa-registry'], function() {
 	var Assets = Backbone.Model.extend({
 		
 		defaults : {

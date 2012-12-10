@@ -14,7 +14,14 @@ require.config({
 	  socketio		: 'corec/vendors/socket.io-0.9.10',
 	  underscore	: 'corec/vendors/underscore-1.3.1',
 	  backbone		: 'corec/vendors/backbone-0.9.2',
-		basbosa 		: 'corec/app'
+		basbosa 		: 'corec/app',
+		'basbosa-config' 		: 'node_modules/basbosa-config/index',
+		'basbosa-logger' 		: 'node_modules/basbosa-logger/index',
+		'basbosa-registry' 	: 'node_modules/basbosa-registry/index',
+	},
+	shim : {
+		'basbosa-config' : ['basbosa-registry'],
+		'basbosa-logger' : ['basbosa-registry']
 	}
 });
 

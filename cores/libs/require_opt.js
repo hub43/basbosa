@@ -1,20 +1,28 @@
 var RequireJs = require('requirejs'), 
 	Fs = require('fs'), 
 	Crypto = require('crypto'), 
-	Path = require('path'), 
-	build, vendorsPath;
+	Path = require('path'),
+	build, vendorsPath, nodeModulesPath;
 
 build = typeof Config !== 'undefined' ? Config.requireOpt : {}, 
 vendorsPath = Path.dirname(Path.dirname(Path.dirname(__filename))) + '/corec/vendors/';
-
+nodeModulesPath = Path.dirname(Path.dirname(Path.dirname(__filename))) + '/';
 build.paths = {
 	jquery 			: vendorsPath + 'jquery-1.7.1.min',
 	socketio 		: vendorsPath + 'socket.io-0.9.10',
 	underscore	: vendorsPath + 'underscore-1.3.1',
 	backbone 		: vendorsPath + 'backbone-0.9.2',
 	jplayer 		: vendorsPath + 'jquery.jplayer.min',
-	basbosa			: vendorsPath + '../libs/basbosa'
+	basbosa			: vendorsPath + '../libs/basbosa',
+	'basbosa-config' 		: nodeModulesPath + 'node_modules/basbosa-config/index',
+	'basbosa-logger' 		: nodeModulesPath + 'node_modules/basbosa-logger/index',
+	'basbosa-registry' 		: nodeModulesPath + 'node_modules/basbosa-registry/index',
 };
+build.shim =  {
+		'basbosa-config' : ['basbosa-registry'],
+		'basbosa-logger' : ['basbosa-registry']
+};
+
 // Export it for other modules if needed
 module.exports.build = build;
 function buildCb(buildResponse, buildConfig) {

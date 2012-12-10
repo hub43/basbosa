@@ -1,5 +1,5 @@
 var RequireJs = require('requirejs'), 
-	build = require('./cores/libs/require_opt').build
+	build = require('./cores/libs/require_opt').build, 
 	Fs 		= require('fs');
 
 build.out = 'basbosa.client.js';

@@ -5,7 +5,7 @@ define([
 	,	'../collections/groups'
 	, '../libs/leveled_events'
 	, 'backbone'	
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(User, Group, GroupsList, LeveledEvents) {
 	
 	var JModel = Backbone.Model.extend({

@@ -2867,41 +2867,25 @@ define('models/behaviours/uuid',[],function(){
 	};
 	return Uuid;
 });
-
-define('libs/config',['underscore'], function(_) {
-	var config, defaults = {
-			socketUrl : '/'
-	};
-	if (typeof BasbosaConfig !== 'undefined') {
-		config = BasbosaConfig;
-	} else if (typeof jRaw !== 'undefined') {
-		config = jRaw;
-	} else {
-		config = {};
-	}
-	config = _.extend(defaults, config);
+(function(root, factory) {
+	// Basbosa registry should be loaded once
 	
-	var Config = {
-			__config : config,
-			read	: function(index) {
-				if (typeof this.__config[index] !== 'undefined') {
-					return this.__config[index];
-				} else {
-					Logger.warn('The value ' + index + ' is not defined in Config yet');
-					return 'undefined';
-				}
-			},
-			write : function(index) {
-				this.__config[index] = value;
-				return this;
-			}		
-	};
-	Config.get = Config.read;
-	Config.set = Config.write;
-	return Config;
-});
-
-define('libs/basbosa',['./config'], function(Config) {
+	
+	if (typeof exports !== 'undefined') {
+  	// Node.js
+    module.exports = factory(root);
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define('basbosa-registry',[],function() {
+    	if (typeof Basbosa !== 'undefined') return;
+    	root.Basbosa = factory(root);
+      return root.Basbosa;
+    });
+  } else {
+    // Browser globals
+    root.Basbosa = factory(root);
+  }
+}(this, function(root) {
 	var Basbosa = function Basbosa(className) {
 		if (!className) return Basbosa;
 		if (Basbosa.classes[className]) {
@@ -2915,16 +2899,15 @@ define('libs/basbosa',['./config'], function(Config) {
 		Basbosa.classes = Basbosa.classes || [];
 		Basbosa.classes[className] = instance;
 	};
-	if (typeof window !== 'undefined') window.Basbosa = Basbosa;
-	Basbosa.add('Config', Config);
+	
 	return Basbosa;
-});
+}));
 
 define('models/user',[
 		'../collections/activities'
 	, './behaviours/uuid'
 	, 'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(ActivitiesList, Uuid) {
 	var UserModel = Backbone.Model.extend({
 		idAttribute 		: '_id',
@@ -3017,7 +3000,7 @@ define('models/sector',[
 		'../collections/users'
 	, '../collections/messages'
 	, 'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(UsersList, MessagesList) {
 	var SectorModel = Backbone.Model.extend({
 		idAttribute	: "_id",
@@ -3196,19 +3179,51 @@ define('collections/groups',[
   return GroupsList;
 
 });
-
-define('libs/logging_module',['underscore', 'require', './basbosa'], function( _ , require) {
+(function(root, factory) {
+  if (typeof exports !== 'undefined') {
+  	// Node.js
+    module.exports = factory(root);
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define('basbosa-logger',[],function() {
+      root.Logger = factory(root);
+      return root.Logger;
+    });
+  } else {
+    // Browser globals
+    root.Logger = factory(root);
+  }
+}(this, function(root) {
 	
 	/**
 	 * SERVER: true if this code is running server-side, false if client-side
 	 */
-	var SERVER = typeof (exports) != 'undefined', instance;
+	var SERVER = typeof (exports) !== 'undefined', instance, isFirstTime = true;
 	
-	
+	/**
+	 *  
+	 *	colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
+	 *	enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
+	 *	showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
+	 *	showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
+	 *	level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
+	 *	poorLogger (boolean, default false) - On browsers without a console object
+	 *	uiLogger	(boolean, true) - Enable or disable on screen custom logger, usefull on mobile and tablets requires jquery 
+	 * 
+	 */
+	var defaultOptions = {
+			colors 		: SERVER ? true : false,
+			enabled 	: true,
+			showTime	: true,
+			showPath	: true,
+			level			: 2,
+			poorLogger: false,
+			uiLogger  : true
+	};
+		
 	/**
 	 * Log levels.
 	 */
-
 	var levels = [
 		'error'
 		, 'warn'
@@ -3220,7 +3235,6 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	/**
 	 * Colors for log levels.
 	 */
-
 	var colors = [
 		31
 		, 33
@@ -3233,9 +3247,7 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	 * Converts an enumerable to an array.
 	 *
 	 * @api public
-	 */ 
-	 
-	 
+	 */ 	 
 	var toArray = function (enu) {
 	  var arr = [];
 
@@ -3248,7 +3260,6 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	/**
 	 * Pads the nice output to the longest log level.
 	 */
-
 	function pad (str) {
 		var max = 0;
 
@@ -3263,62 +3274,70 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 
 	/**
 	 * Logger class
-	 *
+	 *  optional argument to constructor (if not included, defaults options are applied):
 	 * @api public
 	 */
-	
-	// optional argument to constructor (if not included, defaults options are applied):
-	// opts {
-		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
-		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
-		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
-		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
-		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
-	// }
-	
-	var Logger = function (opts) {
-		this.setOptions(opts);
+	 var Logger = function (opts) {
+		 this.setOptions(opts);
+		 this.initUiLogger();
 	};
 	
 	/**
-	 * setOptions method
+	 * setOptions method to update logger options after initialization
 	 *
 	 */
-	
-	// optional argument(if not included, defaults options are applied):
-	// opts {
-		// colors	(boolean,	default true)	- specifies whether to use colors for log levels or not
-		// enabled	(boolean,	default tue)	- specifies whether the logger is enabled to output messages or not
-		// showTime	(boolean,	default true)	- specifies whether a time stamp should be output with log messages or not
-		// showPath	(boolean,	default true)	- specifies whether a path to the file logging the message shoud be output with it
-		// level	(int,		default 3)		- specifies the highest log level to be output (***indexing is zero-based***)
-	// }
-	
-	var defaultOptions = {
-		colors 		: SERVER ? true : false,
-		enabled 	: true,
-		showTime	: true,
-		showPath	: true,
-		level			: 2,
-		poorLogger: false,
-		uiLogger  : false
-	};
-	
 	Logger.prototype.setOptions = function (opts) {
 		// Auto populate logging level
 		typeof Config != 'undefined' && Config.logging != 'undefined' &&	(defaultOptions.level = Config.logging);
-	
-		opts = opts || {}; // make this argument optional
-		// Client side settings
-		if (typeof jRaw != 'undefined') {
-			jRaw.logging != 'undefined' &&	(defaultOptions.level = jRaw.logging);
-			// on iphone, no support for multiple arguments to consol fnctions
-			if (jRaw.agent.family == 'iPhone') {
-				opts.poorLogger = true;
-			}
+		if (typeof BasbosaConfig  != 'undefined') {
+			if (BasbosaConfig.logging != 'undefined') defaultOptions.level = BasbosaConfig.logging;
+			
+			// on iphone, no support for multiple arguments to console.log function
+			// if (BasbosaConfig.agent.family == 'iPhone') opts.poorLogger = true;
 		}
-
-		_.extend(this, defaultOptions, opts);
+		opts = opts || {}; // make this argument optional
+		for (var optKey in defaultOptions) {
+			this[optKey] = typeof(opts[optKey]) === 'undefined' ? defaultOptions[optKey] : opts[optKey]; 
+		}
+		//_.extend(this, defaultOptions, opts);
+	};
+	
+	Logger.prototype.initUiLogger = function() {
+		var $buttonMax, $buttonClose;
+		if (typeof $ === 'undefined') return;
+		$(function() {
+			$('body').append($('<div>').addClass('basbosa-logger')					   
+	  		.css({
+	  			'position': 'fixed',
+	  			'top': '0',
+	  			'opacity': '0.8',
+	  			'display': 'block',
+	  			'width': '100%',
+	  			'height': '100px',
+	  			'background-color': 'white',
+	  			'z-index': '1001',
+	  			'overflow': 'scroll'
+	  			})
+	  	);
+	    			
+			$buttonMax = $('<input>')
+				.attr({'class' : 'basbosa-logger-max-min',	type	: 'button',	value	: '+'})
+				.css({'right': '45px','position': 'fixed'})
+				.click(function() {			
+					$('.basbosa-logger').css('height', $('.basbosa-logger').css('height') == '100px' ? '100%' : '100px');
+			});
+				
+			$buttonClose = $('<input>')
+				.attr({'claas' : 'basbosa-logger-close',	type	: 'button',	value	: 'x'})
+				.css({'right': '15px','position': 'fixed'})
+				.click(function() {			
+					$('.basbosa-logger').hide();	
+			});
+			
+			$('.basbosa-logger').append($buttonMax, $buttonClose);
+		});
+		
+		isFirstTime = false;
 	};
 	
 	/**
@@ -3326,42 +3345,25 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 	 *
 	 * @api public
 	 */
-	var isFirstTime = null;
 	Logger.prototype.log = function (type) {
-		var index = _(levels).indexOf(type), self = this;
-
+		var index, consoleArgs, filePath = '', lineNumber, traceDetails;
+		
+		for (var i = 0; i < levels.length; i++) {
+			if (levels[i] == type) index = i;
+		}
+		
 		if (index > this.level 
 				|| !this.enabled
 				|| typeof console == 'undefined' 
 				|| typeof console.log == 'undefined')
 			return this;
-		
-		// Logger that do not support multiple parameters
-		if (this.poorLogger) {
-			for (var i = 1; i < arguments.length ; i++) {								
-				console.log.call(console, JSON.stringify(arguments[i]));
-			
-			}
-			
-			return ;
-		}				
-		var date = new Date();
-		
-		function checkTime (i) {
-			return i < 10 ? '0' + i : i + '';
-		}
-		
-		var timeStamp = checkTime(date.getHours()) + ':'
-			+ checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
-			
-		var filePath = '';
-		var lineNumber = -1;
-		var traceDetails = '';
+				
 		
 		// Works only for V8 (i.e. Chrome & nodejs)
 		Error.prepareStackTrace = function (error, frames) {
 			var frame, i;
 			for (i = 0; i < frames.length; ++i) {
+				if (!frames[i].getFileName()) return;
 				// if this is not the path to logging_module.js, assign this frame to the var 'frame'
 				if (frames[i].getFileName().indexOf('logging_module') == -1) {
 					frame = frames[i];
@@ -3370,8 +3372,9 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 			}
 			filePath = frame.getFileName();
 			// Exclude app root from logged file path
-			(typeof APP_PATH != 'undefined') ? filePath = filePath.replace(APP_PATH, '')
-				: (!SERVER) ? filePath = filePath.replace(window.location.origin, '') : '';
+			if (typeof APP_PATH != 'undefined')  filePath = filePath.replace(APP_PATH, '');
+			if (!SERVER) filePath = filePath.replace(window.location.origin, '');
+			
 			lineNumber = frame.getLineNumber();
 			return '';
 		};
@@ -3402,101 +3405,82 @@ define('libs/logging_module',['underscore', 'require', './basbosa'], function( _
 			}
 		}
 	
-		function getMyConsoleArgs (inputConsoleArgs, context) {
-			var outputConsoleArgs = new Array();
-			context.showTime ? outputConsoleArgs.push(timeStamp) : '';
-			outputConsoleArgs.push(context.colors ? '\033[' + colors[index] + 'm' + pad(type) + ' -\033[39m' : type + ':');
-			//var inputs = toArray(inputConsoleArgs).slice(1);
-			for (var i = 1; i < inputConsoleArgs.length; ++i) {
-				if(inputConsoleArgs[i]=='[object Object]') 
-					outputConsoleArgs.push(JSON.stringify(inputConsoleArgs[i]));
-				else
-					outputConsoleArgs.push(inputConsoleArgs[i]);
-			
-			}
-			context.showPath ? outputConsoleArgs.push(traceDetails) : '';		
-			
-			if (!SERVER && self.uiLogger) {
-				require(['jquery'], function() {					
-					if (isFirstTime == null) {
-						$('body').append($('<div>').addClass('logger-div')					   
-		    			.css({'position': 'fixed', 'top': '0', 'opacity': '0.8', 'display': 'block'
-		    			, 'width': '100%', 'height': '100px', 'background-color': 'white', 'z-index': '1001','overflow': 'scroll'}));
-			    			
-						//$('.logger-div').append($('<input id = "max-min" value = '+'  type = "button" '/>  <input id = "close" value = "x" type = "button"/>'));
-						var buttonMax = $('<input>').attr({id : 'max-min',	type	: 'button',	value	: '+'}),
-						buttonClose = $('<input>').attr({id : 'close',	type	: 'button',	value	: 'x'});
-							
-						$('.logger-div').append(buttonMax, buttonClose);
-						
-						$('#close').css({'right': '15px','position': 'fixed'});
-						$('#max-min').css({'right': '45px','position': 'fixed'});						
-						
-						/**
-						 * add functionality to the buttons 
-						 */
-						$('#close').click(function() {			
-								$('.logger-div').slideToggle('slow');	
-						});						
-						$('#max-min').click(function() {			
-							if ($('.logger-div').css('height') == '100px') {
-								$('.logger-div').animate({'height': '100%'}, 1000);	
-							} else {	
-								$('.logger-div').animate({'height': '100px'}, 1000);
-							}
-						});						
-						/**
-						 * 		append new log 
-						 */						
-						$('.logger-div').append($('<div>').addClass(type).html(outputConsoleArgs+'<hr/>'));
-						isFirstTime = 1;
-					}	else {										
-						$loggerRow = $('<div>').addClass(type).html(outputConsoleArgs+'<hr/>');
-						$('.logger-div').append($loggerRow);																									
-					}
-					/**
-					 * show the div at the case it was hiden 
-					*/
-					if ($('.logger-div').hide()) $('.logger-div').show();
-					
-					/**
-					 * style the fonts each type with specific color 
-					 */
-					$('.debug').css({ 'color': '#3333FF'});
-					$('.trace').css({ 'color': '#333366'});
-					$('.erroe').css({ 'color': 'red'});
-					$('.info').css({ 'color': '#66CC00'});
-			});
-		}	
-			
-			return outputConsoleArgs;
-		}
 		
-		console.log && console.log.apply && console.log.apply (console, getMyConsoleArgs(arguments, this));
+		consoleArgs = this.getMyConsoleArgs(arguments, this, type, traceDetails, index);
+		console.log && console.log.apply && console.log.apply(console, consoleArgs);
 		return this;
 	};
+	
+	Logger.prototype.getLogTime = function() {
+		var date = new Date()
+		function checkTime (i) {
+			return i < 10 ? '0' + i : i + '';
+		}
+		
+		return checkTime(date.getHours()) + ':'
+			+ checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
+	};
+	
+	Logger.prototype.uiLog = function(type, outputConsoleArgs) {
+		if (typeof $ === 'undefined') return;
+		$loggerRow = $('<div>').addClass('basbosa-logger-' + type).html(outputConsoleArgs + '<hr/>');
+		$('.basbosa-logger').append($loggerRow);
+		$('.basbosa-logger').scrollTop(99999999999);
+							
+		/**
+		 * style the fonts each type with specific color 
+		 */
+		$('.basbosa-logger-debug').css({ 'color': '#3333FF'});
+		$('.basbosa-logger-trace').css({ 'color': '#333366'});
+		$('.basbosa-logger-error').css({ 'color': 'red'});
+		$('.basbosa-logger-info').css({ 'color': '#66CC00'});
+	};
+	
+	Logger.prototype.getMyConsoleArgs = function (inputConsoleArgs, context, type, traceDetails, index) {
+		var outputConsoleArgs = new Array();
+		context.showTime ? outputConsoleArgs.push(context.getLogTime()) : '';
+		outputConsoleArgs.push(context.colors ? '\033[' + colors[index] + 'm' + pad(type) + ' -\033[39m' : type + ':');
+		//var inputs = toArray(inputConsoleArgs).slice(1);
+		
+		
+		for (var i = 1; i < inputConsoleArgs.length; ++i) {
+			if (inputConsoleArgs[i] == '[object Object]') 
+				outputConsoleArgs.push(JSON.stringify(inputConsoleArgs[i]));
+			else
+				outputConsoleArgs.push(inputConsoleArgs[i]);
+		}
+		
+		
+		context.showPath ? outputConsoleArgs.push(traceDetails) : '';		
+				
+		if (context.uiLogger) {					
+			context.uiLog(type, outputConsoleArgs);
+		}	
+		return outputConsoleArgs;
+	}
 
 	/**
 	 * Generate methods for each log level.
 	 */
 
-	_.forEach(levels, function (name) {				
-		Logger.prototype[name] = function () {			
-			this.log.apply(this, [name].concat(toArray(arguments)));			
-		};
+	for (var i = 0; i < levels.length; i++) {
+		var name = levels[i];
+		(function(name) {
+			Logger.prototype[name] = function () {			
+				this.log.apply(this, [name].concat(toArray(arguments)));			
+			};
+		})(name);
 		
-	});
+	}
+	
 	
 	if (typeof instance === 'undefined') instance = new Logger;
-	if (!SERVER) window.Logger = instance;
-	Basbosa && Basbosa.add('Logger', instance);
+	if (typeof Basbosa !== 'undefined') Basbosa.add('Logger', instance);
 	return instance;
-	
-});
+}));
 
 
-
-define('libs/leveled_events',['require', './logging_module', './basbosa'], function( require, LoggingModule) {
+define('libs/leveled_events',['require', 'basbosa-logger', 'basbosa-registry'], function( require, LoggingModule) {
  	// Can add more complex checks here
 	var SERVER = typeof(exports) !== 'undefined';
 	var Logger = LoggingModule;
@@ -3641,7 +3625,7 @@ define('models/j',[
 	,	'../collections/groups'
 	, '../libs/leveled_events'
 	, 'backbone'	
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(User, Group, GroupsList, LeveledEvents) {
 	
 	var JModel = Backbone.Model.extend({
@@ -3738,7 +3722,7 @@ define('libs/app_backbone',['backbone'], function() {
 	
   return Backbone;
 });
-define('libs/assets',['backbone', 'jquery', './basbosa'], function() {
+define('libs/assets',['backbone', 'jquery', 'basbosa-registry'], function() {
 	var Assets = Backbone.Model.extend({
 		
 		defaults : {
@@ -3798,6 +3782,58 @@ define('libs/assets',['backbone', 'jquery', './basbosa'], function() {
 	return Assets;
 });
 
+(function(root, factory) {
+  if (typeof exports !== 'undefined') {
+  	// Node.js
+    module.exports = factory(root);
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define('basbosa-config',[],function() {
+      return factory(root);
+    });
+  } else {
+    // Browser globals
+  	factory(root);
+  }
+}(this, function(root) {
+	var config, defaults = {
+			socketUrl : '/'
+	};
+	
+	if (typeof BasbosaConfig !== 'undefined') {
+		config = BasbosaConfig;
+	} else if (typeof jRaw !== 'undefined') {
+		config = jRaw;
+	} else {
+		config = {};
+	}
+	
+	for (var key in defaults) {
+		config[key] = typeof(config[key]) === 'undefined' ? defaults[key] : config[key]; 
+	}
+	
+	var Config = {
+			__config : config,
+			read	: function(index) {
+				if (typeof this.__config[index] !== 'undefined') {
+					return this.__config[index];
+				} else {
+					//Logger.warn('The value ' + index + ' is not defined in Config yet');
+					return 'undefined';
+				}
+			},
+			write : function(index) {
+				this.__config[index] = value;
+				return this;
+			}		
+	};
+	
+	Config.get = Config.read;
+	Config.set = Config.write;
+	//if (typeof Basbosa !== 'undefined') 
+	Basbosa.add('Config', Config);
+	return Config;
+}));
 define("libs/i18n_client", BasbosaConfig ? (BasbosaConfig.dictionaries || []) : [], function() {
 	var locales = {}, dictionaries = BasbosaConfig ? (BasbosaConfig.dictionaries || []) : [];
 	
@@ -3822,17 +3858,19 @@ define("libs/i18n_client", BasbosaConfig ? (BasbosaConfig.dictionaries || []) : 
 	window.t = t;
 });
 define('libs/index',[
-  './app_backbone'
+    'basbosa-registry'
+  , './app_backbone'
   , './assets'
   , './leveled_events'
-  , './logging_module'
+  , 'basbosa-logger'
+  , 'basbosa-config'
   , './i18n_client'
-  , './basbosa'
+  
 ]);
 define('themes/fps',[
 		'require'
 	,	'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(require) {
 	var FpsView = Backbone.View.extend({
 		initialize : function() {
@@ -3898,7 +3936,7 @@ define('themes/fps',[
 define('themes/screen_size',[
     'jquery'
    ,'backbone'
-   , '../libs/basbosa'
+   , 'basbosa-registry'
 	], function() {
 	var ScreenSizeView = Backbone.View.extend({
 		id	: 'screen-size',
@@ -4037,7 +4075,7 @@ define('themes/sound',[
 	'backbone', 
 	'jquery',
 	'./../vendors/jquery.jplayer.min'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 ], function(require) {
 	var SoundView = Backbone.View.extend({
 		
@@ -4130,7 +4168,7 @@ define('themes/sound',[
 define('themes/feedback',[
 		'require'
 	,	'backbone'
-	, '../libs/basbosa'
+	, 'basbosa-registry'
 	], function(require) {
 	var FeedbackView = Backbone.View.extend({
 		initialize : function() {
@@ -8025,9 +8063,10 @@ define("socketio", function(){});
 
 define('controllers/components/socket_client',[
 		'../../libs/leveled_events'
-	, '../../libs/logging_module'
+	, 'basbosa-logger'
 	, 'underscore'
 	,	'socketio'
+	, 'basbosa-config'
 	
 	], function(LeveledEvents, Logger) {
 	
@@ -8765,7 +8804,14 @@ require.config({
 	  socketio		: 'corec/vendors/socket.io-0.9.10',
 	  underscore	: 'corec/vendors/underscore-1.3.1',
 	  backbone		: 'corec/vendors/backbone-0.9.2',
-		basbosa 		: 'corec/app'
+		basbosa 		: 'corec/app',
+		'basbosa-config' 		: 'node_modules/basbosa-config/index',
+		'basbosa-logger' 		: 'node_modules/basbosa-logger/index',
+		'basbosa-registry' 	: 'node_modules/basbosa-registry/index',
+	},
+	shim : {
+		'basbosa-config' : ['basbosa-registry'],
+		'basbosa-logger' : ['basbosa-registry']
 	}
 });
 
@@ -8776,8 +8822,7 @@ define('app',[
 	, './controllers/default_controller'
 	, './vendors/viewporter'
 	, './vendors/jade_runtime'
-	, 'jquery'
-	, 'underscore'
+	, 'jquery'	, 'underscore'
 	, 'backbone'
 	], function() {
 	

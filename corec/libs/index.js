@@ -1,8 +1,10 @@
 define([
-  './app_backbone'
+    'basbosa-registry'
+  , './app_backbone'
   , './assets'
   , './leveled_events'
-  , './logging_module'
+  , 'basbosa-logger'
+  , 'basbosa-config'
   , './i18n_client'
-  , './basbosa'
+  
 ]);

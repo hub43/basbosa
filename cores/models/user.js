@@ -17,10 +17,14 @@ define([
 	, 'http'
 	, '../libs/email_module'
 	, '../libs/validations_module'
+	, 'jade'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations, jade) { //user Model inherent from user and j in corec.
 	
 	var Validations =  Validations.getInstance();
+	var  mailPath = CORES + '/themes/views/mail.jade';
+	var mailString = require('fs').readFileSync(mailPath, 'utf8'),
+	jadeMail = jade.compile(mailString, { filename: mailPath, pretty: true });
 	var UserServer = {
 		validationRules : {
 			email : [{
@@ -36,7 +40,9 @@ define([
 			text : 'some thing',
 			from : 'nobody@hub43.com',
 			to 	 : 'nfutoam.atef@gmail.com',
-			subject : 'welcome to hub43.com'
+			subject : 'welcome to hub43.com',
+			attachment: 
+			      {data:"<html>i <i>hope</i> this works!</html>", alternative:true}
 		},
 		status : null,
 		collectionName 	: 'users',  																		//define the collection that this class will deal with it.
@@ -372,7 +378,7 @@ define([
 		  }
 		},
 		validate : function(callback) {
-			var self = this, validationResult = {}, hashPassword, options = {};
+			var self = this, validationResult = {}, hashPassword, options = {}, token;
 			var attributes = self.toJSON();
 			_.each(self.validationRules, function(rules, fieldName) {
 				if (self.get(fieldName) !== undefined) {
@@ -397,7 +403,7 @@ define([
 						hashPassword = self.hash(self.get('password'));
 						attributes.token = self.generateActivationToken(self.get('email'));
 						self.set(attributes);
-						self.mailMessage.text = 'Welcome in hub43.com, to activate your account, click on this link http://www.hub43.com/activate?email=' + self.get('email') + '&token=' + attributes.token;
+						self.mailMessage.attachment.data = jadeMail({ url: 'http://localhost:3000/activate?email=' +  self.get('email') + '&token=' + attributes.token});
 						self.mailMessage.to = self.get('email');
 						email.sendMail(self.mailMessage);
 						self.set('status', 'pending_activation');

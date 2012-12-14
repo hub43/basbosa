@@ -1,7 +1,7 @@
 {
     "name": "basbosa"
   , "description": "Real-time scalable messaging framework based on Socket.io, Express and Backbone"
-  , "version": "0.0.1"
+  , "version": "0.0.2"
   , "dependencies": {
 		  "express"			: "3.0.0rc3"
 		, "connect"			: "2.4.4"
@@ -27,6 +27,9 @@
 		, "commander"		: "0.6.0"
 		, "dialect"			: "https://github.com/ygaras/dialect/tarball/master"
 		, "dialect-http"	: "https://github.com/ygaras/dialect-http/tarball/master"
+		, "basbosa-config"	: "https://github.com/ygaras/basbosa-config/tarball/master"
+		, "basbosa-logger"	: "https://github.com/ygaras/basbosa-logger/tarball/master"
+		, "basbosa-registry"	: "https://github.com/ygaras/basbosa-registry/tarball/master"
 		, "connect-auth"	: "0.5.1"
 		, "mongodb"				: "1.1.4"
 		, "connect-mongodb"			: "1.1.4"

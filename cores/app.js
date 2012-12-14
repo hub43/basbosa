@@ -136,7 +136,7 @@ initServer = function(App) {
 	 */
 	var startListening = function() {
 		App.server.listen(Config.port, function() {
-			Logger.info('Server started on port ' + Config.port );
+			Basbosa('Logger').info('Server started on port ' + Config.port );
 			// run tests if required
 			if (Config.test) {			require('./tests');
 				var appTests = './../' + Config.app + '/tests/index.js';
@@ -156,7 +156,7 @@ initServer = function(App) {
 	 */  
 	
 	var listenWhenDbReady = function() {
-		//Logger.debug('db state ')
+		//Basbosa('Logger').debug('db state ')
 		if (Db.getDb().state == 'connected') {
 			startListening();
 		} else {

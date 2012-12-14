@@ -77,7 +77,7 @@ define([
 			if (obj && obj.set) {
 				obj.set(args[i]);
 			} else {
-				Logger.warn('obj has no methis set', obj, args);
+				Basbosa('Logger').warn('obj has no methis set', obj, args);
 			}
 			
 			return obj;

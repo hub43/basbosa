@@ -52,11 +52,11 @@ exports.getData = function (req, res) {
 	if (allowedAccess(req,res)) {
 		function callBack(error , docs) {
 			if (error) {
-				Logger.error(error);
+				Basbosa('Logger').error(error);
 				res.writeHead(500);
 				res.end();
 			} else {
-				Logger.info(docs);
+				Basbosa('Logger').info(docs);
 				res.writeHead(200, {'content-type': 'application/json'});
 				res.write (JSON.stringify(docs));
 				res.end();
@@ -71,6 +71,6 @@ exports.getData = function (req, res) {
 					: analytics[req.query['statsType']](startTime , endTime , callBack);
 		}		
 	} else {
-		Logger.error('You are not allowed to enter that');
+		Basbosa('Logger').error('You are not allowed to enter that');
 	}
 };

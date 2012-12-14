@@ -8,7 +8,7 @@ diff = 100;
 
 var f  = setInterval(function() {
 	if (count--) {
-		Logger.info('Bot user is entering, ' + count + ' bots remaining');
+		Basbosa('Logger').info('Bot user is entering, ' + count + ' bots remaining');
 		Login.create(function(user) {	});
 	} else {
 		clearInterval(f);

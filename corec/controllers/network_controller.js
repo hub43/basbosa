@@ -22,7 +22,7 @@ define([
 		});
 		
 		j.network.on('requestPing', function() {
-  		Logger.debug('sending network ping');
+  		Basbosa('Logger').debug('sending network ping');
   		SocketClient.sendPacket('network.ping', j.network.genPing());
 		});
 		

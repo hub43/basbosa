@@ -92,7 +92,7 @@ exports.index = function(req, res, next) {
 		dictionaries : ['appc/build/dictionary-ar', 'appc/build/dictionary-fr']
 	};
 
-	Logger.debug('Connected user agent', j.agent);
+	Basbosa('Logger').debug('Connected user agent', j.agent);
 	// Check if desktop users are not accessing it from Facebook
 	var isMobile = false, isDesktop = false;
 	

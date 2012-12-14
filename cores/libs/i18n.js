@@ -9,7 +9,7 @@ dialect.connect(function() {
 	}, function() {
 		// Save the dictionary to the client build folder
 		for (locale in dialect.dictionaries) {
-			Logger.debug(APP_PATH + '/appc/build/dictionary-' + locale);
+			Basbosa('Logger').debug(APP_PATH + '/appc/build/dictionary-' + locale);
 			var requireJsDictionary =  'define(function(){return ' + JSON.stringify(dialect.dictionaries[locale]) + '});';
 			Fs.writeFile(APP_PATH + '/appc/build/dictionary-' + locale + '.js', requireJsDictionary);
 		}

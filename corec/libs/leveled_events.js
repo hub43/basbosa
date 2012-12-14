@@ -22,7 +22,7 @@ define(['require', 'basbosa-logger', 'basbosa-registry'], function( require, Log
 		next();
 
 		function next() {
-			Logger.trace("Calling handler number " + count + " for event " +  message.eventName);
+			Basbosa('Logger').trace("Calling handler number " + count + " for event " +  message.eventName);
 			handlers && handlers[count] && handlers[count++].call(context, self, message, next);
 		}
 	}
@@ -33,14 +33,14 @@ define(['require', 'basbosa-logger', 'basbosa-registry'], function( require, Log
 	};
 
 	LeveledEvents.prototype.localEventHandler = function(message) {
-		Logger.debug('got message ' + message.eventName, message);
+		Basbosa('Logger').debug('got message ' + message.eventName, message);
 		if (typeof message.eventName == 'undefined') {
-			Logger.warn('Malformed message' + message);
+			Basbosa('Logger').warn('Malformed message' + message);
 		}
 		if (!this._fHandlers || !this._fHandlers[message.eventName]) {
-			Logger.warn('Calling trigger for event ' + message.eventName + ' before listening to it');
+			Basbosa('Logger').warn('Calling trigger for event ' + message.eventName + ' before listening to it');
 			// Add wild handlers to this event then fire it again
-			Logger.info('Attaching wild handlers to ' + message.eventName);
+			Basbosa('Logger').info('Attaching wild handlers to ' + message.eventName);
 			this.lon(message.eventName, function(e, result, next) { next(); });
 			this.ltrigger(message.eventName, message);
 			
@@ -85,7 +85,7 @@ define(['require', 'basbosa-logger', 'basbosa-registry'], function( require, Log
       wildHandlers[event][level].push(handler);
       // Add wild Handler to all existing events
       _.each(handlers, function(eventHandler, existingEvent) {
-				//Logger.debug(e);
+				//Basbosa('Logger').debug(e);
 				// Check if the wild event name matches the event name
 				var str = event.replace('*', '');
 				if (str == '' || existingEvent.indexOf(str) > -1) {
@@ -111,7 +111,7 @@ define(['require', 'basbosa-logger', 'basbosa-registry'], function( require, Log
 			// To prevent listening to the same event more than once
 			self.removeListener && self.removeListener(event, this.localEventHandler);
 			self.on && self.on(event, this.localEventHandler);
-			Logger.debug('Listeneing to ' + event);
+			Basbosa('Logger').debug('Listeneing to ' + event);
 			self.__buildFlat(event);
     }
   };

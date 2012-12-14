@@ -23,7 +23,7 @@ exports.index = function(req, res, next) {
 		var error = new Error();
 		if (error.createError(req) > 3) {
 			res.redirect('/changeBrowser');
-			Logger.warn(error.toJSON());
+			Basbosa('Logger').warn(error.toJSON());
 			return;
 		};
 	} 

@@ -20,7 +20,7 @@ define([
 	_.extend(SocketClient, new LeveledEvents());
 	
 	SocketClient.sendPacket = function(eventName, message) {
-		Logger.debug('Sending ' + eventName, message);
+		Basbosa('Logger').debug('Sending ' + eventName, message);
 		message.eventName = eventName;
 		//SocketClient.emit(eventName, message);
 		SocketClient.json.send(message);

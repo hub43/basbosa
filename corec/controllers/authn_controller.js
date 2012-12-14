@@ -37,7 +37,7 @@ define([
 		// If the server did not find user id in the session or db
 		if (message.user == -1) {
 			//window.location.reload(); 
-			Logger.warn('Server did not find user id in session');
+			Basbosa('Logger').warn('Server did not find user id in session');
 		} else {
 			next();
 		}

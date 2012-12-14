@@ -47,7 +47,7 @@ define(['backbone', 'jquery', 'basbosa-registry'], function() {
 		},
 		
 		updateProgress : function() {
-			Logger.trace('Assets loaded ' + this.get('loaded') + ' this total ' + this.get('total'));
+			Basbosa('Logger').trace('Assets loaded ' + this.get('loaded') + ' this total ' + this.get('total'));
 			var progress = Math.ceil(this.get('loaded') / this.get('total') * 100);
 			this.set('progress', progress);
 			progress == 100 && this.trigger('loadComplete');

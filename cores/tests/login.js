@@ -14,7 +14,7 @@ module.exports.create = function(cb) {
 			cb(user);
 			
 			user.socket.on('connect', function() {
-				Logger.debug('Sending Auth socket from a client');
+				Basbosa('Logger').debug('Sending Auth socket from a client');
 				if (user.entered) return;
 				user.socket.mySend({
 					eventName : 'authn.socket',
@@ -26,7 +26,7 @@ module.exports.create = function(cb) {
 			
 			user.socket.on('authn.socket_result', function(message) {
 				user.entered = 1;
-				Logger.debug('Client ' + user._id + 'got socket_result', message);
+				Basbosa('Logger').debug('Client ' + user._id + 'got socket_result', message);
 				
 				user.socket.mySend({
 					eventName : 'sectors.join',

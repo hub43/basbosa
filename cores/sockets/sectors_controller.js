@@ -10,7 +10,7 @@ var SocketServer = require('./components/socket_server')
 // she joins. She should not be able to send any updates to the sector unless she enters  
 SocketServer.on('connection', function(socket) {
 	socket.lon('sectors.join',  function(e, message, next) {
-		Logger.debug('User ' + socket.handshake.userId + 'joined sectorid: ' + message.sectorId);
+		Basbosa('Logger').debug('User ' + socket.handshake.userId + 'joined sectorid: ' + message.sectorId);
 		
 		sector = j.group.sectors.get(message.sectorId);
 		function finalize(e, message, next) {
@@ -22,8 +22,8 @@ SocketServer.on('connection', function(socket) {
 			next();
 		}
 		if (!sector || sector.users.length >= sector.maxUsers ) {
-			Logger.info('We got a request for a non-existing  or full sectorId ' + message.sectorId);
-			Logger.info('Preparing new sector for user');
+			Basbosa('Logger').info('We got a request for a non-existing  or full sectorId ' + message.sectorId);
+			Basbosa('Logger').info('Preparing new sector for user');
 			
 			// A little bit tricky, we should preserve the values of variables
 			(function(e, message, next, socket) {
@@ -41,7 +41,7 @@ SocketServer.on('connection', function(socket) {
 	});
 	
 	socket.lon('sectors.enter', function(e, message, next) {
-		Logger.debug('User ' + socket.handshake.userId + ' enter sectorId: ' + message.sectorId);
+		Basbosa('Logger').debug('User ' + socket.handshake.userId + ' enter sectorId: ' + message.sectorId);
 		var sector = j.group.sectors.get(message.sectorId),
 			user = j.group.users.get(socket.handshake.userId);
 		
@@ -68,8 +68,8 @@ SocketServer.on('connection', function(socket) {
 		user = j.group.users.get(socket.handshake.userId);
 		e.result.broadcastTo = [];
 		if (!user) {
-			Logger.warn('No user found in the group with userId :' + userId);
-			Logger.warn(socket);
+			Basbosa('Logger').warn('No user found in the group with userId :' + userId);
+			Basbosa('Logger').warn(socket);
 		} else {
 			// Send a message to all sectors user that he is leaving
 			user && user.sectors.each(function(sector) {

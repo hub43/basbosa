@@ -65,7 +65,7 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		// Config
 		// GLOBAL.Config = require('./index');
 		// Reload options to populate from config
-		// Logger.setOptions();
+		// Basbosa('Logger').setOptions();
 
 		// To load all modules in a directory
 		GLOBAL.AppDirLoad	= function(path, loadOptions) {

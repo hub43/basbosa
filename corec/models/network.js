@@ -28,7 +28,7 @@ define([
 		},
 		
 		serverDownChange : function() {
-			(this.previous('serverDown') === 0) && (Logger.debug('Server down'));
+			(this.previous('serverDown') === 0) && (Basbosa('Logger').debug('Server down'));
 		},
 		
 		genPing : function() {

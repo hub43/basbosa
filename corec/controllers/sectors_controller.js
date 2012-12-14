@@ -17,7 +17,7 @@ define([
 			// If the current user is the one who is allowed to enter the sector
 			j.group.sectors.get(message.sectorId).users.add(j.user);
 			if (message.sectorId != j.user.get('sectorId')) {
-				Logger.warn('User is joining a sector' + message.sectorId + 
+				Basbosa('Logger').warn('User is joining a sector' + message.sectorId + 
 						' which is  different from the one he wanted to join' + j.user.get('sectorId'));
 			}
 		} else {

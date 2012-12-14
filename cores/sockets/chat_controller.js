@@ -7,7 +7,7 @@ SocketServer.on('connection', function(socket) {
 		
 		// Only constructs result
 	  // App will handle emitting that result to everyone connected
-	  Logger.debug("Event (chat.message) invoked at level 10");
+	  Basbosa('Logger').debug("Event (chat.message) invoked at level 10");
 	  if (message.users && message.users.length) {
 	  	e.result = {
 	  	    eventName : 'chat.message_result',

@@ -39,7 +39,7 @@ SocketServer.on('connection', function(socket){
 				if (Config.skipSocketAuth) {
 					next();
 				} else {
-					Logger.warn('Socket is not authenticated');
+					Basbosa('Logger').warn('Socket is not authenticated');
 				}
 			} else {
 				next();
@@ -47,9 +47,9 @@ SocketServer.on('connection', function(socket){
 			
 		} else {
 			// For easy development, log a warning message but do not drop the message
-			Logger.warn('The following message was not validated: ' + message.eventName);
+			Basbosa('Logger').warn('The following message was not validated: ' + message.eventName);
 			unvalidated[message.eventName] = _.extend({}, message);
-			Logger.warn('unvalidated', unvalidated);
+			Basbosa('Logger').warn('unvalidated', unvalidated);
 			next();
 		}
 

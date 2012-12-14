@@ -11,7 +11,7 @@ define(['fs', 'jade', 'path'], function(Fs, Jade, Path) {
 			var localFile = APP_PATH + req.url.replace('.jade.js', '.jade');
 			jadeTemplate = Fs.readFileSync(localFile, options.encoding);
 			requireJsCompiledJade = 'define(function(){return ' + Jade.compile(jadeTemplate, {client:true}) + '});';
-			Logger.debug('Sending file: ' + localFile);
+			Basbosa('Logger').debug('Sending file: ' + localFile);
 			res.send(requireJsCompiledJade);
 			//Fs.writeFileSync(localFile + '.js', requireJsCompiledJade, options.encoding);
 

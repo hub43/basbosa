@@ -144,7 +144,7 @@ define(['underscore'], function(_) {
 				if (_.all(validation_results, _.identity)) {
 					return true;
 				} else {
-					Logger.info(validation_results);
+					Basbosa('Logger').info(validation_results);
 					return false;
 				}
 			}

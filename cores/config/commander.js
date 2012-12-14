@@ -28,7 +28,7 @@ commander = function() {
 	program.parse(process.argv);
 	
 	_.each(['port', 'env', 'test', 'min', 'app', 'logging', 'skipOpt', 'enableFeedback'], function(key) {
-		//Logger.debug('key: '+ key + ' value :' + program[key]);
+		//Basbosa('Logger').debug('key: '+ key + ' value :' + program[key]);
 		program[key] !== undefined && (Config[key] = program[key]);
 	});
 	

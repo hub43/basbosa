@@ -10,7 +10,7 @@ SocketServer.on('connection', function(socket) {
 		// preserve context
 		socket = this;
 		if (!socket || ! socket.emit) {
-			Logger.warn('Socket now is null while trying to send message', message, e);
+			Basbosa('Logger').warn('Socket now is null while trying to send message', message, e);
 			next();
 			return;
 		}
@@ -19,36 +19,36 @@ SocketServer.on('connection', function(socket) {
 			e.result.message.eventName = e.result.eventName;
 			if (e.result.broadcast) {
 				// broadcast to everyone
-				Logger.debug("Broadcasting to everyone");
+				Basbosa('Logger').debug("Broadcasting to everyone");
 				socket.broadcast.emit(e.result.eventName, e.result.message);
 			} else if (e.result.broadcastTo) {
 				var	sectors = typeof e.result.broadcastTo.push === 'function'  ? e.result.broadcastTo : [e.result.broadcastTo];
 				
 				// broadcast to everyone in channel
 				_.each(sectors, function(sector) {
-					Logger.debug("Broadcasting to sector " + sector);
+					Basbosa('Logger').debug("Broadcasting to sector " + sector);
 					socket.broadcast.to(sector).emit(e.result.eventName, e.result.message);
 				});
 				
 							
 			} else if (e.result.sockets) {
 				_.each(e.result.sockets, function(userSocket) {
-					Logger.debug("Sending to socekts" , userSocket.id);
+					Basbosa('Logger').debug("Sending to socekts" , userSocket.id);
 					userSocket.emit(e.result.eventName, e.result.message);
 				});
 				
 			} else {
 				// broadcast to socket
-				Logger.debug("Emitting to socket");
+				Basbosa('Logger').debug("Emitting to socket");
 				socket.emit(e.result.eventName, e.result.message);
 			}
 			
 			if (e.result.broadcastToSelf) {
-				Logger.debug("Emitting to socket");
+				Basbosa('Logger').debug("Emitting to socket");
 				socket.emit(e.result.eventName, e.result.message);
 			} 	
 			
-			Logger.debug(e.result.eventName);
+			Basbosa('Logger').debug(e.result.eventName);
 		}
 		next();
 	});
@@ -79,7 +79,7 @@ SocketServer.on('connection', function(socket) {
   	    broadcastToSelf : true
   	    
   	};
-		Logger.info('Public.* was caled');
+		Basbosa('Logger').info('Public.* was caled');
 		next();
 	});
 	

@@ -24,7 +24,7 @@ SocketServer.prototype.init = function(App) {
 
 	WS.set('authorization', function(data, accept) {
 		if (Config.skipSocketAuth) {
-			Logger.info('Session accepted in skipAuth Mode');
+			Basbosa('Logger').info('Session accepted in skipAuth Mode');
 			accept(null, true);
 			return ;
 		}
@@ -32,14 +32,14 @@ SocketServer.prototype.init = function(App) {
 			data.cookie = cookie.parse(data.headers.cookie);
 			data.sessionID = data.cookie['express.sid'].replace('s:', '').split('.')[0];
 			// get the session data from the session store
-			Logger.debug('trying to get sesseion for sessionid ' +  data.sessionID);
+			Basbosa('Logger').debug('trying to get sesseion for sessionid ' +  data.sessionID);
 			Store.sessionStore.get(data.sessionID, function(err, session) {
 				if (err) {
 					accept('Error', false);
-					Logger.warn(err);
+					Basbosa('Logger').warn(err);
 				} else if(!session) {
 					accept('No Session', false);
-					Logger.warn('No Session found', session);
+					Basbosa('Logger').warn('No Session found', session);
 				} else {
 					// User already has an active express session
 					// Add user socket data
@@ -50,12 +50,12 @@ SocketServer.prototype.init = function(App) {
 					} else {
 						accept(null, true);
 						//accept('No user found in session', false);
-						Logger.warn('No user found in session');
+						Basbosa('Logger').warn('No user found in session');
 					}
 				}
 			});
 		} else {
-			Logger.warn("No cookie transmitted");
+			Basbosa('Logger').warn("No cookie transmitted");
 			return accept('No cookie transmitted.', false);
 		}
 	});
@@ -68,9 +68,9 @@ SocketServer.prototype.init = function(App) {
 			// Only trigger the event if user has authenticated
 			if (clientSocket.handshake.userId) {
 				clientSocket.ltrigger('sectors.disconnect', {internalMessage : true});
-				Logger.info('DISCONNECTED - userID ' + clientSocket.handshake.userId);
+				Basbosa('Logger').info('DISCONNECTED - userID ' + clientSocket.handshake.userId);
 			} else {
-				Logger.info('DISCONNECTED a user with no session');
+				Basbosa('Logger').info('DISCONNECTED a user with no session');
 			}		
 		});
 

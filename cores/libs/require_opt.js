@@ -32,7 +32,7 @@ function buildCb(buildResponse, buildConfig) {
 	md5sum.update(contents);
 	buildConfig.digest = md5sum.digest('hex');
 
-	Logger.debug('Current client build: ' + buildConfig.digest + ' for app');
+	Basbosa('Logger').debug('Current client build: ' + buildConfig.digest + ' for app');
 
 	buildConfig.outBuild = buildConfig.out + '-' + buildConfig.digest + '.js';
 	Fs.writeFile(buildConfig.outBuild, contents);
@@ -43,14 +43,14 @@ function buildCb(buildResponse, buildConfig) {
 			// Delete all old build files
 			file = Path.dirname(currentBuild.outBuild) + '/' + file;
 			if (file.indexOf(currentBuild.out) > -1	&& file.indexOf(currentBuild.digest) == -1) {
-				Logger.debug('Deleting ' + file);
+				Basbosa('Logger').debug('Deleting ' + file);
 				Fs.unlink(file);
 			}
 		});
 	});
 	Config.build = Config.build || {}; 
 	Config.build[buildConfig.currentTheme] = buildConfig.digest;
-	Logger.info(Config.build);
+	Basbosa('Logger').info(Config.build);
 }
 /**
  * Only build the minified version of the client if -m option is set
@@ -60,7 +60,7 @@ if (typeof Config != 'undefined' && Config.min) {
 	var base = build.out, appSettings = build.apps[Config.app], appName = Config.app;
 	// Build for each theme
 	_.each(appSettings.themes, function(themeName) {
-		Logger.debug('Building for app :' + appName + ' theme: ' + themeName);
+		Basbosa('Logger').debug('Building for app :' + appName + ' theme: ' + themeName);
 		build.currentTheme = themeName;
 		build.currentApp = appName;
 		

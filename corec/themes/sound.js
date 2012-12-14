@@ -56,7 +56,7 @@ define([
 				soundSelector = '#jplayer-sound2';
 			}
 			
-			Logger.debug('using channel ' + soundSelector);
+			Basbosa('Logger').debug('using channel ' + soundSelector);
 			$(soundSelector).jPlayer('setMedia', {
 				mp3: jRaw.themeBase + '/sounds/' + sound + '.mp3',
 				ogg: jRaw.themeBase + '/sounds/' + sound + '.ogg',
@@ -66,7 +66,7 @@ define([
 		music : function(music, loop) {		
 			typeof (loop == 'undefined') && (loop = true);
 			if (!this.model.get('enableMusic') || !music) return;
-			Logger.info('music function called to play ' + music);
+			Basbosa('Logger').info('music function called to play ' + music);
 			$('#jplayer-music').jPlayer('setMedia', {
 					mp3: jRaw.themeBase + '/sounds/' + music + '.mp3',
 					ogg: jRaw.themeBase + '/sounds/' + music + '.ogg',

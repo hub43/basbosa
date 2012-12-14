@@ -51,7 +51,7 @@ define([
 			this.users.each(function(user) {
 				user.sockets && user.sockets[0] && user.sockets[0].emit && (socket = user.sockets[0]); 
 			});
-			if (!socket) Logger.warn('No socket found in current sector');
+			if (!socket) Basbosa('Logger').warn('No socket found in current sector');
 			return socket;
 		}
   };

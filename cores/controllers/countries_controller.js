@@ -18,12 +18,12 @@ exports.getCountries = function (req, res) {
 	var countryName = req.query['country'];
 	function callBack(error , docs) {
 		if (error) {
-			Logger.info('in error');
-			Logger.error(error);
+			Basbosa('Logger').info('in error');
+			Basbosa('Logger').error(error);
 			res.writeHead(500);
 			res.end();
 		} else {
-			Logger.info(docs);
+			Basbosa('Logger').info(docs);
 			res.writeHead(200, {'content-type': 'application/json'});
 			res.write (JSON.stringify(docs));
 			res.end();

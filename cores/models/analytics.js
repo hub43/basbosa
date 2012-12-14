@@ -46,7 +46,7 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 	  	var dataArray = [ ['Date', 'getActiveUsers'] ];
 	  	Db.collection('visits', function(err,collection) {
 	  		 if (err) {
-		      	Logger.warn('Error while get active users ', err);
+		      	Basbosa('Logger').warn('Error while get active users ', err);
 		      } else {
 						collection.group(
 						   {userId : true, stime: true}
@@ -54,7 +54,7 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 						   ,{ count: 0}
 						   ,function(doc, out){ out.count++; }
 						   ,function(err, results) {
-						  	 Logger.info(numberOfDays);
+						  	 Basbosa('Logger').info(numberOfDays);
 						  	 for (var j = 0; j < numberOfDays; j++) {
 						  		 var count = 0;
 						  		 var previousId = 0;
@@ -94,7 +94,7 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 			, Db = DbClass.getDb();
 			Db.collection('visits', function(err,collection) {
 				 if (err) {
-		      	Logger.warn('Error while get session lengths ', err);
+		      	Basbosa('Logger').warn('Error while get session lengths ', err);
 		      } else {
 						collection.group(
 						   {duration : true}
@@ -140,7 +140,7 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 	  	var Db = DbClass.getDb();
 	  	Db.collection('visits', function(err,collection) {
 	  		 if (err) {
-		      	Logger.warn('Error while get visits stats ' , err);
+		      	Basbosa('Logger').warn('Error while get visits stats ' , err);
 		      } else {
 						collection.group(
 						   {userId : true}
@@ -179,7 +179,7 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 					Db = DbClass.getDb(), visits = {}, data = {};
 			Db.collection('visits', function(error,collection) {
 	      if (error) {
-	      	Logger.warn('Error while get Visits for user ', error);
+	      	Basbosa('Logger').warn('Error while get Visits for user ', error);
 	      } else {
 	      	collection.group(
 					   {stime: true, uagent: true, etime:true , duration: true}
@@ -191,7 +191,7 @@ define([ '../libs/db', 'backbone' ], function(DbClass) {
 					  	 //goto data base again to get registrationDate
 					  	 Db.collection('users', function(error,collection) {
 					      if (error) {
-					      	Logger.warn('Error while get Visits for user ', error);
+					      	Basbosa('Logger').warn('Error while get Visits for user ', error);
 					      } else {
 					      	collection.group(
 								   {registrationDate: true}

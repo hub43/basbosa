@@ -172,7 +172,7 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
           if(self.id === undefined) {
           	collection.insert(attributes, function(error) {
           		if(error) {
-          			Logger.warn('there is error through insertion', error);
+          			Basbosa('Logger').warn('there is error through insertion', error);
           		} else {
           			typeof callback === 'function' && callback(null, {});
           		}
@@ -185,11 +185,11 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
         }
       });
     }
-    Logger.debug('This is the model attribute : ', self);
+    Basbosa('Logger').debug('This is the model attribute : ', self);
     if(typeof self.validate  === 'function') {
     	self.validate(function(error, validationError) {
     		if(error) {
-    			Logger.warn('error through validate the model attribute' , error);
+    			Basbosa('Logger').warn('error through validate the model attribute' , error);
     		} else {
     			if(_.isEmpty(validationError.validationResult)) {
     				if(validationError.hashPassword !== undefined) {

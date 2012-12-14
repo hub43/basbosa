@@ -84,7 +84,7 @@ define([
 				    		friend.fb_user_id = item.id;
 				    		return friend;
 				    	});
-				    	Logger.debug('Facebook friends:', friends);					    	
+				    	Basbosa('Logger').debug('Facebook friends:', friends);					    	
 				    	url = 'http://graph.facebook.com/' + fbUserData.id + '/picture';
 		    		 	var photo = url;					    										    						  
 				    	// prepare user data to write to db
@@ -108,10 +108,10 @@ define([
 				    	// before calling user.create(...)
 				    	self.findOne({fb_user_id: fbUserData.id}, function(error, userJsonInternal) {
 				    		if (!userJsonInternal) {
-				    			Logger.debug('writing user to db - users collection');
+				    			Basbosa('Logger').debug('writing user to db - users collection');
 				    			user =  new User(userData);
 									user.create(function(error) {
-										Logger.debug(error);
+										Basbosa('Logger').debug(error);
 										authCb(error, user.toJSON());
 									});
 				    		}
@@ -121,7 +121,7 @@ define([
 							// array in country doc in countries collection
 							country.findOne ({country : userData.location.country}, function (error, countryJson) {
 								if (error) {
-									Logger.error(error);
+									Basbosa('Logger').error(error);
 									return;
 								}
 								if (!countryJson) {
@@ -135,7 +135,7 @@ define([
 							http_res.on('end', function () {});
 						});
 					}).on('error', function(e) {
-						  Logger.error(e.message);
+						  Basbosa('Logger').error(e.message);
 					});
 				} else {
 					authCb(null, userJson);
@@ -192,14 +192,14 @@ define([
 			var Db = DbClass.getDb();
 			Db.collection('users', function(error,collection) {
   		 if (error) {
-	      	Logger.warn('Error while updating lastEntryTime  for user ' + userId, error);
+	      	Basbosa('Logger').warn('Error while updating lastEntryTime  for user ' + userId, error);
 	      } else {
 	      	collection.update({_id: new ObjectID(id)}, {$set : {lastEntryTime : date}},{}, function(err) {});
 	      }
     	});
     	Db.collection('visits', function(error,collection) {
   		 if (error) {
-	      	Logger.warn('Error while updating visits for user ' + userId, error);
+	      	Basbosa('Logger').warn('Error while updating visits for user ' + userId, error);
 	      } else {
 	      	var document = {userId : new ObjectID(id), stime : date, uagent:JSON.stringify(userAgent), etime: 0, duration : 0};
 	      	collection.insert(document);
@@ -218,7 +218,7 @@ define([
 				, Db = DbClass.getDb();
 			Db.collection('visits', function(error,collection) {
 	      if (error) {
-	      	Logger.warn('Error while setEnd Visit Time for user ' + userId, error);
+	      	Basbosa('Logger').warn('Error while setEnd Visit Time for user ' + userId, error);
 	      } else {
 					collection.update({userId: new ObjectID(userId), stime: lastEntryTime}, 
 									  { $set : {etime :  (new Date).getTime(), duration : ((new Date).getTime() - lastEntryTime)}},
@@ -249,11 +249,11 @@ define([
 			var ObjectID = require('mongodb').ObjectID;
 			this._withCollection(function(error, collection) {
 	      if (error) {
-	      	Logger.warn('Error while changing users points ', error);
+	      	Basbosa('Logger').warn('Error while changing users points ', error);
 	      } else {
 	        var appLog = 'pointsLog', $push = {};
 	        $push[appLog] = {	t: (new Date).getTime(), p : model.get('points'), s : new ObjectID(model._lastSectorId)};
-	        Logger.debug('before update');
+	        Basbosa('Logger').debug('before update');
 	        collection.update(
 	        		{ _id: new ObjectID(model.id.toString()) }, 
 	        		{ $set : {points :  model.get('points')},	$push: $push },
@@ -308,15 +308,15 @@ define([
 		  }
 		  if (country && country != 'world') {
 			  if (country == 'friends') {
-				  Logger.info('in Friends');
+				  Basbosa('Logger').info('in Friends');
 				  var friendsIds;
 				  this.findOne({fb_user_id: fbUserId}, function(error, userJson) {
 					  if (error) {
-						  Logger.error(error);
+						  Basbosa('Logger').error(error);
 						  return;
 					  }
 					  if (!userJson) {
-						  Logger.error('user not found...');
+						  Basbosa('Logger').error('user not found...');
 						  return;
 					  }
 					  
@@ -325,7 +325,7 @@ define([
 					  });
 					  friendsIds.push(fbUserId);
 					  query['fb_user_id'] = {$in : friendsIds};
-					  Logger.debug(query);
+					  Basbosa('Logger').debug(query);
 					  var mr = {
 					      mapreduce		: 'users', 
 					      map				: mapFn.toString(),
@@ -336,7 +336,7 @@ define([
 					  };
 					  Db.executeDbCommand(mr, function(error, dbres) {
 					      var results = dbres.documents[0].results;
-					      Logger.debug(error, dbres);
+					      Basbosa('Logger').debug(error, dbres);
 					      callback(error, JSON.stringify(results));
 					  });
 					  
@@ -350,7 +350,7 @@ define([
 			  }
 		  }
 		  if (country != 'friends') {
-			  Logger.debug(query);
+			  Basbosa('Logger').debug(query);
 			  var mr = {
 		      mapreduce		: 'users', 
 		      map			: mapFn.toString(),
@@ -390,7 +390,7 @@ define([
 			});
 			if(_.isEmpty(validationResult)) {
 				options.success = function (results) {
-					Logger.debug('The result of checking in db if this data there exsit before', results);
+					Basbosa('Logger').debug('The result of checking in db if this data there exsit before', results);
 					if(_.isEmpty(results))  {
 						hashPassword = self.hash(self.get('password'));
 						email.sendMail(self.mailMessage);

@@ -25,11 +25,11 @@ define (['backbone'], function () {
 		addCity : function (country, city) {
 			this._withCollection(function(error, collection) {
 				if (error) {
-					Logger.error(error);
+					Basbosa('Logger').error(error);
 				} else {
 		      collection.update({country: country}, {$push: {'cities' : city}}, {}, function(error) {
 		      	if(error) {
-		      		Logger.warn('country does not exsit or error in update city of this country' + error);
+		      		Basbosa('Logger').warn('country does not exsit or error in update city of this country' + error);
 		      	}
 		      });
 				}

@@ -23,8 +23,8 @@ define([
 	
 	var Validations =  Validations.getInstance();
 	var  mailPath = CORES + '/themes/views/mail.jade';
-	var mailString = require('fs').readFileSync(mailPath, 'utf8'),
-	jadeMail = jade.compile(mailString, { filename: mailPath, pretty: true });
+	//var mailString = require('fs').readFileSync(mailPath, 'utf8'),
+	//jadeMail = jade.compile(mailString, { filename: mailPath, pretty: true });
 	var UserServer = {
 		validationRules : {
 			email : [{

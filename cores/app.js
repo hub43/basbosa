@@ -131,43 +131,23 @@ initServer = function(App) {
 	App.post('/*', Http.AppController.beforeRender);
 	
 	/**
-	 * Start listening on set port an respond to http and WebSocekt requests
-	 * @method startListening
+	 * Start listening on set port and respond to http and WebSocekt requests
+	 * 
 	 */
-	var startListening = function() {
-		App.server.listen(Config.port, function() {
-			Basbosa('Logger').info('Server started on port ' + Config.port );
-			// run tests if required
-			if (Config.test) {			require('./tests');
-				var appTests = './../' + Config.app + '/tests/index.js';
-				// Bug on with exsists Sync on windows
-				if (require('fs').existsSync(appTests) || 1) {
-					require(appTests);
-				} 
-			}
-		});
-	};
-
 	
-	/**
-	 * A hack not to start listening to  connections till the connection is
-	 * established to the db
-	 * @method listenWhenDbReady
-	 */  
-	
-	var listenWhenDbReady = function() {
-		//Basbosa('Logger').debug('db state ')
-		if (Db.getDb().state == 'connected') {
-			startListening();
-		} else {
-			setTimeout(function() {
-				
-				listenWhenDbReady();
-				
-			}, 100);
-		}
-	};
-	listenWhenDbReady();
+	Db.on('connected', function(){
+	  App.server.listen(Config.port, function() {
+      Basbosa('Logger').info('Server started on port ' + Config.port );
+      // run tests if required
+      if (Config.test) {      require('./tests');
+        var appTests = './../' + Config.app + '/tests/index.js';
+        // Bug on with exsists Sync on windows
+        if (require('fs').existsSync(appTests) || 1) {
+          require(appTests);
+        } 
+      }
+    });
+	});
 	
 	return App;
 };

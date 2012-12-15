@@ -31,7 +31,7 @@
 		, "basbosa-logger"	: "https://github.com/ygaras/basbosa-logger/tarball/master"
 		, "basbosa-registry"	: "https://github.com/ygaras/basbosa-registry/tarball/master"
 		, "connect-auth"	: "0.5.1"
-		, "mongodb"				: "1.1.4"
+		, "mongodb"				: "1.2.2"
 		, "connect-mongodb"			: "1.1.4"
 		, "useragent"				: "1.1.0"
 		,	"emailjs"					:	"0.3.3"

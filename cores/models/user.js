@@ -430,6 +430,16 @@ define([
 		generateActivationToken : function(email) {
 			var self =  this;
 			return self.hash((new Date).getTime() + email);
+		},
+		activate : function(email) {
+			var Db = DbClass.getDb();
+			Db.collection('users', function(error,collection) {
+  		 if (error) {
+	      	Basbosa('Logger').warn('Error while updating status of the user ' + email , error);
+	      } else {
+	      	collection.update({email: email}, {$set : {status : 'developer'}},{}, function(err) {});
+	      }
+    	});
 		}
   };
 	

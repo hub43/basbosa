@@ -17,14 +17,10 @@ define([
 	, 'http'
 	, '../libs/email_module'
 	, '../libs/validations_module'
-	, 'jade'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations, jade) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations) { //user Model inherent from user and j in corec.
 	
 	var Validations =  Validations.getInstance();
-	var  mailPath = CORES + '/themes/views/mail.jade';
-	//var mailString = require('fs').readFileSync(mailPath, 'utf8'),
-	//jadeMail = jade.compile(mailString, { filename: mailPath, pretty: true });
 	var UserServer = {
 		validationRules : {
 			email : [{
@@ -403,7 +399,8 @@ define([
 						hashPassword = self.hash(self.get('password'));
 						attributes.token = self.generateActivationToken(self.get('email'));
 						self.set(attributes);
-						self.mailMessage.attachment.data = jadeMail({ url: 'http://localhost:3000/activate?email=' +  self.get('email') + '&token=' + attributes.token});
+						self.mailMessage.attachment.data = self.prepareMailContent({ 
+							url: 'http://localhost:3000/activate?email=' +  self.get('email') + '&token=' + attributes.token});
 						self.mailMessage.to = self.get('email');
 						email.sendMail(self.mailMessage);
 						self.set('status', 'pending_activation');

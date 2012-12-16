@@ -36,6 +36,7 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		} else {
 			GLOBAL.Config = require('./default_config');
 		}
+		Basbosa.add('Config', Config);
 		
 		_.mixin(_.str.exports());
 		_.str.include('Underscore.string', 'string'); 

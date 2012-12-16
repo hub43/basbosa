@@ -5,6 +5,7 @@ var MongoClient = require('mongodb').MongoClient
 var Database = function() {
   //this.config = Basbosa('Config').db;
   this.config = Config.db;
+  Basbosa('Logger').debug('Db config', Config.db);
 };
 
 /**
@@ -17,9 +18,10 @@ Database.prototype.connect = function() {
   var mongoClient, self = this;
   mongoClient = new MongoClient(new Server(self.config.host, self.config.port));
   mongoClient.open(function(err, mongoClient) {
+    Logger.debug('returning db ' + self.config.database);
     self.db = mongoClient.db(self.config.database);
     self.emit('connected');
-    mongoClient.close();
+
   });
 };
 
@@ -27,3 +29,5 @@ Database.prototype.getDb = function() {
   return this.db;
 };
 module.exports = new Database();
+module.exports.connect();
+Basbosa.add('Database', module.exports);

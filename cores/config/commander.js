@@ -2,7 +2,7 @@
  * Parse command line arguments
  */
 
-commander = function() {
+module.exports = function(Config) {
 	var program = require('commander');
 	
 	// Populate default options
@@ -33,5 +33,3 @@ commander = function() {
 	});
 	
 };
-
-commander();

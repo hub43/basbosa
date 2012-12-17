@@ -3,9 +3,8 @@ var MongoClient = require('mongodb').MongoClient
   , EventEmitter = require('events').EventEmitter;
 
 var Database = function() {
-  this.config = Basbosa('Config').db;
-  //this.config = Config.db;
-  Basbosa('Logger').debug('Db config', Config.db);
+  this.config = Basbosa('Config').get('db');
+  Basbosa('Logger').debug('Db config', this.config);
 };
 
 /**
@@ -18,7 +17,12 @@ Database.prototype.connect = function() {
   var mongoClient, self = this;
   mongoClient = new MongoClient(new Server(self.config.host, self.config.port));
   mongoClient.open(function(err, mongoClient) {
-    Logger.debug('returning db ' + self.config.database);
+    if (err) {
+      Basbosa('Logger').error(err);
+      throw err;
+    }
+    Basbosa('Logger').debug('returning db ' + self.config.database);
+    //console.log('returning db ' + self.config.database, err);
     self.db = mongoClient.db(self.config.database);
     self.emit('connected');
 

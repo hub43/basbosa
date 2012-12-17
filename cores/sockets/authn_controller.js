@@ -7,7 +7,7 @@ var Libs        	= require('./../libs'),
 
 SocketServer.on('connection', function(socket) {
 	socket.lon('authn.socket', function(e, message, next) {
-		if (Config.skipSocketAuth && message.userId) {
+		if (Basbosa('Config').get('skipSocketAuth') && message.userId) {
 			socket.handshake.userId = message.userId;
 			Basbosa('Logger').debug('User skip auth in effect');
 		} 

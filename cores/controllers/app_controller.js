@@ -3,7 +3,7 @@ var	I18n		= require('../libs/i18n');
 exports.beforeAction = function(req, res, next) {
 	res.view = '';
 	res.viewVars = {
-		Config			: Config,
+	//	Config			: Basbosa('Config'),
 		title				: 'JSGroups',
 		j			: null,
 	};

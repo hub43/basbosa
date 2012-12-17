@@ -11,5 +11,5 @@ if (require('fs').existsSync(SERVER_PATH + '/app.js')) {
 
 // Start translation server
 var DialectHttp = require('dialect-http');
-_.extend(DialectHttp.options, Config.dialectHttp);
+_.extend(DialectHttp.options, Basbosa('Config').get('dialectHttp'));
 DialectHttp.run();

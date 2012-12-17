@@ -46,7 +46,7 @@ passport.use(new LocalStrategy(
 
 
 
-_.each(Config.auth, function(data, provider) {
+_.each(Basbosa('Config').get('auth'), function(data, provider) {
 	var strategy = require('passport-' + provider).Strategy;
 	if (provider == 'dummy') {
 		passport.use(new strategy(function(done) {

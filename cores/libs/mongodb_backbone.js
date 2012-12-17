@@ -7,7 +7,7 @@ var //_ = require('underscore')._,
     // Our version of backbone and underscore are already loaded
     //Backbone = require('backbone'),
     //_ = require('underscore')._,
-    Db = require('./db').getDb();
+    Db = require('./db');
 
 
 var Mongo = function(collectionName, model){};
@@ -15,7 +15,7 @@ _.extend(Mongo.prototype, {
   
   // Request the Database collection associated with this Document
   _withCollection : function(callback) {
-    Db.collection(this.collectionName, function(err, collection) {
+    Db.getDb().collection(this.collectionName, function(err, collection) {
     	callback(err, collection);
     });
   }

@@ -10,7 +10,7 @@ var passport = require('./components/passport').passport
 	,	settings = { successRedirect: '/',  failureRedirect: '/login' }
 	, socketsData = require('../libs').Store.socketsData;
 
-_.each(Config.auth, function(data, provider) {
+_.each(Basbosa('Config').get('auth'), function(data, provider) {
 	module.exports[provider] = passport.authenticate(provider); 
 	module.exports[provider + 'Cb'] = passport.authenticate(provider, settings);
 }); 

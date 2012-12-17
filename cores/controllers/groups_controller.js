@@ -36,7 +36,7 @@ function populateClientAssets(j) {
 		clientAssets.img.push(require('path').basename(file));
 	});
 	// scan img_png24
-	if (Config.app == 'apps') {
+	if (Basbosa('Config').get('app') == 'apps') {
 		clientAssets.img_png24 = [];
 		clientDir = APP_PATH + '/' + j.themeBase + '/img_png24';
 		// Scan default img directory
@@ -87,7 +87,7 @@ exports.index = function(req, res, next) {
 		cui 			: { type: 'html', enableJsPan: true},
 		user 			: {
 			//group_id 	: group._id,
-			group_id : Config.defaultGroup
+			group_id : Basbosa('Config').get('defaultGroup')
 		},
 		dictionaries : ['appc/build/dictionary-ar', 'appc/build/dictionary-fr']
 	};
@@ -120,17 +120,13 @@ exports.index = function(req, res, next) {
 	_.extend(j.user, group.defaults);
 
 	// Override defaults using user session
-	if (Config.skipDb) {
-		if (req.user && req.user._id) {
-			_.extend(j.user, req.user.toJSON());
-		}
-	} else {
-		if (req.user && req.user._id) {
-			_.extend(j.user, req.user);
-			j.user.sockets = null;
-			user.visitsUpdate(req.user._id, JSON.parse(UserAgent.parse(req.headers['user-agent']).toJSON()));
-		}			
-	}
+
+	if (req.user && req.user._id) {
+		_.extend(j.user, req.user);
+		j.user.sockets = null;
+		user.visitsUpdate(req.user._id, JSON.parse(UserAgent.parse(req.headers['user-agent']).toJSON()));
+	}			
+
 
 	j.user.app		= 'app';
 
@@ -138,8 +134,8 @@ exports.index = function(req, res, next) {
 	_.extend(j.user, req.query);
 	
 	// populate client config
-	_.each(Config.clientConfig, function(configName) {
-		j[configName] = Config[configName];
+	_.each(Basbosa('Config').get('clientConfig'), function(configName) {
+		j[configName] = Basbosa('Config').get(configName);
 	});
 	
 	res.viewVars.j = j;

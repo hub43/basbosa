@@ -25,7 +25,7 @@ define([
 			GLOBAL.j = this;
 			
 			// Groups should be loaded in a different way
-			this.group = new Group(groups[Config.app]);
+			this.group = new Group(groups[Basbosa('Config').get('app')]);
 		}
 			
   });

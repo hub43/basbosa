@@ -1,7 +1,7 @@
 var	Dialect 	= require('dialect')
 	, Fs 				= require('fs');
 
-var dialect = Dialect.dialect(Config.dialect);
+var dialect = Dialect.dialect(Basbosa('Config').get('dialect'));
 
 dialect.connect(function() {
 	dialect.sync({

@@ -62,7 +62,7 @@ initServer = function(App) {
 		// Blocking access to application files should be done here
 		
 		// On development, prevent caching to easy change files
-		if (Config.env == 'development') {
+		if (Basbosa('Config').get('env') == 'development') {
 			App.use(function (req, res, next) {
 		    res.setHeader('Pragma-directive', 'no-cache');
 		    res.setHeader('Cache-directive', 'no-cache');
@@ -109,7 +109,7 @@ initServer = function(App) {
 	App.get('/search', Http.SearchController.index);
 	App.get('/countries', Http.CountriesController.getCountries);	
 	
-	_.each(Config.auth, function(data, provider){
+	_.each(Basbosa('Config').get('auth'), function(data, provider){
 		App.get('/auth/' + provider, Http.AuthController.storeUrl);
 		App.get('/auth/' + provider, Http.AuthController[provider]);
 		App.get('/auth/' + provider, function(req, res) { res.redirect('/'); } );
@@ -118,7 +118,7 @@ initServer = function(App) {
 	
 	App.get(/.*(png|jpg|svg|app|mp3|ogg\-opt|vendors)/, function(req, res, next) { 
 		// on production, cache files
-		if (Config.env == 'production') {
+		if (Basbosa('Config').get('env') == 'production') {
 			if (!res.getHeader('Cache-Control')) res.setHeader('Cache-Control', 'public, max-age=1000');
 			if (!res.getHeader('Expires')) res.setHeader('Expires', 'Fri, 01 Mar 2013 20:51:01 GMT');
 		}
@@ -136,11 +136,11 @@ initServer = function(App) {
 	 */
 	
 	Db.on('connected', function(){
-	  App.server.listen(Config.port, function() {
-      Basbosa('Logger').info('Server started on port ' + Config.port );
+	  App.server.listen(Basbosa('Config').get('port'), function() {
+      Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
       // run tests if required
-      if (Config.test) {      require('./tests');
-        var appTests = './../' + Config.app + '/tests/index.js';
+      if (Basbosa('Config').get('test')) {      require('./tests');
+        var appTests = './../' + Basbosa('Config').get('app') + '/tests/index.js';
         // Bug on with exsists Sync on windows
         if (require('fs').existsSync(appTests) || 1) {
           require(appTests);

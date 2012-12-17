@@ -17,7 +17,7 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		 * @type {string}
 		 * 
 		 */
-		var pdn = Path.dirname;
+		var pdn = Path.dirname, config;
 		GLOBAL.APP_PATH 				= pdn(pdn(pdn(pdn(pdn(__filename)))));
 
 		GLOBAL.PUBLIC_DIR				= 'appc';
@@ -26,18 +26,42 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		GLOBAL.CORES						= APP_PATH + '/node_modules/basbosa/cores';
 
 		GLOBAL.SERVER 					= true;
-		GLOBAL.Basbosa					= require('basbosa-registry');
 		GLOBAL._ 								= require('../../corec/vendors/underscore-1.3.1');
 		_.str						=	require('../../corec/vendors/underscore.string-2.1.1.js');
 		
-		// Load config
-		if (Fs.existsSync(SERVER_PATH + '/config/index.js')) {
-			GLOBAL.Config = _.extend(require('./default_config'), require(SERVER_PATH + '/config/index.js'));
-		} else {
-			GLOBAL.Config = require('./default_config');
-		}
-		Basbosa.add('Config', Config);
+		// Load Basbosa class registry
+		GLOBAL.Basbosa          = require('basbosa-registry');
 		
+		
+		// Load config, start with the default
+    config                  = require('./default_config');
+		
+		
+		// Override with the index config file
+		if (Fs.existsSync(SERVER_PATH + '/config/index.js')) {
+		  config = _.extend(config, require(SERVER_PATH + '/config/index.js'));
+		}
+		
+		// Override with local config file
+		if (Fs.existsSync(SERVER_PATH + '/config/local.js')) {
+		  config = _.extend(config, require(SERVER_PATH + '/config/local.js'));
+    }
+		
+	// Parse command lines, put them in the Config
+    require('./commander')(config);
+		
+		// Build dynamic Config values
+    config.dynamic();
+      
+    // Load Basbosa config managin class
+    // and set the compiled config as the default config
+    require('basbosa-config');
+    Basbosa('Config').setConfig(config);
+    
+    // Logger
+    require('basbosa-logger');
+  
+    
 		_.mixin(_.str.exports());
 		_.str.include('Underscore.string', 'string'); 
 
@@ -56,12 +80,8 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 		 */
 		GLOBAL.t								= function (x) {return 'Warning! dialect is not loaded yet.';};
 
-		// Parse command lines
-		require('./commander');
 		
-		// Populate dynamic Config values
-		Config.dynamic();
-		GLOBAL.Logger						= require('basbosa-logger');
+		
 
 		// Config
 		// GLOBAL.Config = require('./index');

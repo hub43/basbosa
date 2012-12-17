@@ -1,4 +1,4 @@
-var Config = {
+module.exports = {
 	// Read from environment variable NODE_ENV
 	env : process.env.NODE_ENV || 'development',
 	min : false,
@@ -76,23 +76,17 @@ var Config = {
 		// Gets populated after build
 		currentApp					: 'none',
 		currentTheme 				: 'none'
+	},
+	
+	dynamic : function() {
+	  //Dynamic config values
+	  process.env.NODE_ENV = this.env;
+	  this.debug = this.env == 'development';
+	  this.webRoot = 'http://' + this.serverName + ':' + this.port;
+	  this.dialectHttp.port = this.port + 1;
+	  this.dialectHttp.dialect = this.dialect;
+	  this.test && (this.skipSocketAuth = true);
+	  this.testServer = 'http://' + this.serverName + ':' + this.port;
+	  this.requireOpt.optimize = this.skipOpt ? 'none' : 'uglify';
 	}
 };
-
-
-
-
-Config.dynamic = function() {
-	//Dynamic config values
-	process.env.NODE_ENV = Config.env;
-	Config.debug = Config.env == 'development';
-	Config.webRoot = 'http://' + Config.serverName + ':' + Config.port;
-	Config.dialectHttp.port = Config.port + 1;
-	Config.dialectHttp.dialect = Config.dialect;
-	Config.test && (Config.skipSocketAuth = true);
-	Config.testServer = 'http://' + Config.serverName + ':' + Config.port;
-	Config.requireOpt.optimize = Config.skipOpt ? 'none' : 'uglify';
-};
-
-
-module.exports = Config;

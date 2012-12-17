@@ -16,14 +16,14 @@ SocketServer.prototype.setMaxListeners(20);
 SocketServer.prototype.init = function(App) {
 	var self = this;
 	var WS = SocketServer = Sio.listen(App.server);
-	WS.set('log level', Config.logging);
+	WS.set('log level', Basbosa('Config').get('logging'));
 	WS.set('transports', [ 'websocket', 'htmlfile',
 			'xhr-polling', 'jsonp-polling' ]);
 	
 	WS.set('transports', ['websocket', 'xhr-polling']);
 
 	WS.set('authorization', function(data, accept) {
-		if (Config.skipSocketAuth) {
+		if (Basbosa('Config').get('skipSocketAuth')) {
 			Basbosa('Logger').info('Session accepted in skipAuth Mode');
 			accept(null, true);
 			return ;

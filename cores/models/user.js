@@ -205,7 +205,9 @@ define([
 	      	Basbosa('Logger').warn('Error while updating visits for user ' + userId, error);
 	      } else {
 	      	var document = {userId : new ObjectID(id), stime : date, uagent:JSON.stringify(userAgent), etime: 0, duration : 0};
-	      	collection.insert(document);
+	      	collection.insert(document, function(err){
+	      	  
+	      	});
 	      }
     	});
 		},
@@ -377,11 +379,15 @@ define([
 			var self = this, validationResult = {}, hashPassword, options = {}, token;
 			var attributes = self.toJSON();
 			this._withCollection(function(error, collection) {
-				if(collection) {
-					collection.ensureIndex({email: 1}, {unique: true});
-				}
+				collection.ensureIndex({email: 1}, {unique: true}, function(err) {
+				  if (err) {
+				    Basbosa('Logger').warn(err);
+				    throw err;
+				  }
+				});
 			});
-			if(attributes.email !== undefined) {
+			
+			if (attributes.email !== undefined) {
 				_.each(self.validationRules, function(rules, fieldName) {
 					if (self.get(fieldName) !== undefined) {
 						_.each(rules, function(rule) {

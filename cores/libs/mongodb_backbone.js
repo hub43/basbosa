@@ -7,24 +7,15 @@ var //_ = require('underscore')._,
     // Our version of backbone and underscore are already loaded
     //Backbone = require('backbone'),
     //_ = require('underscore')._,
-    Db = require('./db');
+    Db = require('./db').getDb();
 
 
 var Mongo = function(collectionName, model){};
 _.extend(Mongo.prototype, {
-  // Obtain a database connection or die
-  _requireConnection : function() {
-    var connection = Db.getConnection();
-    if (!connection) {
-      throw new Error('FATAL: Database not connected');
-    }
-    return connection;    
-  },
   
   // Request the Database collection associated with this Document
   _withCollection : function(callback) {
-    var connection = this._requireConnection();
-    connection.collection(this.collectionName, function(err, collection) {
+    Db.collection(this.collectionName, function(err, collection) {
     	callback(err, collection);
     });
   }
@@ -93,7 +84,10 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
     }
     
     this._withCollection(function(err, collection) {
-      if (err) { return callback(err); }
+      if (err) { 
+        throw err;
+        return callback(err); 
+      }
       
       var findOneError = new Error('Could not find ' + collection.name + ':' + model.id);
       

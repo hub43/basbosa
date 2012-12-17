@@ -3,8 +3,8 @@ var MongoClient = require('mongodb').MongoClient
   , EventEmitter = require('events').EventEmitter;
 
 var Database = function() {
-  //this.config = Basbosa('Config').db;
-  this.config = Config.db;
+  this.config = Basbosa('Config').db;
+  //this.config = Config.db;
   Basbosa('Logger').debug('Db config', Config.db);
 };
 

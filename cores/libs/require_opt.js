@@ -4,7 +4,7 @@ var RequireJs = require('requirejs'),
 	Path = require('path'),
 	build, vendorsPath, nodeModulesPath;
 
-build = typeof Config !== 'undefined' ? Config.requireOpt : {}, 
+build = Basbosa('Config').get('requireOpt'); 
 vendorsPath = Path.dirname(Path.dirname(Path.dirname(__filename))) + '/corec/vendors/';
 nodeModulesPath = Path.dirname(Path.dirname(Path.dirname(__filename))) + '/';
 build.paths = {
@@ -48,16 +48,17 @@ function buildCb(buildResponse, buildConfig) {
 			}
 		});
 	});
-	Config.build = Config.build || {}; 
-	Config.build[buildConfig.currentTheme] = buildConfig.digest;
-	Basbosa('Logger').info(Config.build);
+	Basbosa('Config').set('build', Basbosa('Config').get('build') || {});
+	Basbosa('Config').get('build')[buildConfig.currentTheme] = buildConfig.digest;
+	Basbosa('Logger').info(Basbosa('Config').get('build'));
 }
 /**
  * Only build the minified version of the client if -m option is set
  */
-if (typeof Config != 'undefined' && Config.min) {
+if (Basbosa('Config').get('min')) {
 	//Build for current app
-	var base = build.out, appSettings = build.apps[Config.app], appName = Config.app;
+	var base = build.out, appSettings = build.apps[Basbosa('Config').get('app')], 
+	  appName = Basbosa('Config').get('app');
 	// Build for each theme
 	_.each(appSettings.themes, function(themeName) {
 		Basbosa('Logger').debug('Building for app :' + appName + ' theme: ' + themeName);

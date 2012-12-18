@@ -35,5 +35,5 @@ define([
 	, 'jquery'	, 'underscore'
 	, 'backbone'
 	], function() {
-	
+	  Basbosa('Logger').disableUiLogger();
 });

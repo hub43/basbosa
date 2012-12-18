@@ -411,7 +411,7 @@ define([
 							hashPassword = self.hash(self.get('password'));
 							attributes.token = self.generateActivationToken(self.get('email'));
 							self.set(attributes);
-							self.mailMessage.attachment.data = self.prepareMailContent({ url: Config.baseUrl + 'activate?email=' +  self.get('email') + '&token=' + attributes.token});
+							self.mailMessage.attachment.data = self.prepareMailContent({ url: Config.webRoot + 'activate?email=' +  self.get('email') + '&token=' + attributes.token});
 							self.mailMessage.to = self.get('email');
 							email.sendMail(self.mailMessage);
 							self.set('status', 'pending_activation');

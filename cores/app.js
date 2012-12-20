@@ -102,7 +102,8 @@ initServer = function(App) {
 	App.post('/', Http.GroupsController.index);
 	App.get('/leaders', Http.UsersController.leaders);
 	App.get('/login', Http.UsersController.login);
-	App.post('/login', Passport.authenticate('local', {failureRedirect : '/login'}), Http.UsersController.postLogin);
+	App.post('/login', Passport.authenticate('local', {failureRedirect : '/login', failureFlash: true, 
+		successRedirect: Basbosa('Config').get('sucussLogin')}), Http.UsersController.postLogin);
 	App.get('/analytics', Http.AnalyticsController.index);
 	App.get('/analytics/getData', Http.AnalyticsController.getData);
 	App.get('/stats', Http.StatsController.index);
@@ -135,7 +136,7 @@ initServer = function(App) {
 	 * 
 	 */
 	
-	Db.on('connected', function(){
+	Db.on('connected', function() {
 	  App.server.listen(Basbosa('Config').get('port'), function() {
       Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
       // run tests if required

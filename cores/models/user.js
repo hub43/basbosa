@@ -412,11 +412,11 @@ define([
 							hashPassword = self.hash(self.get('password'));
 							attributes.token = self.generateActivationToken(self.get('email'));
 							self.set(attributes);
-							self.mailMessage.attachment.data = self.prepareMailContent({ url: Config.webRoot + 'activate?email=' +  self.get('email') + '&token=' + attributes.token});
+							self.mailMessage.attachment.data = self.prepareMailContent({ url: Basbosa('Config').get('webRoot') + 'activate?email=' +  self.get('email') + '&token=' + attributes.token});
 							self.mailMessage.to = self.get('email');
 							email.sendMail(self.mailMessage);
 							self.set('status', 'pending_activation');
-							Logger.debug('this user is :' + 'pending_activation');
+							Basbosa('Logger').debug('this user is :' + 'pending_activation');
 						} else {
 							validationResult['dbValidation'] = 'This account exist before';
 						}
@@ -433,7 +433,7 @@ define([
 		},
 		hash : function(string) {
 			var crypto = require('crypto');
-			return crypto.createHmac('sha1', Config.salt.toString()).update(string).digest('hex');
+			return crypto.createHmac('sha1', Basbosa('Config').get('salt').toString()).update(string).digest('hex');
 		},
 		generateActivationToken : function(email) {
 			var self =  this;
@@ -448,6 +448,36 @@ define([
 	      	collection.update({email: email}, {$set : {status : 'developer'}},{}, function(err) {});
 	      }
     	});
+		},
+		auth : function(user, callback) {
+			var self = this;
+			function __userPendingActivation() {
+				self.findOne({email: user.username, password: self.hash(user.password)}, function(error, user) {
+					if(error) {
+						Basbosa('Logger').debug('error', error);
+					} else {
+						if(_.isEmpty(user)) {
+							callback("This user doesn't exist before", null);
+						} else {
+							callback("This user didn't Activate his/her Account", null);
+						}
+					}
+				});
+			}
+			self.findOne({email: user.username, password: self.hash(user.password), 
+				status: Basbosa('Config').get('userAfterAct')}, function(error, result) {
+					if(error) {
+						Basbosa('Logger').debug('Error when check if the user is exist', error);
+						callback(error, null);
+					} else {
+						if(_.isEmpty(result)) {
+							Basbosa('Logger').debug("This user didn't exist before");
+							__userPendingActivation();
+						} else {
+							callback(null, result);
+						}
+					}
+			});
 		}
   };
 	

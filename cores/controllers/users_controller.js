@@ -15,9 +15,10 @@ var User = require('./../models/index').User;
  * @param {Fanction} next is used to go next. 
  */
 exports.login = function(req, res, next) {
-	 res.view = j.user.theme + '/views/index';
-	 res.view = '/themes/html/views/users/login';
-	 next();
+	//i didn't found this views so i was commented it
+	 //res.view = j.user.theme + '/views/index';
+	 //res.view = '/themes/html/views/users/login';
+	res.redirect('/register');
 };
 /**
  * postLogin is a method used to check on user is logged in, if so add user to online users.
@@ -25,10 +26,10 @@ exports.login = function(req, res, next) {
  * @param {String} req hold the request that come from the client. 
  * @param {String} res the response that will hold the message to the client.
  */
-exports.postLogin = function(req, res) {
+exports.postLogin = function(req, res, next) {
 	// Check user is logged in, if so add user to online users
-	if (req.user && req.user._id) {
-		res.send(req.user);
+	if(req.user && req.user._id) {
+		next();
 	}
 };
 /**

@@ -106,6 +106,7 @@ define(['path', 'underscore', 'fs'], function(Path, _, Fs) {
 			
 			return _modules;
 		};
+		Basbosa.add('requireDir', AppDirLoad);
 	};
 	Globals();	
 });

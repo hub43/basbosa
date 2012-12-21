@@ -1,0 +1,9 @@
+[submodule "node_modules/basbosa-logger"]
+	path = node_modules/basbosa-logger
+	url = git@github.com:ygaras/basbosa-logger.git
+[submodule "node_modules/basbosa-config"]
+	path = node_modules/basbosa-config
+	url = git@github.com:ygaras/basbosa-config.git
+[submodule "node_modules/basbosa-registry"]
+	path = node_modules/basbosa-registry
+	url = git@github.com:ygaras/basbosa-registry.git

@@ -64,12 +64,6 @@ if (Basbosa('Config').get('min')) {
 		Basbosa('Logger').debug('Building for app :' + appName + ' theme: ' + themeName);
 		build.currentTheme = themeName;
 		build.currentApp = appName;
-		
-		// include the theme (ui.js) file and corec
-		build.include = [
-		     'appc/themes/' + themeName + '/ui'
-		  , 'node_modules/basbosa/corec/app.js'
-		];
 		build.out = base + '-' + themeName;
 		RequireJs.optimize(build, function(buildResponse) {
 			buildCb(buildResponse, build);

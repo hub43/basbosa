@@ -24,7 +24,7 @@ module.exports = {
 	languages : {
 		
 	},
-
+	successLogin : '/',
 	db : {
 		host : 'localhost',
 		port : 27017,

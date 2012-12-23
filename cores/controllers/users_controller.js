@@ -15,9 +15,6 @@ var User = require('./../models/index').User;
  * @param {Fanction} next is used to go next. 
  */
 exports.login = function(req, res, next) {
-	//i didn't found this views so i was commented it
-	 //res.view = j.user.theme + '/views/index';
-	 //res.view = '/themes/html/views/users/login';
 	res.redirect('/register');
 };
 /**

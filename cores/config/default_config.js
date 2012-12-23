@@ -44,6 +44,8 @@ module.exports = {
 		}
 	},
 
+	enableDialectHttp : false,
+	
 	dialectHttp : {
 		users : [ {
 			username : 'admin',

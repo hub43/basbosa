@@ -230,8 +230,8 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
       });
     }
     Basbosa('Logger').debug('This is the model attribute : ', self);
-    if(typeof self.validate  === 'function') {
-      self.validate(function(error, validationError) {
+    if(typeof self.validateUsers  === 'function') {
+      self.validateUsers(function(error, validationError) {
         if(error) {
           Basbosa('Logger').warn('error through validate the model attribute' , error);
         } else {

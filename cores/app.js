@@ -103,7 +103,7 @@ initServer = function(App) {
 	App.get('/leaders', Http.UsersController.leaders);
 	App.get('/login', Http.UsersController.login);
 	App.post('/login', Passport.authenticate('local', {failureRedirect : '/login', failureFlash: true, 
-		successRedirect: Basbosa('Config').get('sucussLogin')}), Http.UsersController.postLogin);
+		successRedirect: Basbosa('Config').get('successLogin')}), Http.UsersController.postLogin);
 	App.get('/analytics', Http.AnalyticsController.index);
 	App.get('/analytics/getData', Http.AnalyticsController.getData);
 	App.get('/stats', Http.StatsController.index);

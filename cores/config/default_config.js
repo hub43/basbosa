@@ -24,7 +24,7 @@ module.exports = {
 	languages : {
 		
 	},
-
+	successLogin : '/',
 	db : {
 		host : 'localhost',
 		port : 27017,
@@ -70,6 +70,10 @@ module.exports = {
 	requireOpt : {
 		baseUrl : APP_PATH,
 	
+		include : [
+		  'appc/themes/default/ui',
+		  'node_modules/basbosa/corec/app.js'
+		],
 		name : './appc/app',
 		out : PUBLIC_PATH + '/build/app-opt',
 		digest : '',

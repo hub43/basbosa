@@ -375,19 +375,9 @@ define([
 			  });
 		  }
 		},
-		validate : function(callback) {
+		validateUsers : function(callback) {
 			var self = this, validationResult = {}, hashPassword, options = {}, token;
 			var attributes = self.toJSON();
-			/* Breaks hawks
-			this._withCollection(function(error, collection) {
-				collection.ensureIndex({email: 1}, {unique: true}, function(err) {
-				  if (err) {
-				    Basbosa('Logger').warn(err);
-				    throw err;
-				  }
-				});
-			});
-			*/
 			if (attributes.email !== undefined) {
 				_.each(self.validationRules, function(rules, fieldName) {
 					if (self.get(fieldName) !== undefined) {

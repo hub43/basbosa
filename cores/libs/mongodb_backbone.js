@@ -4,6 +4,7 @@ var //_ = require('underscore')._,
     ObjectID = require('mongodb').ObjectID,
     events = require('events'),
     async = require('async'),
+    mongoLogger = new (require('./mongo-logger')),
     // Our version of backbone and underscore are already loaded
     //Backbone = require('backbone'),
     //_ = require('underscore')._,
@@ -27,55 +28,8 @@ Mongo.extend = Backbone.Model.extend;
 _.extend(Backbone.Model.prototype, Mongo.prototype, {
   
   dbCommand : function(req, res, command, next) {
-    var self = this;
-    command.duration = (new Date).getTime();
-    self._withCollection(function(err, coll) {
-      if (err) {
-        Basbosa('Logger').warn(err);
-        throw err;
-      }
-      command.query = command.query || {};
-      command.fields = command.fields || {};
-      command.qOptions = command.qOptions || {};
-      
-      
-      if (command.name == 'findOne') {
-        coll.findOne(command.query, command.qOptions, function(err, result) {
-          command.duration = (new Date).getTime() - command.duration;
-          command.collection = self.collectionName;
-          command.err = err;
-          command.result = result;
-          res.locals.dbCommands = res.locals.dbCommands || [];  
-          res.locals.dbCommands.push(command);
-          next(err, result);
-        });
-      } else if(command.name == 'find') {
-        coll.find(command.query, command.fields, command.qOptions).toArray(function(err, result) {
-          var _prepareResults = function(results) {
-            if (!results) return null;
-
-            results = _.map(results, function(result) {
-              result._id = result._id.toString();
-              return result;
-            });
-            
-            return results;
-          };
-          result = _prepareResults(result);
-          command.duration = (new Date).getTime() - command.duration;
-          command.collection = self.collectionName;
-          command.err = err;
-          command.result = result;
-          res.locals.dbCommands = res.locals.dbCommands || [];  
-          res.locals.dbCommands.push(command);
-          next(err, result);  
-        });      
-          
-       
-        
-      }
-            
-    });
+    command.collection = this.collectionName;
+    mongoLogger.dbCommand(req, res, command, next, Db.getDb());
   },
   //Runs a mongodb find search. 
   // 

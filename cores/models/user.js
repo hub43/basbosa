@@ -451,7 +451,7 @@ define([
 							callback(null, false, {message: 'Incorrect user name or password. Please try again.'});
 						} else {
 							callback(null, false, {message:	'This account is not activated.' + 
-								'Please follow the instructions in the confirmation email to activate your account.'});
+								' Please follow the instructions in the confirmation email to activate your account.'});
 						}
 					}
 				});

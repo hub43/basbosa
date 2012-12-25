@@ -1,15 +1,8 @@
-// Bootstrap the app, GLoablas, load Config and parse command lines
+/*
+ * Bootstrap the app, register Basbosa as Global, 
+ * set config and parse command lines
+ */ 
 require('./config/bootstrap');
-// Extend backbone - client and server
-require('../corec/libs/app_backbone');
-// Extend backbone at server side with mongodb function
-require('./libs/mongodb_backbone');
-require('./models');
-// Load client models if they exsist
-if (require('fs').existsSync(APP_PATH + '/appc/models')) {
-	AppDirLoad(APP_PATH + '/appc/models');
-}
-
 /* Loading express and Creating the main server instance */
 var App =  require('express')();
 App.server = require('http').createServer(App);

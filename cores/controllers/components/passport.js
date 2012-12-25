@@ -19,7 +19,11 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(id, done) {
 	var user = new User(); 
 	user.findById(id, {pointsLog : 0, visits : 0, friends : 0}, function(err, user) {
-		done(err, user);
+		if (err) {
+		  Basbosa('Logger').warn(err);
+		  throw err;
+		}
+	  done(err, user);
   });
 });
 
@@ -56,7 +60,7 @@ _.each(Basbosa('Config').get('auth'), function(data, provider) {
 		passport.use(new strategy(function(done) {
 		    var user = new User();
 		    user.getDummy(function(err, user){
-		    	done(null, user);
+		    	done(err, user);
 		    }); 	
 		  }
 		));

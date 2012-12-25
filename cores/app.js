@@ -125,7 +125,7 @@ initServer = function(App) {
 	App.get('/*', Http.AppController.beforeRender);
 	App.post('/*', Http.AppController.beforeRender);
 	
-	/**
+	/*
 	 * Start listening on set port and respond to http and WebSocekt requests
 	 * 
 	 */

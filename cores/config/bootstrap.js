@@ -9,8 +9,7 @@ var Path = require('path'),
  * The globals class register certain global vairables that
  * can be accessed from anywhere on the server side
  * @class Globals
- * @contructor
- * @modul Cores
+ * @module Cores
  */
 
 var Globals = function() {

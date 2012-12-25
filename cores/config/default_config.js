@@ -1,6 +1,7 @@
 /**
  * The default configurations for a Basbosa application on the server side
  * check Config class for information on how to access these configurations
+ * 
  * @class BasbosaConfig
  * @constructor
  * @module BasbosaCoreServer
@@ -11,10 +12,13 @@ var BasbosaConfig = function() {
 };
 
 BasbosaConfig.prototype = {
-	/*
+	/**
 	 * The environment the the application runs in. the default value is read from
 	 * process.env.NODE_ENV. In case process.env.NODE_ENV is not set will default to 
 	 * 'development'
+	 * 
+	 * @type {String}
+	 * @default process.env.NODE_ENV || 'development'
 	 * @property env 
 	 */ 
 	env : process.env.NODE_ENV || 'development',

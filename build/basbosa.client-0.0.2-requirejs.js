@@ -2982,13 +2982,10 @@ define('collections/groups',[
           }).css({
             'right' : '45px',
             'position' : 'fixed'
-          }).click(
-              function() {
-                $('.basbosa-logger').css(
-                    'height',
-                    $('.basbosa-logger').css('height') == '100px' ? '100%'
-                        : '100px');
-              });
+          }).click(function() {
+            var height = $('.basbosa-logger').css('height') == '100px' ? '100%' : '100px'; 
+            $('.basbosa-logger').css('height', height);
+          });
 
       $buttonClose = $('<input>').attr({
         'claas' : 'basbosa-logger-close',

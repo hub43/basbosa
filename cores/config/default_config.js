@@ -86,14 +86,14 @@ BasbosaConfig.prototype = {
 	
 	
 	requireOpt : {
-		baseUrl : APP_PATH,
+		baseUrl : (typeof APP_PATH !== 'undefined') ? APP_PATH : 'undefined',
 	
 		include : [
 		  'appc/themes/default/ui',
 		  'node_modules/basbosa/corec/app.js'
 		],
 		name : './appc/app',
-		out : PUBLIC_PATH + '/build/app-opt',
+		out : (typeof APP_PATH !== 'undefined') ? APP_PATH + '/build/app-opt' : 'undefined',
 		digest : '',
 		optimize : 'uglify',
 		

@@ -1,8 +1,9 @@
 var RequireJs = require('requirejs'), 
-	build = require('./cores/libs/require_opt').build, 
-	Fs 		= require('fs');
+  Fs = require('fs'),
+  build, config;
 
-build.out = 'basbosa.client.js';
+build = require('./cores/libs/require_opt').build,
+build.out = 'build/basbosa.client.js';
 build.baseUrl = './corec/';
 build.optimize = 'none';
 build.paths.requireLib = 'vendors/require-2.0.4';
@@ -12,17 +13,17 @@ Fs.readFile('package.json', function(err, data) {
 	var packageJson = JSON.parse(data);
 	build.name = 'app';
 	build.include = 'requireLib';
-	build.out = 'basbosa.client-' + packageJson.version + '-requirejs.js';
+	build.out = 'build/basbosa.client-' + packageJson.version + '-requirejs.js';
 	RequireJs.optimize(build, function(buildResponse) {
 		console.log(build);
 		console.log(buildResponse);
-		Fs.createReadStream(build.out).pipe(Fs.createWriteStream('basbosa-require.js'));
+		//Fs.createReadStream(build.out).pipe(Fs.createWriteStream('build/basbosa-require.js'));
 	});
 		
 	// Build with almond 
 	build.name = './../almond';
 	build.include = ['app'];
-	build.out = 'basbosa.client-' + packageJson.version + '.js';
+	build.out = 'build/basbosa.client-' + packageJson.version + '.js';
 	build.wrap = {
 		start : '//',
 		end : 'require(\'app\');'
@@ -31,7 +32,7 @@ Fs.readFile('package.json', function(err, data) {
 	RequireJs.optimize(build, function(buildResponse) {
 		console.log(build);
 		console.log(buildResponse);
-		Fs.createReadStream(build.out).pipe(Fs.createWriteStream('basbosa.js'));
+		//Fs.createReadStream(build.out).pipe(Fs.createWriteStream('build/basbosa.js'));
 	});
 });
 

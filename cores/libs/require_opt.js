@@ -4,9 +4,10 @@ var RequireJs = require('requirejs'),
 	Path = require('path'),
 	build, vendorsPath, nodeModulesPath;
 
-build = Basbosa('Config').get('requireOpt'); 
+build = (typeof Basbosa !== 'undefined') ? Basbosa('Config').get('requireOpt') : {}; 
 vendorsPath = Path.dirname(Path.dirname(Path.dirname(__filename))) + '/corec/vendors/';
 nodeModulesPath = Path.dirname(Path.dirname(Path.dirname(__filename))) + '/';
+
 build.paths = {
 	jquery 			: vendorsPath + 'jquery-1.7.1.min',
 	socketio 		: vendorsPath + 'socket.io-0.9.10',
@@ -18,6 +19,7 @@ build.paths = {
 	'basbosa-logger' 		: nodeModulesPath + 'node_modules/basbosa-logger/index',
 	'basbosa-registry' 		: nodeModulesPath + 'node_modules/basbosa-registry/index',
 };
+
 build.shim =  {
 		'basbosa-config' : ['basbosa-registry'],
 		'basbosa-logger' : ['basbosa-registry']
@@ -55,7 +57,7 @@ function buildCb(buildResponse, buildConfig) {
 /**
  * Only build the minified version of the client if -m option is set
  */
-if (Basbosa('Config').get('min')) {
+if (typeof Basbosa !== 'undefined' && Basbosa('Config').get('min')) {
 	//Build for current app
 	var base = build.out, appSettings = build.apps[Basbosa('Config').get('app')], 
 	  appName = Basbosa('Config').get('app');

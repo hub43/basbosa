@@ -39,13 +39,8 @@ passport.use(new LocalStrategy(
 		var hashed_pass = password;
     // asynchronous verification, for effect...
     process.nextTick(function () {
-			User.prototype.auth({username:username, password:hashed_pass}, function(err, user) {
-				if(err) {				
-					return done(null, false, { message: err });
-				} else {
-					return done(null, user);
-				}
-
+			User.prototype.auth({username:username, password:hashed_pass}, function(err, user, message) {
+				return done(err, user, message);
 			});
     });
   }

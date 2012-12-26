@@ -1,15 +1,8 @@
-// Bootstrap the app, GLoablas, load Config and parse command lines
+/*
+ * Bootstrap the app, register Basbosa as Global, 
+ * set config and parse command lines
+ */ 
 require('./config/bootstrap');
-// Extend backbone - client and server
-require('../corec/libs/app_backbone');
-// Extend backbone at server side with mongodb function
-require('./libs/mongodb_backbone');
-require('./models');
-// Load client models if they exsist
-if (require('fs').existsSync(APP_PATH + '/appc/models')) {
-	AppDirLoad(APP_PATH + '/appc/models');
-}
-
 /* Loading express and Creating the main server instance */
 var App =  require('express')();
 App.server = require('http').createServer(App);
@@ -31,7 +24,8 @@ initServer = function(App) {
 	, Http 					= AppDirLoad(__dirname + '/controllers')
 	, SocketServer 	= require('./sockets/components/socket_server')
 	, Db						= require('./libs/db')
-	, Path					= require('path');
+	, Path					= require('path')
+	, flash					=	require('connect-flash');
 	
 	
 	// Init Socket	
@@ -56,7 +50,7 @@ initServer = function(App) {
 		App.use(Passport.initialize()); // initialize passport
 		App.use(Passport.session()); // setup its session handling
 		App.use(JadeCompiler);
-		
+		App.use(flash());
 		App.use(App.router); // push our routing table to the stack
 		
 		// Blocking access to application files should be done here
@@ -131,7 +125,7 @@ initServer = function(App) {
 	App.get('/*', Http.AppController.beforeRender);
 	App.post('/*', Http.AppController.beforeRender);
 	
-	/**
+	/*
 	 * Start listening on set port and respond to http and WebSocekt requests
 	 * 
 	 */

@@ -1,0 +1,14 @@
+{
+    "name"	: "The Basbosa Framework",
+    "description": "The Basbosa Framework provides the basic functionality needed to create multiplayer cross-platform HTML5 games",
+    "version": "0.7.1",
+    "url": "http://hub43.com/",
+    "options": {
+        "outdir": "apidocs",
+		"linkNatives": "true",
+		"paths" : ".",
+		"ignorePaths" : ["corec/vendors", "corec\\vendors"],
+		"exclude" : "corec/vendors,build,vendors,almond,db"
+	
+    }
+}

@@ -1,6 +1,28 @@
-module.exports = {
-	// Read from environment variable NODE_ENV
+/**
+ * The default configurations for a Basbosa application on the server side
+ * check Config class for information on how to access these configurations
+ * 
+ * @class BasbosaConfig
+ * @constructor
+ * @module BasbosaCoreServer
+ */
+
+var BasbosaConfig = function() {
+  
+};
+
+BasbosaConfig.prototype = {
+	/**
+	 * The environment the the application runs in. the default value is read from
+	 * process.env.NODE_ENV. In case process.env.NODE_ENV is not set will default to 
+	 * 'development'
+	 * 
+	 * @type {String}
+	 * @default process.env.NODE_ENV || 'development'
+	 * @property env 
+	 */ 
 	env : process.env.NODE_ENV || 'development',
+	
 	min : false,
 	logging : 4,
 	skipSocketAuth : false,
@@ -68,14 +90,14 @@ module.exports = {
 	
 	
 	requireOpt : {
-		baseUrl : APP_PATH,
+		baseUrl : (typeof APP_PATH !== 'undefined') ? APP_PATH : 'undefined',
 	
 		include : [
 		  'appc/themes/default/ui',
 		  'node_modules/basbosa/corec/app.js'
 		],
 		name : './appc/app',
-		out : PUBLIC_PATH + '/build/app-opt',
+		out : (typeof APP_PATH !== 'undefined') ? APP_PATH + '/build/app-opt' : 'undefined',
 		digest : '',
 		optimize : 'uglify',
 		
@@ -96,3 +118,5 @@ module.exports = {
 	  this.requireOpt.optimize = this.skipOpt ? 'none' : 'uglify';
 	}
 };
+
+module.exports = BasbosaConfig;

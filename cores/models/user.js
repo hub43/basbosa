@@ -445,11 +445,13 @@ define([
 				self.findOne({email: user.username, password: self.hash(user.password)}, function(error, user) {
 					if(error) {
 						Basbosa('Logger').debug('error', error);
+						callback(error);
 					} else {
 						if(_.isEmpty(user)) {
-							callback("This user doesn't exist before", null);
+							callback(null, false, {message: 'Incorrect user name or password. Please try again.'});
 						} else {
-							callback("This user didn't Activate his/her Account", null);
+							callback(null, false, {message:	'This account is not activated.' + 
+								' Please follow the instructions in the confirmation email to activate your account.'});
 						}
 					}
 				});
@@ -458,7 +460,7 @@ define([
 				status: Basbosa('Config').get('userAfterAct')}, function(error, result) {
 					if(error) {
 						Basbosa('Logger').debug('Error when check if the user is exist', error);
-						callback(error, null);
+						callback(error);
 					} else {
 						if(_.isEmpty(result)) {
 							Basbosa('Logger').debug("This user didn't exist before");

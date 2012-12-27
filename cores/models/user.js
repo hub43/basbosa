@@ -22,14 +22,6 @@ define([
 	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations, Async) { //user Model inherent from user and j in corec.
 	
 	var UserServer = {
-		mailMessage : {
-			text : 'some thing',
-			from : 'nobody@hub43.com',
-			to 	 : 'nfutoam.atef@gmail.com',
-			subject : 'Welcome to hub43.com',
-			attachment: 
-			      {data:"<html>i <i>hope</i> this works!</html>", alternative:true}
-		},
 		status : null,
 		collectionName 	: 'users',  																		//define the collection that this class will deal with it.
 		/**

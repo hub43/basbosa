@@ -17,21 +17,11 @@ define([
 	, 'http'
 	, '../libs/email_module'
 	, '../libs/validations_module'
+	, 'async'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations, Async) { //user Model inherent from user and j in corec.
 	
-	var Validations =  Validations.getInstance();
 	var UserServer = {
-		validationRules : {
-			email : [{
-				rule 		: Validations.isValidMail,
-				message	: 'Please enter a valid email'
-			}],
-			password : [{
-				rule : Validations.isLargerThan,
-				message : 'Your password must be at least 6 characters long'
-			}],
-		},
 		mailMessage : {
 			text : 'some thing',
 			from : 'nobody@hub43.com',
@@ -375,50 +365,67 @@ define([
 			  });
 		  }
 		},
-		validateUsers : function(callback) {
-			var self = this, validationResult = {}, hashPassword, options = {}, token;
-			var attributes = self.toJSON();
-			if (attributes.email !== undefined) {
+		validateUser : function(callback) {
+			var self = this, validationError = {}, hashPassword, options = {}
+			, attributes = self.toJSON(), token, rulesFunctions = [];
+			//check if this user has validationRules object if not return true and do nothing.
+			if(self.validationRules === undefined) {
+				if(callback !== undefined && callback === 'function') callback(null, {});
+				return true;
+			} else {
+				// if validationRules object is exist in this user loop on it 
+				//and push in rulesFunctions with the parameters of them.
 				_.each(self.validationRules, function(rules, fieldName) {
 					if (self.get(fieldName) !== undefined) {
 						_.each(rules, function(rule) {
 							if(fieldName === 'password') {
-								if (!rule.rule(self.get(fieldName), 6)) {
-									validationResult[fieldName] = rule.message;
-								}
+								rulesFunctions.push(function(cb) {
+									rule.rule(self.get(fieldName), 6, function(result) {
+										if(!result)	cb(rule.message);
+										if(result)	cb(null, true);
+									})
+								});
 							} else {
-								if (!rule.rule(self.get(fieldName))) {
-									validationResult[fieldName] = rule.message;
-								}
+								rulesFunctions.push(function(cb) {
+									rule.rule(self.get(fieldName), function(result) {
+										if(!result)	cb(rule.message);
+										if(result)	cb(null, true);
+									})
+								});
 							}
-							
 						});
 					}
 				});
-				if(_.isEmpty(validationResult)) {
-					options.success = function (results) {
-						Basbosa('Logger').debug('The result of checking in db if this data there exsit before', results);
-						if(_.isEmpty(results))  {
-							hashPassword = self.hash(self.get('password'));
-							attributes.token = self.generateActivationToken(self.get('email'));
-							self.set(attributes);
-							self.mailMessage.attachment.data = self.prepareMailContent({ url: Basbosa('Config').get('webRoot') + 'activate?email=' +  self.get('email') + '&token=' + attributes.token});
-							self.mailMessage.to = self.get('email');
-							email.sendMail(self.mailMessage);
-							self.set('status', 'pending_activation');
-							Basbosa('Logger').debug('this user is :' + 'pending_activation');
-						} else {
-							validationResult['dbValidation'] = 'This account exist before';
-						}
-						typeof callback === 'function' && callback (null, {validationResult : validationResult, hashPassword : hashPassword});	
-					};
-					options.error = function (error) {
-						typeof callback === 'function' && callback (error, validationResult);
-					};
-					self.find({email: self.get('email')}, options);
-				} else {
-					typeof callback === 'function' && callback(null, validationResult);
-				}
+				//Async execution depending on the callback check on the database or not.
+				Async.parallel(rulesFunctions, function(error, result) {
+					if(error) {
+						validationError = _.extend({}, validationError, error);
+						typeof callback === 'function' && callback(null, validationError);
+					}
+					if(result) {
+						options.success = function (results) {
+							Basbosa('Logger').debug('The result of checking in db if this data there exsit before', results);
+							if(_.isEmpty(results))  {
+								hashPassword = self.hash(self.get('password'));
+								attributes.token = self.generateActivationToken(self.get('email'));
+								self.set(attributes);
+								self.mailMessage.attachment.data = self.prepareMailContent({ url: Basbosa('Config').get('webRoot') + '/activate?email=' +  self.get('email') + '&token=' + attributes.token});
+								self.mailMessage.to =	self.get('email');
+								email.sendMail(self.mailMessage);
+								self.set('status', 'pending_activation');
+								Basbosa('Logger').debug('this user is :' + 'pending_activation');
+							} else {
+								validationError['dbValidation'] = 'This account exist before';
+							}
+							typeof callback === 'function' && callback (null, {validationResult : validationError, hashPassword : hashPassword});	
+						};
+						options.error = function (error) {
+							typeof callback === 'function' && callback (error, validationError);
+						};
+						self.find({email: self.get('email')}, options);
+					}
+			  });
+			  
 			}
 		},
 		hash : function(string) {
@@ -428,16 +435,6 @@ define([
 		generateActivationToken : function(email) {
 			var self =  this;
 			return self.hash((new Date).getTime() + email);
-		},
-		activate : function(email) {
-			var Db = DbClass.getDb();
-			Db.collection('users', function(error,collection) {
-  		 if (error) {
-	      	Basbosa('Logger').warn('Error while updating status of the user ' + email , error);
-	      } else {
-	      	collection.update({email: email}, {$set : {status : 'developer'}},{}, function(err) {});
-	      }
-    	});
 		},
 		auth : function(user, callback) {
 			var self = this;

@@ -57,7 +57,7 @@ function buildCb(buildResponse, buildConfig) {
 /**
  * Only build the minified version of the client if -m option is set
  */
-if (typeof Basbosa !== 'undefined' && Basbosa('Config').get('min')) {
+if (typeof Basbosa !== 'undefined' && Basbosa('Config').get('min') && build.apps) {
 	//Build for current app
 	var base = build.out, appSettings = build.apps[Basbosa('Config').get('app')], 
 	  appName = Basbosa('Config').get('app');

@@ -4,7 +4,7 @@
 */
 
 var SocketServer		= require('./components/socket_server'),
-		Validations			= require('./../libs').Validations,
+		validate			= require('basbosa-validation').validate,
 		MessageTypes		= {},
 		validated 			= {},
 		unvalidated 		= {};
@@ -33,7 +33,7 @@ SocketServer.on('connection', function(socket){
 		// it should be dropped ==> Please check validations_module.js line #59
 		// if(validator.length && Validations.validateWith(validator, e.message)) {
 		
-		if (message.internalMessage || Validations.validateWith(validator, message)) {
+		if (message.internalMessage || validate(validator, message)) {
 			validated[message.eventName] = _.extend({}, message);
 			if (!message.internalMessage && message.eventName != 'authn.socket' && !socket.handshake.userId) {
 				if (Config.skipSocketAuth) {

@@ -159,13 +159,12 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
    * the model attribute if it is saved well
    */
   update: function(callback) {
-    var self = this;
+    var self = this  , attributes = self.toJSON();;
     function __updateDb() {
       self._withCollection(function(error, collection) {
         if(error) {
           typeof callback === 'function' && callback(error);
         } else {
-          var attributes = self.toJSON();
           delete attributes._id;
           if(self.id === undefined) {
             collection.insert(attributes, function(error) {
@@ -185,18 +184,19 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
     }
     Basbosa('Logger').debug('This is the model attribute : ', self);
     if(typeof self.validationRules  !== undefined) {
-      self.validateUser(function(error, validationError) {
-        if(error) {
-          Basbosa('Logger').warn('error through validate the model attribute' , error);
-        } else {
-          if(_.isEmpty(validationError.validationResult)) {
-            if(validationError.hashPassword !== undefined) {
-              self.set('password', validationError.hashPassword);
-              __updateDb();
-            }
-          } else {
-            typeof callback === 'function' && callback(null, validationError.validationResult);
-          }
+      self.validateUser(function(error, result) {
+      	Basbosa('Logger').warn(error, result);
+        if(error !== null) {
+        	typeof callback === 'function' && callback(null, error);
+        } else if(result) {
+	        	var hashPassword = self.hash(self.get('password'));
+						attributes.token = self.generateActivationToken(self.get('email'));
+						self.set(attributes);
+						self.sendMail();	
+						self.set('status', 'pending_activation');
+						Basbosa('Logger').debug('this user is :' + 'pending_activation');
+            self.set('password', hashPassword);
+            __updateDb();
         }
       });
     } else {

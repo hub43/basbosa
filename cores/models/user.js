@@ -15,11 +15,8 @@ define([
 	, './country'
 	, 'https'
 	, 'http'
-	, '../libs/email_module'
-	, '../libs/validations_module'
-	, 'async'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http, email, Validations, Async) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, DbClass, Country, https, http) { //user Model inherent from user and j in corec.
 	
 	var UserServer = {
 		status : null,
@@ -358,67 +355,14 @@ define([
 		  }
 		},
 		validateUser : function(callback) {
-			var self = this, validationError = {}, hashPassword, options = {}
-			, attributes = self.toJSON(), token, rulesFunctions = [];
-			//check if this user has validationRules object if not return true and do nothing.
-			if(self.validationRules === undefined) {
-				if(callback !== undefined && callback === 'function') callback(null, {});
-				return true;
-			} else {
-				// if validationRules object is exist in this user loop on it 
-				//and push in rulesFunctions with the parameters of them.
-				_.each(self.validationRules, function(rules, fieldName) {
-					if (self.get(fieldName) !== undefined) {
-						_.each(rules, function(rule) {
-							if(fieldName === 'password') {
-								rulesFunctions.push(function(cb) {
-									rule.rule(self.get(fieldName), 6, function(result) {
-										if(!result)	cb(rule.message);
-										if(result)	cb(null, true);
-									})
-								});
-							} else {
-								rulesFunctions.push(function(cb) {
-									rule.rule(self.get(fieldName), function(result) {
-										if(!result)	cb(rule.message);
-										if(result)	cb(null, true);
-									})
-								});
-							}
-						});
-					}
-				});
-				//Async execution depending on the callback check on the database or not.
-				Async.parallel(rulesFunctions, function(error, result) {
-					if(error) {
-						validationError = _.extend({}, validationError, error);
-						typeof callback === 'function' && callback(null, validationError);
-					}
-					if(result) {
-						options.success = function (results) {
-							Basbosa('Logger').debug('The result of checking in db if this data there exsit before', results);
-							if(_.isEmpty(results))  {
-								hashPassword = self.hash(self.get('password'));
-								attributes.token = self.generateActivationToken(self.get('email'));
-								self.set(attributes);
-								self.mailMessage.attachment.data = self.prepareMailContent({ url: Basbosa('Config').get('webRoot') + '/activate?email=' +  self.get('email') + '&token=' + attributes.token});
-								self.mailMessage.to =	self.get('email');
-								email.sendMail(self.mailMessage);
-								self.set('status', 'pending_activation');
-								Basbosa('Logger').debug('this user is :' + 'pending_activation');
-							} else {
-								validationError['dbValidation'] = 'This account exist before';
-							}
-							typeof callback === 'function' && callback (null, {validationResult : validationError, hashPassword : hashPassword});	
-						};
-						options.error = function (error) {
-							typeof callback === 'function' && callback (error, validationError);
-						};
-						self.find({email: self.get('email')}, options);
-					}
-			  });
-			  
-			}
+			var self = this, validateA = Basbosa('BasbosaValidation').validateA;
+			validateA(self.toJSON(), self.validationRules, function(error , result) {
+				if(error !== null) {
+					typeof callback === 'function' && callback(error);
+				} else if(result) {
+					typeof callback === 'function' && callback(null, true);
+				}
+			});
 		},
 		hash : function(string) {
 			var crypto = require('crypto');

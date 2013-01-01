@@ -22,6 +22,7 @@ define(['emailjs'], function(email) {
 		},
 		
 	};
+	Basbosa && Basbosa.add('Email', EmailModule);
 	return EmailModule;
 });
 

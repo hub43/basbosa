@@ -15,6 +15,7 @@ define([
 	, './country'
 	, 'https'
 	, 'http'
+	, '../libs/email_module'
   ,	'backbone'
 	], function(User, j, DummyUsers, DbClass, Country, https, http) { //user Model inherent from user and j in corec.
 	

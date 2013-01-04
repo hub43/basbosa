@@ -1,35 +1,94 @@
 //    backbone-mongodb mongodb-sync.js
 //    (c) 2011 Done.
-var //_ = require('underscore')._,
-    ObjectID = require('mongodb').ObjectID,
-    events = require('events'),
-    async = require('async'),
+var ObjectID = require('mongodb').ObjectID,
     mongoLogger = new (require('./mongo-logger')),
-    // Our version of backbone and underscore are already loaded
-    //Backbone = require('backbone'),
-    //_ = require('underscore')._,
     Db = require('./db');
 
 
-var Mongo = function(collectionName, model){};
-_.extend(Mongo.prototype, {
-  
-  // Request the Database collection associated with this Document
+var MongoBackbone = {
+    
   _withCollection : function(callback) {
     Db.getDb().collection(this.collectionName, function(err, collection) {
       callback(err, collection);
     });
-  }
-  
-});
-Mongo.extend = Backbone.Model.extend;
-
-
-_.extend(Backbone.Model.prototype, Mongo.prototype, {
+  },
   
   dbCommand : function(req, res, command, next) {
     command.collection = this.collectionName;
     mongoLogger.dbCommand(req, res, command, next, Db.getDb());
+  },
+  
+  /*
+   *Possible ways to pass parameters
+   * cb
+   * cb, res
+   * query, cb
+   * query, cb, res
+   * query, fields, cb
+   * query, fields, cb, res
+   * query, fields, qOptions, cb
+   * query fields, qOptions, cb, res
+   *  
+   * @param query
+   * @param fields
+   * @param qOptions
+   * @param cb
+   * @param res
+   */
+  search : function(query, fields, qOptions, cb, res) {
+    var dbCommand, args = Array.prototype.slice.call(arguments, 0);
+    
+    query = typeof query === 'object' ?  query : {};
+    if (args.length < 3) fields = {};
+    if (args.length < 4) qOptions = {};
+        
+    res = args.pop();
+    
+    // If the last parameter is an object, log the query to it
+    if (typeof res === 'object') {
+      res.locals = res.locals || {}; 
+      res.locals.dbCommands = res.locals.dbCommands || [];
+      
+      dbCommand = {
+          collection : this.collectionName,
+          name : 'find',
+          query : query,
+          fields : fields,
+          qOptions : qOptions,
+          duration : (new Date).getTime()
+        };
+      
+      // Remove original call back
+      cb = args.pop();
+    } else {
+      cb = res;
+    }
+        
+    this._withCollection(function(error, collection) {
+      if (error) { 
+        return cb(err, null); 
+      } else {
+        collection.find(query, fields, qOptions).toArray(function(err, results) {
+          if (err) return cb(err, results);
+                   
+          results = _.map(results, function(result) {
+            result._id = result._id.toString();
+            return result;
+          });
+          
+          // If a response was sent, log to it;
+          if (typeof res === 'object') {
+            dbCommand.duration = (new Date).getTime() - dbCommand.duration;
+            dbCommand.result = results;
+            dbCommand.resultCount = results.length;
+            dbCommand.err = err;
+            res.locals.dbCommands.push(dbCommand);
+          }
+           
+          cb(err, results);         
+        });      
+      }
+    });
   },
   //Runs a mongodb find search. 
   // 
@@ -39,31 +98,30 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
   // @params qoptions (optional): additional arguments for query
   // @param callback: the usual backbone success/error callback json
   // @returns: the reseted collection with new models
-  find: function(query, qoptions, cb) {
-    //if(!options) {
-      options = qoptions;
-     // qoptions = {};
-    //}
+  find: function(query, qOptions, cb) {
+    if (typeof query === 'function') cb = query;
+    if (typeof qoptions === 'function') cb = qOptions;
+      
     var self = this;
     this._withCollection(function(error, collection) {
       if (error) { 
         return options.error(err); 
       } else {
-          collection.find(query, qoptions).toArray(function(err, results) {
-            var _prepareResults = function(results) {
-              if (!results) return null;
-  
-              results = _.map(results, function(result) {
-                result._id = result._id.toString();
-                return result;
-              });
-              
-              return results;
-            };
-            if (_.isFunction(options)) options(err, _prepareResults(results));
-            else if (err) options.error(err);
-            else options.success(_prepareResults(results));
-          });      
+        collection.find(query, qoptions).toArray(function(err, results) {
+          var _prepareResults = function(results) {
+            if (!results) return null;
+
+            results = _.map(results, function(result) {
+              result._id = result._id.toString();
+              return result;
+            });
+            
+            return results;
+          };
+          if (_.isFunction(options)) options(err, _prepareResults(results));
+          else if (err) options.error(err);
+          else options.success(_prepareResults(results));
+        });      
       }
     });
   },
@@ -185,17 +243,17 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
     Basbosa('Logger').debug('This is the model attribute : ', self);
     if(typeof self.validationRules  !== undefined) {
       self.validateUser(function(error, result) {
-      	Basbosa('Logger').warn(error, result);
+        Basbosa('Logger').warn(error, result);
         if(error !== null) {
-        	typeof callback === 'function' && callback(null, error);
+          typeof callback === 'function' && callback(null, error);
         } else if(result) {
-        	var hashPassword = self.hash(self.get('password'));
-					attributes.token = self.generateActivationToken(self.get('email'));
-					self.set(attributes);
-					self.sendMail();	
-					attributes.status = 'pending_activation';
-					attributes.password =  hashPassword;
-					self.set(attributes);
+          var hashPassword = self.hash(self.get('password'));
+          attributes.token = self.generateActivationToken(self.get('email'));
+          self.set(attributes);
+          self.sendMail();  
+          attributes.status = 'pending_activation';
+          attributes.password =  hashPassword;
+          self.set(attributes);
           Basbosa('Logger').debug('this user is :' + 'pending_activation',attributes);
           __updateDb();
         }
@@ -212,8 +270,10 @@ _.extend(Backbone.Model.prototype, Mongo.prototype, {
       if (err) callback(err);
       else collection.remove({ _id: new ObjectID(model.id) }, callback);
     });    
-  },
+  }
   
-});
+};
+
+_.extend(Backbone.Model.prototype, MongoBackbone);
 
 

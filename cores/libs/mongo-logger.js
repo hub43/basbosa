@@ -13,6 +13,7 @@ var finalizeStats = function(req, res, command, next, err, result) {
   command.duration = (new Date).getTime() - command.duration;
   command.err = err;
   command.result = result;
+  command.resultCount = result.length;
   res.locals.dbCommands = res.locals.dbCommands || [];  
   res.locals.dbCommands.push(command);
   next(err, result);

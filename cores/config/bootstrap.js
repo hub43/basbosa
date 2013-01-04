@@ -1,5 +1,4 @@
 var Path = require('path'),
-    _ = require('underscore'),
     Fs = require('fs'),
     BasbosaConfig,
     config;
@@ -31,7 +30,8 @@ var Globals = function() {
 
 	GLOBAL.SERVER 					= true;
 	GLOBAL._ 								= require('../../corec/vendors/underscore-1.3.1');
-	_.str						=	require('../../corec/vendors/underscore.string-2.1.1.js');
+	_.str						        =	require('../../corec/vendors/underscore.string-2.1.1.js');
+	GLOBAL._.inflection            = require('../../corec/vendors/underscore.inflection-1.0.0.js');
 	
 	// Load Basbosa class registry
 	GLOBAL.Basbosa          = require('basbosa-registry');
@@ -69,6 +69,7 @@ var Globals = function() {
   
 	_.mixin(_.str.exports());
 	_.str.include('Underscore.string', 'string'); 
+	
 
 	GLOBAL.Backbone 				= require('../../corec/vendors/backbone-0.9.2');
 	

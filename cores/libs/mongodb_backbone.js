@@ -12,6 +12,59 @@ var MongoBackbone = {
     });
   },
   
+  populateHasMany : function(foreignModelName, models, cb, res) {
+    var self = this, modelMap = {}, modelIds = [], query = {},
+        foreign_key = _(self.collectionName).singularize() + '_id',
+        foreignModelNameModel  = foreignModelName + 'Model';
+      
+    _.each(models, function(model) {
+      modelIds.push(model.id);
+      modelMap[model.id] = model;
+    });
+    
+    query[foreign_key] =  {$in : modelIds};
+    
+    B('Logger').info(foreignModelNameModel);
+    Basbosa(foreignModelNameModel).prototype.search(query, function(err, results) {
+      _.each(results, function(result) {
+        modelMap[result[foreign_key]][foreignModelName] = modelMap[result[foreign_key]][foreignModelName] || [];
+        modelMap[result[foreign_key]][foreignModelName].push(result);
+      });
+      
+      cb(err, results);
+    }, res);
+   
+  },
+  
+  populateBelongsTo : function(foreignModelName, models, cb, res) {
+    var self = this, modelIds = [], query = {}, modelMap = {},
+      foreign_key = foreignModelName.toLowerCase() + '_id',
+      foreignModelNameModel  = foreignModelName + 'Model';
+    
+    B('Logger').info(foreign_key);
+    _.each(models, function(model) {
+      modelIds.push(model[foreign_key]);
+      modelMap[model[foreign_key]] = model;
+    });
+    
+    query['id'] =  {$in : modelIds};
+    
+    Basbosa(foreignModelNameModel).prototype.search(query, function(err, results) {
+      _.each(results, function(result) {
+        modelMap[result.id] = result;
+      });
+      
+      _.each(models, function(model) {
+        model[foreignModelName] = modelMap[model[foreign_key]];
+      });
+      
+      cb(err, results);
+    }, res);
+    
+  },
+  
+  
+  
   /*
    *Possible ways to pass parameters
    * cb
@@ -36,9 +89,8 @@ var MongoBackbone = {
     query = typeof args[0] === 'object' ?  args[0] : {};
     fields = args.length < 3 ? {} : args[1];
     qOptions = args.length < 4 ? {} : args[2];
-    B('Logger').info(args);        
+          
     res = args.pop();
-    
     // If the last parameter is an object, log the query to it
     if (typeof res === 'object') {
       res.locals = res.locals || {}; 
@@ -58,7 +110,7 @@ var MongoBackbone = {
     } else {
       cb = res;
     }
-        
+      
     this._withCollection(function(error, collection) {
       if (error) { 
         return cb(err, null); 
@@ -79,7 +131,7 @@ var MongoBackbone = {
             dbCommand.err = err;
             res.locals.dbCommands.push(dbCommand);
           }
-        
+       
           cb(err, results);         
         });      
       }
@@ -98,6 +150,8 @@ var MongoBackbone = {
       cb(err, results.pop());
     }, res);
   },
+  
+  
   //Runs a mongodb find search. 
   // 
   // The callback is constructed from options.error and options.success

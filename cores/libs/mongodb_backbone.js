@@ -1,7 +1,6 @@
 //    backbone-mongodb mongodb-sync.js
 //    (c) 2011 Done.
 var ObjectID = require('mongodb').ObjectID,
-    mongoLogger = new (require('./mongo-logger')),
     Db = require('./db');
 
 
@@ -11,11 +10,6 @@ var MongoBackbone = {
     Db.getDb().collection(this.collectionName, function(err, collection) {
       callback(err, collection);
     });
-  },
-  
-  dbCommand : function(req, res, command, next) {
-    command.collection = this.collectionName;
-    mongoLogger.dbCommand(req, res, command, next, Db.getDb());
   },
   
   /*
@@ -35,13 +29,14 @@ var MongoBackbone = {
    * @param cb
    * @param res
    */
-  search : function(query, fields, qOptions, cb, res) {
-    var dbCommand, args = Array.prototype.slice.call(arguments, 0);
+  search : function() {
+    var dbCommand, query, fields, qOptions, cb, res,
+      args = Array.prototype.slice.call(arguments, 0);
     
-    query = typeof query === 'object' ?  query : {};
-    if (args.length < 3) fields = {};
-    if (args.length < 4) qOptions = {};
-        
+    query = typeof args[0] === 'object' ?  args[0] : {};
+    fields = args.length < 3 ? {} : args[1];
+    qOptions = args.length < 4 ? {} : args[2];
+    B('Logger').info(args);        
     res = args.pop();
     
     // If the last parameter is an object, log the query to it
@@ -84,11 +79,24 @@ var MongoBackbone = {
             dbCommand.err = err;
             res.locals.dbCommands.push(dbCommand);
           }
-           
+        
           cb(err, results);         
         });      
       }
     });
+  },
+  
+  /*
+   *  
+   * @param query
+   * @param qOptions
+   * @param cb
+   * @param res
+   */
+  searchOne : function(query, cb, res) {
+    return this.search(query, {}, {limit : 1}, function(err, results) {
+      cb(err, results.pop());
+    }, res);
   },
   //Runs a mongodb find search. 
   // 

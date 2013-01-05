@@ -3,8 +3,7 @@
 var ObjectID = require('mongodb').ObjectID,
     Db = require('./db');
 
-
-var MongoBackbone = {
+var BackboneMongo = {
     
   _withCollection : function(callback) {
     Db.getDb().collection(this.collectionName, function(err, collection) {
@@ -24,7 +23,7 @@ var MongoBackbone = {
     
     query[foreign_key] =  {$in : modelIds};
     
-    B('Logger').info(foreignModelNameModel);
+
     Basbosa(foreignModelNameModel).prototype.search(query, function(err, results) {
       _.each(results, function(result) {
         modelMap[result[foreign_key]][foreignModelName] = modelMap[result[foreign_key]][foreignModelName] || [];
@@ -37,11 +36,10 @@ var MongoBackbone = {
   },
   
   populateBelongsTo : function(foreignModelName, models, cb, res) {
-    var self = this, modelIds = [], query = {}, modelMap = {},
+    var modelIds = [], query = {}, modelMap = {},
       foreign_key = foreignModelName.toLowerCase() + '_id',
       foreignModelNameModel  = foreignModelName + 'Model';
     
-    B('Logger').info(foreign_key);
     _.each(models, function(model) {
       modelIds.push(model[foreign_key]);
       modelMap[model[foreign_key]] = model;
@@ -87,9 +85,9 @@ var MongoBackbone = {
       args = Array.prototype.slice.call(arguments, 0);
     
     query = typeof args[0] === 'object' ?  args[0] : {};
-    fields = args.length < 3 ? {} : args[1];
-    qOptions = args.length < 4 ? {} : args[2];
-          
+    fields = args.length >= 3 && typeof args[1] === 'object' ? args[1] : {};
+    qOptions = args.length >= 4 && typeof args[2] === 'object' ? args[2] : {};
+
     res = args.pop();
     // If the last parameter is an object, log the query to it
     if (typeof res === 'object') {
@@ -145,8 +143,16 @@ var MongoBackbone = {
    * @param cb
    * @param res
    */
-  searchOne : function(query, cb, res) {
-    return this.search(query, {}, {limit : 1}, function(err, results) {
+  searchOne : function(query, qOptions,  cb, res) {
+    if (typeof qOptions === 'function') {
+      res = cb;
+      cb = qOptions;
+      qOptions = {};
+    }
+    
+    qOptions.limit = 1;
+    
+    return this.search(query, {}, qOptions, function(err, results) {
       cb(err, results.pop());
     }, res);
   },
@@ -302,6 +308,7 @@ var MongoBackbone = {
         }
       });
     }
+    
     Basbosa('Logger').debug('This is the model attribute : ', self);
     if(typeof self.validationRules  !== undefined) {
       self.validateUser(function(error, result) {
@@ -332,10 +339,44 @@ var MongoBackbone = {
       if (err) callback(err);
       else collection.remove({ _id: new ObjectID(model.id) }, callback);
     });    
-  }
+  },
   
 };
 
-_.extend(Backbone.Model.prototype, MongoBackbone);
+var AutoModels = {
+    initModels : function() {
+      var self = this;
+      Db.getDb().collectionNames(function (err, results) {
+        _(results).each(function (collection) {
+          var collectionName = collection.name.split('.').pop(),
+            className = _(_(collectionName).singularize()).classify();
+          if (!Basbosa(className + 'Model')) {
+            self.createClass(className, collectionName);
+          } 
+          
+          if (!Basbosa(className + 'Model').prototype.collectionName) {
+            Basbosa(className + 'Model').prototype.collectionName = collectionName;
+          }
+          
+        });
+      });
+    },
+    
+    createClass : function (className, collectionName) {
+      var newClass = Backbone.Model.extend({
+        collectionName : collectionName,
+      });
+      
+      Basbosa.add(className + 'Model', newClass);
+    },
+};
 
+_.extend(Backbone.Model.prototype, BackboneMongo);
 
+Db.on('connected', function() {
+  AutoModels.initModels();
+});
+
+module.exports.BackboneMongo = BackboneMongo;
+module.exports.AutoModels = AutoModels;
+Basbosa.add('BackboneMongo', BackboneMongo);

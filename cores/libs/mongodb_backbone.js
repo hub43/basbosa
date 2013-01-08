@@ -1,7 +1,8 @@
 //    backbone-mongodb mongodb-sync.js
 //    (c) 2011 Done.
 var ObjectID = require('mongodb').ObjectID,
-    Db = require('./db');
+    Db = require('./db'),
+    Async = require('async');
 
 var BackboneMongoStatic = {
     _withCollection : function(callback) {
@@ -22,7 +23,6 @@ var BackboneMongoStatic = {
       
       query[foreign_key] =  {$in : modelIds};
       
-
       Basbosa(foreignModelNameModel).search(query, function(err, results) {
         _.each(results, function(result) {
           modelMap[result[foreign_key]][foreignModelName] = modelMap[result[foreign_key]][foreignModelName] || [];
@@ -60,6 +60,27 @@ var BackboneMongoStatic = {
       
     },
     
+    fetchContained : function(contains, models, completed, res) {
+      var functions = [], self = this;
+      _.each(contains, function(relations, relationType) {
+        _.each(relations, function(ModelContains, ModelName) {
+          functions.push(function(next) {
+            self['populate' + relationType](ModelName, models, function(err, results) {
+              Basbosa(ModelName + 'Model').fetchContained(ModelContains, results, function(err, results) {
+                next();
+              }, res);
+            }, res);
+          });
+           
+        });
+      });
+      
+      Async.parallel(functions, function() {
+        completed(models);
+      });
+      
+    },
+    
     
     
     /*
@@ -80,13 +101,15 @@ var BackboneMongoStatic = {
      * @param res
      */
     search : function() {
-      var dbCommand, query, fields, qOptions, cb, res,
-        args = Array.prototype.slice.call(arguments, 0);
+      var dbCommand, query, fields, qOptions, cb, res, contains,
+        args = Array.prototype.slice.call(arguments, 0), self = this;
       
       query = typeof args[0] === 'object' ?  args[0] : {};
       fields = args.length >= 3 && typeof args[1] === 'object' ? args[1] : {};
       qOptions = args.length >= 4 && typeof args[2] === 'object' ? args[2] : {};
-
+      contains = qOptions.contains || {};
+      delete qOptions.contains;
+      
       res = args.pop();
       // If the last parameter is an object, log the query to it
       if (typeof res === 'object') {
@@ -128,8 +151,11 @@ var BackboneMongoStatic = {
               dbCommand.err = err;
               res.locals.dbCommands.push(dbCommand);
             }
-         
-            cb(err, results);         
+            
+            self.fetchContained(contains, results, function(err) {
+              cb(err, results);
+            }, res);
+                     
           });      
         }
       });
@@ -152,9 +178,6 @@ var BackboneMongoStatic = {
       qOptions.limit = 1;
       
       return this.search(query, {}, qOptions, function(err, results) {
-        if (err) {
-          B('Logger').info(err);
-        }
         cb(err, results.pop());
       }, res);
     },

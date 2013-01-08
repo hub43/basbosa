@@ -3,159 +3,165 @@
 var ObjectID = require('mongodb').ObjectID,
     Db = require('./db');
 
-var BackboneMongo = {
+var BackboneMongoStatic = {
+    _withCollection : function(callback) {
+      Db.getDb().collection(this.collectionName, function(err, collection) {
+        callback(err, collection);
+      });
+    },
     
-  _withCollection : function(callback) {
-    Db.getDb().collection(this.collectionName, function(err, collection) {
-      callback(err, collection);
-    });
-  },
-  
-  populateHasMany : function(foreignModelName, models, cb, res) {
-    var self = this, modelMap = {}, modelIds = [], query = {},
-        foreign_key = _(self.collectionName).singularize() + '_id',
+    populateHasMany : function(foreignModelName, models, cb, res) {
+      var self = this, modelMap = {}, modelIds = [], query = {},
+          foreign_key = _(self.collectionName).singularize() + '_id',
+          foreignModelNameModel  = foreignModelName + 'Model';
+        
+      _.each(models, function(model) {
+        modelIds.push(model.id);
+        modelMap[model.id] = model;
+      });
+      
+      query[foreign_key] =  {$in : modelIds};
+      
+
+      Basbosa(foreignModelNameModel).search(query, function(err, results) {
+        _.each(results, function(result) {
+          modelMap[result[foreign_key]][foreignModelName] = modelMap[result[foreign_key]][foreignModelName] || [];
+          modelMap[result[foreign_key]][foreignModelName].push(result);
+        });
+        
+        cb(err, results);
+      }, res);
+     
+    },
+    
+    populateBelongsTo : function(foreignModelName, models, cb, res) {
+      var modelIds = [], query = {}, modelMap = {},
+        foreign_key = foreignModelName.toLowerCase() + '_id',
         foreignModelNameModel  = foreignModelName + 'Model';
       
-    _.each(models, function(model) {
-      modelIds.push(model.id);
-      modelMap[model.id] = model;
-    });
-    
-    query[foreign_key] =  {$in : modelIds};
-    
-
-    Basbosa(foreignModelNameModel).prototype.search(query, function(err, results) {
-      _.each(results, function(result) {
-        modelMap[result[foreign_key]][foreignModelName] = modelMap[result[foreign_key]][foreignModelName] || [];
-        modelMap[result[foreign_key]][foreignModelName].push(result);
-      });
-      
-      cb(err, results);
-    }, res);
-   
-  },
-  
-  populateBelongsTo : function(foreignModelName, models, cb, res) {
-    var modelIds = [], query = {}, modelMap = {},
-      foreign_key = foreignModelName.toLowerCase() + '_id',
-      foreignModelNameModel  = foreignModelName + 'Model';
-    
-    _.each(models, function(model) {
-      modelIds.push(model[foreign_key]);
-      modelMap[model[foreign_key]] = model;
-    });
-    
-    query['id'] =  {$in : modelIds};
-    
-    Basbosa(foreignModelNameModel).prototype.search(query, function(err, results) {
-      _.each(results, function(result) {
-        modelMap[result.id] = result;
-      });
-      
       _.each(models, function(model) {
-        model[foreignModelName] = modelMap[model[foreign_key]];
+        modelIds.push(model[foreign_key]);
+        modelMap[model[foreign_key]] = model;
       });
       
-      cb(err, results);
-    }, res);
+      query['id'] =  {$in : modelIds};
+      
+      Basbosa(foreignModelNameModel).search(query, function(err, results) {
+        _.each(results, function(result) {
+          modelMap[result.id] = result;
+        });
+        
+        _.each(models, function(model) {
+          model[foreignModelName] = modelMap[model[foreign_key]];
+        });
+        
+        cb(err, results);
+      }, res);
+      
+    },
     
-  },
-  
-  
-  
-  /*
-   *Possible ways to pass parameters
-   * cb
-   * cb, res
-   * query, cb
-   * query, cb, res
-   * query, fields, cb
-   * query, fields, cb, res
-   * query, fields, qOptions, cb
-   * query fields, qOptions, cb, res
-   *  
-   * @param query
-   * @param fields
-   * @param qOptions
-   * @param cb
-   * @param res
-   */
-  search : function() {
-    var dbCommand, query, fields, qOptions, cb, res,
-      args = Array.prototype.slice.call(arguments, 0);
     
-    query = typeof args[0] === 'object' ?  args[0] : {};
-    fields = args.length >= 3 && typeof args[1] === 'object' ? args[1] : {};
-    qOptions = args.length >= 4 && typeof args[2] === 'object' ? args[2] : {};
+    
+    /*
+     *Possible ways to pass parameters
+     * cb
+     * cb, res
+     * query, cb
+     * query, cb, res
+     * query, fields, cb
+     * query, fields, cb, res
+     * query, fields, qOptions, cb
+     * query fields, qOptions, cb, res
+     *  
+     * @param query
+     * @param fields
+     * @param qOptions
+     * @param cb
+     * @param res
+     */
+    search : function() {
+      var dbCommand, query, fields, qOptions, cb, res,
+        args = Array.prototype.slice.call(arguments, 0);
+      
+      query = typeof args[0] === 'object' ?  args[0] : {};
+      fields = args.length >= 3 && typeof args[1] === 'object' ? args[1] : {};
+      qOptions = args.length >= 4 && typeof args[2] === 'object' ? args[2] : {};
 
-    res = args.pop();
-    // If the last parameter is an object, log the query to it
-    if (typeof res === 'object') {
-      res.locals = res.locals || {}; 
-      res.locals.dbCommands = res.locals.dbCommands || [];
-      
-      dbCommand = {
-          collection : this.collectionName,
-          name : 'find',
-          query : query,
-          fields : fields,
-          qOptions : qOptions,
-          duration : (new Date).getTime()
-        };
-      
-      // Remove original call back
-      cb = args.pop();
-    } else {
-      cb = res;
-    }
-      
-    this._withCollection(function(error, collection) {
-      if (error) { 
-        return cb(err, null); 
+      res = args.pop();
+      // If the last parameter is an object, log the query to it
+      if (typeof res === 'object') {
+        res.locals = res.locals || {}; 
+        res.locals.dbCommands = res.locals.dbCommands || [];
+        
+        dbCommand = {
+            collection : this.collectionName,
+            name : 'find',
+            query : query,
+            fields : fields,
+            qOptions : qOptions,
+            duration : (new Date).getTime()
+          };
+        
+        // Remove original call back
+        cb = args.pop();
       } else {
-        collection.find(query, fields, qOptions).toArray(function(err, results) {
-          if (err) return cb(err, results);
-                   
-          results = _.map(results, function(result) {
-            result._id = result._id.toString();
-            return result;
-          });
-          
-          // If a response was sent, log to it;
-          if (typeof res === 'object') {
-            dbCommand.duration = (new Date).getTime() - dbCommand.duration;
-            dbCommand.result = results;
-            dbCommand.resultCount = results.length;
-            dbCommand.err = err;
-            res.locals.dbCommands.push(dbCommand);
-          }
-       
-          cb(err, results);         
-        });      
+        cb = res;
       }
-    });
-  },
-  
-  /*
-   *  
-   * @param query
-   * @param qOptions
-   * @param cb
-   * @param res
-   */
-  searchOne : function(query, qOptions,  cb, res) {
-    if (typeof qOptions === 'function') {
-      res = cb;
-      cb = qOptions;
-      qOptions = {};
-    }
+        
+      this._withCollection(function(error, collection) {
+        if (error) { 
+          return cb(error, null); 
+        } else {
+          collection.find(query, fields, qOptions).toArray(function(err, results) {
+            if (err) return cb(err, results);
+                     
+            results = _.map(results, function(result) {
+              result._id = result._id.toString();
+              return result;
+            });
+            
+            // If a response was sent, log to it;
+            if (typeof res === 'object') {
+              dbCommand.duration = (new Date).getTime() - dbCommand.duration;
+              dbCommand.result = results;
+              dbCommand.resultCount = results.length;
+              dbCommand.err = err;
+              res.locals.dbCommands.push(dbCommand);
+            }
+         
+            cb(err, results);         
+          });      
+        }
+      });
+    },
     
-    qOptions.limit = 1;
+    /*
+     *  
+     * @param query
+     * @param qOptions
+     * @param cb
+     * @param res
+     */
+    searchOne : function(query, qOptions,  cb, res) {
+      if (typeof qOptions === 'function') {
+        res = cb;
+        cb = qOptions;
+        qOptions = {};
+      }
+      
+      qOptions.limit = 1;
+      
+      return this.search(query, {}, qOptions, function(err, results) {
+        if (err) {
+          B('Logger').info(err);
+        }
+        cb(err, results.pop());
+      }, res);
+    },
+
+};
+var BackboneMongo = {
     
-    return this.search(query, {}, qOptions, function(err, results) {
-      cb(err, results.pop());
-    }, res);
-  },
   
   
   //Runs a mongodb find search. 
@@ -354,8 +360,8 @@ var AutoModels = {
             self.createClass(className, collectionName);
           } 
           
-          if (!Basbosa(className + 'Model').prototype.collectionName) {
-            Basbosa(className + 'Model').prototype.collectionName = collectionName;
+          if (!Basbosa(className + 'Model').collectionName) {
+            Basbosa(className + 'Model').collectionName = collectionName;
           }
           
         });
@@ -363,7 +369,7 @@ var AutoModels = {
     },
     
     createClass : function (className, collectionName) {
-      var newClass = Backbone.Model.extend({
+      var newClass = Backbone.Model.extend({}, {
         collectionName : collectionName,
       });
       
@@ -371,12 +377,13 @@ var AutoModels = {
     },
 };
 
-_.extend(Backbone.Model.prototype, BackboneMongo);
+Backbone.Model = Backbone.Model.extend(BackboneMongo, BackboneMongoStatic);
 
 Db.on('connected', function() {
   AutoModels.initModels();
 });
 
 module.exports.BackboneMongo = BackboneMongo;
+module.exports.BackboneMongoStatic = BackboneMongoStatic;
 module.exports.AutoModels = AutoModels;
 Basbosa.add('BackboneMongo', BackboneMongo);

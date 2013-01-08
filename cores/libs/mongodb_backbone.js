@@ -345,15 +345,12 @@ var BackboneMongo = {
         if(error !== null) {
           typeof callback === 'function' && callback(null, error);
         } else if(result) {
-          var hashPassword = self.hash(self.get('password'));
-          attributes.token = self.generateActivationToken(self.get('email'));
-          self.set(attributes);
-          self.sendMail();  
-          attributes.status = 'pending_activation';
-          attributes.password =  hashPassword;
-          self.set(attributes);
-          Basbosa('Logger').debug('this user is :' + 'pending_activation',attributes);
-          __updateDb();
+        	if(self.prepareUserToUpdate !== undefined) {
+        		self.prepareUserToUpdate();
+        		__updateDb();
+        	} else {
+        		typeof callback === 'function' && callback('There is no method called prepareUserToUpdate in this user');
+        	}
         }
       });
     } else {

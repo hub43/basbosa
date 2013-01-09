@@ -356,8 +356,8 @@ define([
 		  }
 		},
 		validateUser : function(callback) {
-			var self = this, validateA = Basbosa('BasbosaValidation').validateA;
-			validateA(self.toJSON(), self.validationRules, function(error , result) {
+			var self = this, validate = Basbosa('BasbosaValidation').validate;
+			validate(self.toJSON(), self.validationRules, function(error , result) {
 				if(error !== null) {
 					typeof callback === 'function' && callback(error);
 				} else if(result) {

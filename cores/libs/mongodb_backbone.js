@@ -306,6 +306,16 @@ var BackboneMongo = {
       });
   });
   },
+  
+  saveDb : function(cb) {
+    var self = this;
+    this.constructor._withCollection(function(error, collection) {
+      
+      collection.insert(self.toJSON(), function(err, result) {
+        
+      });
+    });
+  },
   /**
    * @method Update used to update any model attribute ,
    * but before update check if the model have a validate method check it else 
@@ -323,7 +333,7 @@ var BackboneMongo = {
           delete attributes._id;
           if(self.id === undefined) {
             collection.insert(attributes, function(error) {
-              if(error) {
+              if (error) {
                 Basbosa('Logger').warn('there is error through insertion', error);
               } else {
                 typeof callback === 'function' && callback(null, {});
@@ -388,6 +398,7 @@ var AutoModels = {
           }
           
         });
+        Db.emit('modelsReady');
       });
     },
     

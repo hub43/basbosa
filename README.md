@@ -1,5 +1,15 @@
+#Basbosa!
+Basbosa is a client/server JavaScript framework that allows sharing of code between a client browser and a Node.js server application.
+
+##Philosophy
+Basbosa development has following in its heart:
+
+1. Reuse code across the client and the server when building complex HTML5/JavaScript web applications.
+2. Do not reinvent the wheel, use current successful open source projects when possible.
+3. Breakdown each solution for a problem to its simplest form, make the solution an independent and reusable module.
+
+
 ##Architecture Overview
-Basbosa is a node.js framework that uses sockets.io to communicate with clients. Different clients from web or mobile phones should be able to connect to a an application running on Basbosa. 
 
 All communication between client and server is done using messages that fires events. A message in Basbosa always consists of one object that holds all parameters needed and has a property eventName which holds the event name this message will fire. On the receiver side, when a certain message is received, an EventObject is created and passed to all handlers for the message. Handlers for a fired event are invoked in a certain order as explained in MessageHandlers . Below is a dump of an authentication message:
 
@@ -8,7 +18,7 @@ All communication between client and server is done using messages that fires ev
         eventName : "authn.login",
         nickname : "admin",
         password: : "e10adc3949ba59abbe56e057f20f883e",
-        group_id : "1"
+        groupId : "1"
     }
 
 
@@ -31,7 +41,7 @@ In validate controller:
     
     socket.lon('*', 'first', function(e, message, next) {
         // If ok, call 
-        next(e)
+        next(e);
     }
     
 In chat controller:

@@ -25,7 +25,8 @@ initServer = function(App) {
 	, SocketServer 	= require('./sockets/components/socket_server')
 	, Db						= require('./libs/db')
 	, Path					= require('path')
-	, flash					=	require('connect-flash');
+	, flash					=	require('connect-flash')
+	, BasbosaAssets = require('basbosa-assets');
 	
 	
 	// Init Socket	
@@ -72,7 +73,8 @@ initServer = function(App) {
 		
 		// Allow to server static files both from APP_PATH and from node_modules/basbosa
 		App.use(Express.static(APP_PATH)); // can't find a matching route, tell express where our statics live
-		App.use(Express.static(Path.dirname(Path.dirname(__filename)))); // can't find a matching route, tell express where our statics live
+		App.use(Express.static(APP_PATH + '/appc/public'));
+		App.use(Express.static(Path.dirname(Path.dirname(__filename)))); 
 	});	
 	// development environment will throw errors
 	App.configure('development', function() {
@@ -125,6 +127,7 @@ initServer = function(App) {
 	App.get('/*', Http.AppController.beforeRender);
 	App.post('/*', Http.AppController.beforeRender);
 	
+	App.locals.bAssets = new BasbosaAssets(Basbosa('Config').get('requireJsOptions'));
 	/*
 	 * Start listening on set port and respond to http and WebSocekt requests
 	 * 

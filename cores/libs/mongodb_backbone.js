@@ -11,6 +11,29 @@ var BackboneMongoStatic = {
       });
     },
     
+    getDb : function() {
+      return Db.getDb();
+    },
+    
+    getCollection : function(cb) {
+      return this._withCollection(cb);
+    },
+    
+    ensureIndecies : function() {
+      var functions = [], indecies = this.indecies, self = this;
+      _(indecies).each(function(indexDetails) {
+        functions.push(function(next) {
+          self.getCollection(function(err, collection) {
+            collection.ensureIndex(indexDetails, next);
+          });
+        });
+      });
+      
+      Async.parallel(functions, function(err, res) {
+        if (err) throw new Error(err);
+      });      
+    },
+    
     populateHasMany : function(foreignModelName, models, cb, res) {
       var self = this, modelMap = {}, modelIds = [], query = {},
           foreign_key = _(self.collectionName).singularize() + '_id',
@@ -21,7 +44,7 @@ var BackboneMongoStatic = {
         modelMap[model.id] = model;
       });
       
-      query[foreign_key] =  {$in : modelIds};
+      query[foreign_key] = {$in : modelIds};
       
       Basbosa(foreignModelNameModel).search(query, function(err, results) {
         _.each(results, function(result) {
@@ -310,9 +333,8 @@ var BackboneMongo = {
   saveDb : function(cb) {
     var self = this;
     this.constructor._withCollection(function(error, collection) {
-      
       collection.insert(self.toJSON(), function(err, result) {
-        
+        cb(err, result);
       });
     });
   },
@@ -394,8 +416,11 @@ var AutoModels = {
             Basbosa(className + 'Model').collectionName = collectionName;
           }
           
+          Basbosa(className + 'Model').ensureIndecies();
+          
         });
         Db.emit('modelsReady');
+        Basbosa('Logger').debug('Emitted models read');
       });
     },
     

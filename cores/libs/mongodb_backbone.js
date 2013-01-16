@@ -34,7 +34,7 @@ var BackboneMongoStatic = {
       });      
     },
     
-    populateHasMany : function(foreignModelName, models, cb, res) {
+    populateHasMany : function(foreignModelName, models, cb, res, qOptions) {
       var self = this, modelMap = {}, modelIds = [], query = {},
           foreign_key = _(self.collectionName).singularize() + '_id',
           foreignModelNameModel  = foreignModelName + 'Model';
@@ -46,7 +46,7 @@ var BackboneMongoStatic = {
       
       query[foreign_key] = {$in : modelIds};
       
-      Basbosa(foreignModelNameModel).search(query, function(err, results) {
+      Basbosa(foreignModelNameModel).search(query,{}, qOptions, function(err, results) {
         _.each(results, function(result) {
           modelMap[result[foreign_key]][foreignModelName] = modelMap[result[foreign_key]][foreignModelName] || [];
           modelMap[result[foreign_key]][foreignModelName].push(result);
@@ -86,13 +86,15 @@ var BackboneMongoStatic = {
     fetchContained : function(contains, models, completed, res) {
       var functions = [], self = this;
       _.each(contains, function(relations, relationType) {
+        if (['query', 'qOptions'].indexOf(relationType) !== -1) return;
         _.each(relations, function(ModelContains, ModelName) {
           functions.push(function(next) {
+            var qOptions = ModelContains.qOptions || {};
             self['populate' + relationType](ModelName, models, function(err, results) {
               Basbosa(ModelName + 'Model').fetchContained(ModelContains, results, function(err, results) {
                 next();
               }, res);
-            }, res);
+            }, res, qOptions);
           });
            
         });
@@ -420,7 +422,7 @@ var AutoModels = {
           
         });
         Db.emit('modelsReady');
-        Basbosa('Logger').debug('Emitted models read');
+        Basbosa('Logger').debug('Emitted models ready');
       });
     },
     

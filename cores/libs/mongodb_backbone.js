@@ -420,6 +420,10 @@ var AutoModels = {
           
           Basbosa(className + 'Model').ensureIndecies();
           
+          if (typeof Basbosa(className + 'Model').initClass === 'function') {
+            Basbosa(className + 'Model').initClass();
+          }
+          
         });
         Db.emit('modelsReady');
         Basbosa('Logger').debug('Emitted models ready');

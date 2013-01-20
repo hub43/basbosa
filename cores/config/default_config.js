@@ -23,9 +23,11 @@ BasbosaConfig.prototype = {
 	 */ 
 	env : process.env.NODE_ENV || 'development',
 	
-	min : false,
 	logging : 4,
-	skipSocketAuth : false,
+	min : false,
+	
+	httpProtocol : 'http',
+	serverName : 'localhost',
 	port : 3000,
 	defaultGroup : '4fb212dd6c379e2810000000',
 	
@@ -33,7 +35,7 @@ BasbosaConfig.prototype = {
 	feedbackUrl : 'https://docs.google.com/a/hub43.com/spreadsheet/viewform?pli=1&formkey=dFBqaTRDSGZyR2pfU1k1WGdXUWU3ekE6MQ#gid=0',
 	recordClientErros : false,
 	app : 'apps',
-	serverName : 'localhost',
+	
 	
 	// Testing config
 	test : false,
@@ -46,6 +48,7 @@ BasbosaConfig.prototype = {
 	languages : {
 		
 	},
+	skipSocketAuth : false,
 	successLogin : '/',
 	db : {
 		host : 'localhost',
@@ -110,7 +113,7 @@ BasbosaConfig.prototype = {
 	  //Dynamic config values
 	  process.env.NODE_ENV = this.env;
 	  this.debug = this.env == 'development';
-	  this.webRoot = 'http://' + this.serverName + ':' + this.port;
+	  this.webRoot = this.httpProtocol + '://' + this.serverName + ':' + this.port;
 	  this.dialectHttp.port = this.port + 1;
 	  this.dialectHttp.dialect = this.dialect;
 	  this.test && (this.skipSocketAuth = true);

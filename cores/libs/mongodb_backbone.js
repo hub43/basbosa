@@ -100,8 +100,8 @@ var BackboneMongoStatic = {
         });
       });
       
-      Async.parallel(functions, function() {
-        completed(models);
+      Async.parallel(functions, function(err) {
+        completed(err, models);
       });
       
     },

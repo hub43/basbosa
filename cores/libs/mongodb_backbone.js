@@ -24,13 +24,16 @@ var BackboneMongoStatic = {
       _(indecies).each(function(indexDetails) {
         functions.push(function(next) {
           self.getCollection(function(err, collection) {
-            collection.ensureIndex(indexDetails, next);
+            var arr = indexDetails.slice();
+            arr.push(next);
+            collection.ensureIndex.apply(collection, arr);
           });
         });
       });
       
       Async.parallel(functions, function(err, res) {
         if (err) throw new Error(err);
+        Basbosa('Logger').info(res);
       });      
     },
     
@@ -210,7 +213,7 @@ var BackboneMongoStatic = {
 };
 var BackboneMongo = {
     
-  
+  idAttribute: "_id",
   
   //Runs a mongodb find search. 
   // 
@@ -334,11 +337,32 @@ var BackboneMongo = {
   
   saveDb : function(cb) {
     var self = this;
-    this.constructor._withCollection(function(error, collection) {
+    this.constructor.getCollection(function(error, collection) {
+      if (self.get('_id')) {
+        var ob = self.toJSON(); delete ob._id;
+        return collection.update({_id : new ObjectID(self.get('_id'))}, {$set : ob}, cb);
+      }
       collection.insert(self.toJSON(), function(err, result) {
+        result = result.pop();
+        self.set('_id', result._id.toString());
         cb(err, result);
       });
     });
+  },
+  
+  saveDbField : function(field, cb) {
+    var self = this, update = {$set : {}};
+    update.$set[field] = new ObjectID(this.get(field));
+    if (field.indexOf('_id') > -1)  {
+      update.$set[field] = new ObjectID(this.get(field));
+    } else {
+      update.$set[field] = this.get(field);
+    }
+
+    this.constructor.getCollection(function(error, collection) {
+      collection.update({_id : new ObjectID(self.id)},update,  cb);
+    });
+    
   },
   /**
    * @method Update used to update any model attribute ,
@@ -449,3 +473,4 @@ module.exports.BackboneMongo = BackboneMongo;
 module.exports.BackboneMongoStatic = BackboneMongoStatic;
 module.exports.AutoModels = AutoModels;
 Basbosa.add('BackboneMongo', BackboneMongo);
+Basbosa.add('ObjectID', ObjectID);

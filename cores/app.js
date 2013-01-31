@@ -23,7 +23,6 @@ initServer = function(App) {
 	, JadeCompiler	= require('./libs/').JadeCompiler
 	, Http 					= AppDirLoad(__dirname + '/controllers')
 	, SocketServer 	= require('./sockets/components/socket_server')
-	, Db						= require('./libs/db')
 	, Path					= require('path')
 	, flash					=	require('connect-flash')
 	, BasbosaAssets = require('basbosa-assets')
@@ -137,7 +136,7 @@ initServer = function(App) {
 	 * 
 	 */
 	
-	Db.on('connected', function() {
+	Basbosa('Database').on('connected:default', function() {
 	  App.server.listen(Basbosa('Config').get('port'), function() {
       Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
       // run tests if required

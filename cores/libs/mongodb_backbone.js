@@ -1,12 +1,11 @@
 //    backbone-mongodb mongodb-sync.js
 //    (c) 2011 Done.
 var ObjectID = require('mongodb').ObjectID,
-    Db = require('./db'),
     Async = require('async');
 
 var BackboneMongoStatic = {
     _withCollection : function(callback) {
-      Db.getDb().collection(this.collectionName, function(err, collection) {
+      Basbosa('Database').getDb('default').collection(this.collectionName, function(err, collection) {
         callback(err, collection);
       });
     },
@@ -31,7 +30,7 @@ var BackboneMongoStatic = {
         });
       });
       
-      Async.parallel(functions, function(err, res) {
+      Async.series(functions, function(err, res) {
         if (err) throw new Error(err);
         //Basbosa('Logger').info(res);
       });      
@@ -221,7 +220,7 @@ var BackboneMongoStatic = {
 var BackboneMongo;
 BackboneMongo = {
 
-    idAttribute:"_id",
+    idAttribute: '_id',
 
     //Runs a mongodb find search.
     //
@@ -444,7 +443,7 @@ var AutoModels;
 AutoModels = {
     initModels:function () {
         var self = this;
-        Db.getDb().collectionNames(function (err, results) {
+        Basbosa('Database').getDb('default').collectionNames(function (err, results) {
             _(results).each(function (collection) {
                 var collectionName = collection.name.split('.').pop(),
                     className = _(_(collectionName).singularize()).classify();
@@ -463,7 +462,7 @@ AutoModels = {
                 }
 
             });
-            Db.emit('modelsReady');
+            Basbosa('Database').emit('modelsReady');
             Basbosa('Logger').debug('Emitted models ready');
         });
     },
@@ -477,11 +476,12 @@ AutoModels = {
     }
 };
 
-Backbone.Model = Backbone.Model.extend(BackboneMongo, BackboneMongoStatic);
-
-Db.on('connected', function() {
+Basbosa('Database').on('connected:default', function() {
   AutoModels.initModels();
 });
+
+Backbone.Model = Backbone.Model.extend(BackboneMongo, BackboneMongoStatic);
+
 
 module.exports.BackboneMongo = BackboneMongo;
 module.exports.BackboneMongoStatic = BackboneMongoStatic;

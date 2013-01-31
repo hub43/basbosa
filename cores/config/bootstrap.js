@@ -57,12 +57,16 @@ var Globals = function() {
 	
 	// Build dynamic Config values
   config.dynamic();
+  
     
-  // Load Basbosa config managin class
+  // Load Basbosa config managing class
   // and set the compiled config as the default config
   require('basbosa-config');
   Basbosa('Config').setConfig(config);
-  
+
+  // Establish db Connection
+  require('basbosa-mongo').Cm.add('default', Basbosa('Config').get('db'));
+
   // Logger
   require('basbosa-logger');
 

@@ -9,8 +9,9 @@ if (typeof define !== 'function') {
 	var define = require('amdefine')(module);
 }
 
-define([ '../libs/db', 'backbone' ], function(DbClass) {
+define(['backbone'], function(DbClass) {
 	//define Analytics Model
+  var DbClass = Basbosa('Database');
 	var Analytics = Backbone.Model.extend({
 	  collectionName : 'users',									//define the collection that this class will deal with it.
 	  /**

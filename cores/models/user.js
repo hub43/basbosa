@@ -11,14 +11,15 @@ define([
 		'../../corec/models/user'
 	,	'../../corec/models/j'
 	, '../config/dummy_users'
-	, '../libs/db'
+	
 	, './country'
 	, 'https'
 	, 'http'
 	, '../libs/email_module'
   ,	'backbone'
-	], function(User, j, DummyUsers, DbClass, Country, https, http) { //user Model inherent from user and j in corec.
+	], function(User, j, DummyUsers, Country, https, http) { //user Model inherent from user and j in corec.
 	
+  var DBClass = Basbosa('Database');
 	var UserServer = {
 		status : null,
 		collectionName 	: 'users',  																		//define the collection that this class will deal with it.

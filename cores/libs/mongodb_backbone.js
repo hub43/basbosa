@@ -1,12 +1,11 @@
 //    backbone-mongodb mongodb-sync.js
 //    (c) 2011 Done.
 var ObjectID = require('mongodb').ObjectID,
-    Db = require('./db'),
     Async = require('async');
 
 var BackboneMongoStatic = {
     _withCollection : function(callback) {
-      Db.getDb().collection(this.collectionName, function(err, collection) {
+      Basbosa('Database').getDb('default').collection(this.collectionName, function(err, collection) {
         callback(err, collection);
       });
     },
@@ -24,20 +23,25 @@ var BackboneMongoStatic = {
       _(indecies).each(function(indexDetails) {
         functions.push(function(next) {
           self.getCollection(function(err, collection) {
-            collection.ensureIndex(indexDetails, next);
+            var arr = indexDetails.slice();
+            arr.push(next);
+            collection.ensureIndex.apply(collection, arr);
           });
         });
       });
       
-      Async.parallel(functions, function(err, res) {
+      Async.series(functions, function(err, res) {
         if (err) throw new Error(err);
+        //Basbosa('Logger').info(res);
       });      
     },
     
-    populateHasMany : function(foreignModelName, models, cb, res, qOptions) {
+    populateHasMany : function(HasMany, models, cb, res, qOptions) {
+      
       var self = this, modelMap = {}, modelIds = [], query = {},
-          foreign_key = _(self.collectionName).singularize() + '_id',
-          foreignModelNameModel  = foreignModelName + 'Model';
+        foreignModelName = HasMany.modelName,  
+        foreign_key = HasMany.foreign_key || _(self.collectionName).singularize() + '_id',
+        foreignModelNameModel  = foreignModelName + 'Model';
         
       _.each(models, function(model) {
         modelIds.push(model.id);
@@ -53,30 +57,32 @@ var BackboneMongoStatic = {
         });
         
         cb(err, results);
+        
       }, res);
      
     },
     
-    populateBelongsTo : function(foreignModelName, models, cb, res) {
+    populateBelongsTo : function(BelongsTo, models, cb, res) {
       var modelIds = [], query = {}, modelMap = {},
-        foreign_key = foreignModelName.toLowerCase() + '_id',
-        foreignModelNameModel  = foreignModelName + 'Model';
-      
+        foreignModelName = BelongsTo.modelName,
+        local_foreign_key = BelongsTo.local_foreign_key || foreignModelName.toLowerCase() + '_id';
+           
       _.each(models, function(model) {
-        modelIds.push(model[foreign_key]);
-        modelMap[model[foreign_key]] = model;
+        modelIds.push(model[local_foreign_key]);
+        //modelMap[model[local_foreign_key]] = model;
       });
-      
-      query['id'] =  {$in : modelIds};
-      
-      Basbosa(foreignModelNameModel).search(query, function(err, results) {
+         
+      query['id'] = {$in : modelIds};
+        
+      Basbosa(foreignModelName + 'Model').search(query, function(err, results) {
+
         _.each(results, function(result) {
           modelMap[result.id] = result;
         });
         
         _.each(models, function(model) {
-          model[foreignModelName] = modelMap[model[foreign_key]];
-        });
+          model[foreignModelName] = modelMap[model[local_foreign_key]];
+        });    
         
         cb(err, results);
       }, res);
@@ -84,24 +90,27 @@ var BackboneMongoStatic = {
     },
     
     fetchContained : function(contains, models, completed, res) {
-      var functions = [], self = this;
+      var functions = [], self = this, allowedRelations = ['HasMany', 'BelongsTo'];
       _.each(contains, function(relations, relationType) {
-        if (['query', 'qOptions'].indexOf(relationType) !== -1) return;
+        if (allowedRelations.indexOf(relationType) === -1) return;
         _.each(relations, function(ModelContains, ModelName) {
           functions.push(function(next) {
-            var qOptions = ModelContains.qOptions || {};
-            self['populate' + relationType](ModelName, models, function(err, results) {
-              Basbosa(ModelName + 'Model').fetchContained(ModelContains, results, function(err, results) {
-                next();
-              }, res);
+            var relation = {}, qOptions = ModelContains.qOptions || {};
+            relation = {
+                modelName : ModelName,
+                local_foreign_key : relations[ModelName].local_foreign_key,
+                foreign_key : relations[ModelName].foreign_key
+            };
+            self['populate' + relationType](relation, models, function(err, results) {
+              Basbosa(ModelName + 'Model').fetchContained(ModelContains, results, next, res);
             }, res, qOptions);
           });
            
         });
       });
       
-      Async.parallel(functions, function() {
-        completed(models);
+      Async.parallel(functions, function(err) {
+        completed(err, models);
       });
       
     },
@@ -205,247 +214,278 @@ var BackboneMongoStatic = {
       return this.search(query, {}, qOptions, function(err, results) {
         cb(err, results.pop());
       }, res);
-    },
+    }
 
 };
-var BackboneMongo = {
-    
-  
-  
-  //Runs a mongodb find search. 
-  // 
-  // The callback is constructed from options.error and options.success
-  // 
-  // @param args: the query json object
-  // @params qoptions (optional): additional arguments for query
-  // @param callback: the usual backbone success/error callback json
-  // @returns: the reseted collection with new models
-  find: function(query, qOptions, cb) {
-    if (typeof query === 'function') cb = query;
-    if (typeof qoptions === 'function') cb = qOptions;
-      
-    var self = this;
-    this._withCollection(function(error, collection) {
-      if (error) { 
-        return options.error(err); 
-      } else {
-        collection.find(query, qoptions).toArray(function(err, results) {
-          var _prepareResults = function(results) {
-            if (!results) return null;
+var BackboneMongo;
+BackboneMongo = {
 
-            results = _.map(results, function(result) {
-              result._id = result._id.toString();
-              return result;
-            });
-            
-            return results;
-          };
-          if (_.isFunction(options)) options(err, _prepareResults(results));
-          else if (err) options.error(err);
-          else options.success(_prepareResults(results));
-        });      
-      }
-    });
-  },
-  
-  findById : function(id, qOptions, cb) {
-    if(!cb) {
-      cb = qOptions;
-      qOptions = {};
-    }
-    return this.findOne({ _id: new ObjectID(id)}, qOptions, cb);
-  },
-  
-  
-  /**
-   * @returns: returns JSON
-   */
-  findOne: function(query, qOptions, cb) {
-    var model = this;
-    if(typeof cb !== 'function') {
-      cb = qOptions;
-      qOptions = {};
-    }
-    
-    this._withCollection(function(err, collection) {
-      if (err) { 
-        throw err;
-        return callback(err); 
-      }
-      
-      var findOneError = new Error('Could not find ' + collection.name + ':' + model.id);
-      
-      collection.findOne(query, qOptions, function(err, dbModel) {
-        
-        if (!dbModel) {
-          cb(err, null);        
-        } else {
-          dbModel._id = dbModel._id.toString();
-          cb(null, dbModel);
-        }
-      });      
-    });
-  },
-  /**
-   * @returns JSON
-   */
-  
-  /**
-   * create
-   *    
-   * Optional Arguments:
-   *    (callback)  A callback function
-   *    (models)  An array of models to be created instead of the model calling create
-   * In addition to being able to call the method with no or both arguments provided, and calling it with only the callback as argument,
-   *  you can also call it with only the array of models as an argument ( i.e. model.create ( [ {...}, {...}, ... ] ) )
-   *  and the create method will act accordingly.
-   * Actions:
-   *    Delete the id given to the model from Backbone
-   *    Insert the JSON format of the model to MongoDB
-   *    Append the document id assigned by MongoDB to the model
-   */
-  
-  create: function(callback, models) {
-    var jsonDocs = [], i;
-    if (typeof callback === 'function') {
-      models = models || [this];
-    } else {
-      models = (typeof callback === 'object') ? callback : [this];
-    }
-    
-    models[0]._withCollection(function(err, collection) {
-      if (err && typeof callback === 'function') return callback(err);
-      for (i = 0; i < models.length; ++i) {
-        jsonDocs[i] = models[i].toJSON();
-        delete jsonDocs[i]._id;
-      }
-      collection.insert(jsonDocs, function (err, dbModels) {
-        if (err && typeof callback === 'function') callback (err);
-        else {
-          for (i = 0; i < models.length; ++i) {
-            dbModels[i]._id = dbModels[i]._id.toString();
-            models[i].set('_id', dbModels[i]._id);
-            typeof callback === 'function' && callback (null, dbModels[i]);
-          }
-        }
-      });
-  });
-  },
-  
-  saveDb : function(cb) {
-    var self = this;
-    this.constructor._withCollection(function(error, collection) {
-      collection.insert(self.toJSON(), function(err, result) {
-        cb(err, result);
-      });
-    });
-  },
-  /**
-   * @method Update used to update any model attribute ,
-   * but before update check if the model have a validate method check it else 
-   * call the anonymous function to update the attribute in the db.
-   * @returns JSON object contain the validation result if it have some thing wrong or 
-   * the model attribute if it is saved well
-   */
-  update: function(callback) {
-    var self = this  , attributes = self.toJSON();;
-    function __updateDb() {
-      self._withCollection(function(error, collection) {
-        if(error) {
-          typeof callback === 'function' && callback(error);
-        } else {
-          delete attributes._id;
-          if(self.id === undefined) {
-            collection.insert(attributes, function(error) {
-              if (error) {
-                Basbosa('Logger').warn('there is error through insertion', error);
-              } else {
-                typeof callback === 'function' && callback(null, {});
-              }
-            });
-          } else {
-            collection.update({ _id: new ObjectID(self.id) }, {$set: attributes}, {safe:true, upsert:false}, function(err) {
-              typeof callback === 'function' && callback(null, self.toJSON());
-            });
-          }
-        }
-      });
-    }
-    
-    Basbosa('Logger').debug('This is the model attribute : ', self);
-    if(typeof self.validationRules  !== undefined) {
-      self.validateUser(function(error, result) {
-        Basbosa('Logger').warn(error, result);
-        if(error !== null) {
-          typeof callback === 'function' && callback(null, error);
-        } else if(result) {
-        	if(self.prepareUserToUpdate !== undefined) {
-        		self.prepareUserToUpdate();
-        		__updateDb();
-        	} else {
-        		typeof callback === 'function' && callback('There is no method called prepareUserToUpdate in this user');
-        	}
-        }
-      });
-    } else {
-      __updateDb();
-    }
-  },
-  
-  destroy : function(callback) {
-    var model = this;
-    
-    this._withCollection(function(err, collection) {
-      if (err) callback(err);
-      else collection.remove({ _id: new ObjectID(model.id) }, callback);
-    });    
-  },
-  
-};
+    idAttribute: '_id',
 
-var AutoModels = {
-    initModels : function() {
-      var self = this;
-      Db.getDb().collectionNames(function (err, results) {
-        _(results).each(function (collection) {
-          var collectionName = collection.name.split('.').pop(),
-            className = _(_(collectionName).singularize()).classify();
-          if (!Basbosa(className + 'Model')) {
-            self.createClass(className, collectionName);
-          } 
-          
-          if (!Basbosa(className + 'Model').collectionName) {
-            Basbosa(className + 'Model').collectionName = collectionName;
-          }
-          
-          Basbosa(className + 'Model').ensureIndecies();
-          
-          if (typeof Basbosa(className + 'Model').initClass === 'function') {
-            Basbosa(className + 'Model').initClass();
-          }
-          
+    //Runs a mongodb find search.
+    //
+    // The callback is constructed from options.error and options.success
+    //
+    // @param args: the query json object
+    // @params qoptions (optional): additional arguments for query
+    // @param callback: the usual backbone success/error callback json
+    // @returns: the reseted collection with new models
+    find:function (query, qOptions, cb) {
+        if (typeof query === 'function') cb = query;
+        if (typeof qoptions === 'function') cb = qOptions;
+
+        var self = this;
+        this._withCollection(function (error, collection) {
+            if (error) {
+                return options.error(err);
+            } else {
+                collection.find(query, qoptions).toArray(function (err, results) {
+                    var _prepareResults = function (results) {
+                        if (!results) return null;
+
+                        results = _.map(results, function (result) {
+                            result._id = result._id.toString();
+                            return result;
+                        });
+
+                        return results;
+                    };
+                    if (_.isFunction(options)) options(err, _prepareResults(results));
+                    else if (err) options.error(err);
+                    else options.success(_prepareResults(results));
+                });
+            }
         });
-        Db.emit('modelsReady');
-        Basbosa('Logger').debug('Emitted models ready');
-      });
     },
-    
-    createClass : function (className, collectionName) {
-      var newClass = Backbone.Model.extend({}, {
-        collectionName : collectionName,
-      });
-      
-      Basbosa.add(className + 'Model', newClass);
+
+    findById:function (id, qOptions, cb) {
+        if (!cb) {
+            cb = qOptions;
+            qOptions = {};
+        }
+        return this.findOne({ _id:new ObjectID(id)}, qOptions, cb);
     },
+
+
+    /**
+     * @returns: returns JSON
+     */
+    findOne:function (query, qOptions, cb) {
+        var model = this;
+        if (typeof cb !== 'function') {
+            cb = qOptions;
+            qOptions = {};
+        }
+
+        this._withCollection(function (err, collection) {
+            if (err) {
+                throw err;
+                return callback(err);
+            }
+
+            var findOneError = new Error('Could not find ' + collection.name + ':' + model.id);
+
+            collection.findOne(query, qOptions, function (err, dbModel) {
+
+                if (!dbModel) {
+                    cb(err, null);
+                } else {
+                    dbModel._id = dbModel._id.toString();
+                    cb(null, dbModel);
+                }
+            });
+        });
+    },
+    /**
+     * @returns JSON
+     */
+
+    /**
+     * create
+     *
+     * Optional Arguments:
+     *    (callback)  A callback function
+     *    (models)  An array of models to be created instead of the model calling create
+     * In addition to being able to call the method with no or both arguments provided, and calling it with only the callback as argument,
+     *  you can also call it with only the array of models as an argument ( i.e. model.create ( [ {...}, {...}, ... ] ) )
+     *  and the create method will act accordingly.
+     * Actions:
+     *    Delete the id given to the model from Backbone
+     *    Insert the JSON format of the model to MongoDB
+     *    Append the document id assigned by MongoDB to the model
+     */
+
+    create:function (callback, models) {
+        var jsonDocs = [], i;
+        if (typeof callback === 'function') {
+            models = models || [this];
+        } else {
+            models = (typeof callback === 'object') ? callback : [this];
+        }
+
+        models[0]._withCollection(function (err, collection) {
+            if (err && typeof callback === 'function') return callback(err);
+            for (i = 0; i < models.length; ++i) {
+                jsonDocs[i] = models[i].toJSON();
+                delete jsonDocs[i]._id;
+            }
+            collection.insert(jsonDocs, function (err, dbModels) {
+                if (err && typeof callback === 'function') callback(err);
+                else {
+                    for (i = 0; i < models.length; ++i) {
+                        dbModels[i]._id = dbModels[i]._id.toString();
+                        models[i].set('_id', dbModels[i]._id);
+                        typeof callback === 'function' && callback(null, dbModels[i]);
+                    }
+                }
+            });
+        });
+    },
+
+    saveDb:function (cb) {
+        var self = this;
+        this.constructor.getCollection(function (error, collection) {
+            if (self.get('_id')) {
+                var ob = self.toJSON();
+                delete ob._id;
+                return collection.update({_id:new ObjectID(self.get('_id'))}, {$set:ob}, {upsert : true}, cb);
+            }
+            collection.insert(self.toJSON(), function (err, result) {
+              if (!err && result) {   
+                result = result.pop();
+                self.set('_id', result._id.toString());
+              }
+              
+              cb(err, result);
+            });
+        });
+        return this;
+    },
+
+    saveDbField:function (field, cb) {
+        var self = this, update = {$set:{}};
+        
+        if (field.indexOf('_id') > -1 && (field.length == '12' || field.length == '24')) {
+            update.$set[field] = new ObjectID(this.get(field));
+        } else {
+            update.$set[field] = this.get(field);
+        }
+
+        this.constructor.getCollection(function (error, collection) {
+            collection.update({_id:new ObjectID(self.id)}, update, cb);
+        });
+
+    },
+    /**
+     * @method Update used to update any model attribute ,
+     * but before update check if the model have a validate method check it else
+     * call the anonymous function to update the attribute in the db.
+     * @returns JSON object contain the validation result if it have some thing wrong or
+     * the model attribute if it is saved well
+     */
+    update:function (callback) {
+        var self = this  , attributes = self.toJSON();
+        ;
+        function __updateDb() {
+            self._withCollection(function (error, collection) {
+                if (error) {
+                    typeof callback === 'function' && callback(error);
+                } else {
+                    delete attributes._id;
+                    if (self.id === undefined) {
+                        collection.insert(attributes, function (error) {
+                            if (error) {
+                                Basbosa('Logger').warn('there is error through insertion', error);
+                            } else {
+                                typeof callback === 'function' && callback(null, {});
+                            }
+                        });
+                    } else {
+                        collection.update({ _id:new ObjectID(self.id) }, {$set:attributes}, {safe:true, upsert:false}, function (err) {
+                            typeof callback === 'function' && callback(null, self.toJSON());
+                        });
+                    }
+                }
+            });
+        }
+
+        Basbosa('Logger').debug('This is the model attribute : ', self);
+        if (typeof self.validationRules !== undefined) {
+            self.validateUser(function (error, result) {
+                Basbosa('Logger').warn(error, result);
+                if (error !== null) {
+                    typeof callback === 'function' && callback(null, error);
+                } else if (result) {
+                    if (self.prepareUserToUpdate !== undefined) {
+                        self.prepareUserToUpdate();
+                        __updateDb();
+                    } else {
+                        typeof callback === 'function' && callback('There is no method called prepareUserToUpdate in this user');
+                    }
+                }
+            });
+        } else {
+            __updateDb();
+        }
+    },
+
+    destroy:function (callback) {
+        var model = this;
+
+        this._withCollection(function (err, collection) {
+            if (err) callback(err);
+            else collection.remove({ _id:new ObjectID(model.id) }, callback);
+        });
+    }
+
 };
+
+var AutoModels;
+AutoModels = {
+    initModels:function () {
+        var self = this;
+        Basbosa('Database').getDb('default').collectionNames(function (err, results) {
+            _(results).each(function (collection) {
+                var collectionName = collection.name.split('.').pop(),
+                    className = _(_(collectionName).singularize()).classify();
+                if (!Basbosa(className + 'Model')) {
+                    self.createClass(className, collectionName);
+                }
+
+                if (!Basbosa(className + 'Model').collectionName) {
+                    Basbosa(className + 'Model').collectionName = collectionName;
+                }
+
+                Basbosa(className + 'Model').ensureIndecies();
+
+                if (typeof Basbosa(className + 'Model').initClass === 'function') {
+                    Basbosa(className + 'Model').initClass();
+                }
+
+            });
+            Basbosa('Database').emit('modelsReady');
+            Basbosa('Logger').debug('Emitted models ready');
+        });
+    },
+
+    createClass:function (className, collectionName) {
+        var newClass = Backbone.Model.extend({}, {
+            collectionName:collectionName,
+        });
+
+        Basbosa.add(className + 'Model', newClass);
+    }
+};
+
+Basbosa('Database').on('connected:default', function() {
+  AutoModels.initModels();
+});
 
 Backbone.Model = Backbone.Model.extend(BackboneMongo, BackboneMongoStatic);
 
-Db.on('connected', function() {
-  AutoModels.initModels();
-});
 
 module.exports.BackboneMongo = BackboneMongo;
 module.exports.BackboneMongoStatic = BackboneMongoStatic;
 module.exports.AutoModels = AutoModels;
 Basbosa.add('BackboneMongo', BackboneMongo);
+Basbosa.add('ObjectID', ObjectID);

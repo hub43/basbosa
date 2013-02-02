@@ -23,10 +23,10 @@ initServer = function(App) {
 	, JadeCompiler	= require('./libs/').JadeCompiler
 	, Http 					= AppDirLoad(__dirname + '/controllers')
 	, SocketServer 	= require('./sockets/components/socket_server')
-	, Db						= require('./libs/db')
 	, Path					= require('path')
 	, flash					=	require('connect-flash')
-	, BasbosaAssets = require('basbosa-assets');
+	, BasbosaAssets = require('basbosa-assets')
+	, BasbosaHelpers = require('basbosa-helpers');
 	
 	
 	// Init Socket	
@@ -128,12 +128,15 @@ initServer = function(App) {
 	App.post('/*', Http.AppController.beforeRender);
 	
 	App.locals.bAssets = new BasbosaAssets(Basbosa('Config').get('requireJsOptions'));
+	App.locals.Html = BasbosaHelpers.Html;
+	App.locals.Text = BasbosaHelpers.Text;
+	
 	/*
 	 * Start listening on set port and respond to http and WebSocekt requests
 	 * 
 	 */
 	
-	Db.on('connected', function() {
+	Basbosa('Database').on('connected:default', function() {
 	  App.server.listen(Basbosa('Config').get('port'), function() {
       Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
       // run tests if required

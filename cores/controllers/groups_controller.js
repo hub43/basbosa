@@ -9,11 +9,11 @@
 var Group 	= require('../models/index').ClientModels.Group
 	, Sector	= require('../models/index').ClientModels.Sector
 	, J				= require('../models/index').ClientModels.J
-	, UserAgent = require('useragent')
+	//, UserAgent = require('useragent')
 	, User = require('../models/user'); 
 
 // Load user agent db
-UserAgent(true);
+//UserAgent(true);
 var user = new User;
 // Populate client assets
 var clientAssets = null, 

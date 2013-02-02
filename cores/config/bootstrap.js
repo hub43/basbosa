@@ -88,7 +88,7 @@ var Globals = function() {
 	_.str.include('Underscore.string', 'string'); 
 	
 
-	GLOBAL.Backbone 				= require('../../corec/vendors/backbone-0.9.2');
+	GLOBAL.Backbone 				= require('backbone');
 	
 	/*
 	 * Extend Backbone with functionality on the client 

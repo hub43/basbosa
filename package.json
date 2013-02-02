@@ -33,6 +33,7 @@
 		, "basbosa-logger"	: "https://github.com/ygaras/basbosa-logger/tarball/master"
 		, "basbosa-registry"	: "https://github.com/ygaras/basbosa-registry/tarball/master"
 		, "basbosa-validation" : "https://github.com/hub43/basbosa-validation/tarball/master"
+		, "basbosa-mongo" : "https://github.com/hub43/basbosa-mongo/tarball/master"
 		, "connect-auth"	: "0.5.1"
 		, "mongodb"				: "1.2.2"
 		, "connect-mongodb"			: "1.1.4"

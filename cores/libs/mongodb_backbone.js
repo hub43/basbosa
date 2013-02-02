@@ -359,12 +359,13 @@ BackboneMongo = {
               cb(err, result);
             });
         });
+        return this;
     },
 
     saveDbField:function (field, cb) {
         var self = this, update = {$set:{}};
-        update.$set[field] = new ObjectID(this.get(field));
-        if (field.indexOf('_id') > -1) {
+        
+        if (field.indexOf('_id') > -1 && (field.length == '12' || field.length == '24')) {
             update.$set[field] = new ObjectID(this.get(field));
         } else {
             update.$set[field] = this.get(field);

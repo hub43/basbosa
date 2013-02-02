@@ -36,32 +36,45 @@ var Globals = function() {
 	// Load Basbosa class registry
 	GLOBAL.Basbosa          = require('basbosa-registry');
 	
-	
-	// Load BasbosaConfig, start with the default
-	BasbosaConfig = require('./default_config');
-  config = new BasbosaConfig(); 
-	
-	
-	// Override with the index config file
-	if (Fs.existsSync(SERVER_PATH + '/config/index.js')) {
-	  config = _.extend(config, require(SERVER_PATH + '/config/index.js'));
-	}
-	
-	// Override with local config file
-	if (Fs.existsSync(SERVER_PATH + '/config/local.js')) {
-	  config = _.extend(config, require(SERVER_PATH + '/config/local.js'));
-  }
-	
-// Parse command lines, put them in the Config
-  require('./commander')(config);
-	
-	// Build dynamic Config values
-  config.dynamic();
-  
-    
   // Load Basbosa config managing class
   // and set the compiled config as the default config
   require('basbosa-config');
+	
+	// Load BasbosaConfig, start with the default
+	// Hack due to bug in cloning arrays in Config.extend
+  var defaultConfig = require('./default_config');
+  var config = defaultConfig.config;
+  
+  Basbosa('Config').setConfig(config);
+	
+  //Parse command lines, put them in the Config
+  require('./commander')(config);
+  
+  // But them in config class
+  Basbosa('Config').set(config);
+  
+  // Parse command lines, put them in the Config
+  require('./commander')(config);
+	
+	// Process config from app
+	if (Fs.existsSync(SERVER_PATH + '/config/index.js')) {
+	  //config = _.extend(config, require(SERVER_PATH + '/config/index.js'));
+	  require(SERVER_PATH + '/config/index.js');
+	}
+	
+	//Process config in local config file
+	if (Fs.existsSync(SERVER_PATH + '/config/local.js')) {
+	  //config = _.extend(config, require(SERVER_PATH + '/config/local.js'));
+	  require(SERVER_PATH + '/config/local.js');
+  }
+	
+	//Parse command lines, put them in the Config, again!
+  require('./commander')(config);
+  
+		
+	// Build dynamic Config values
+  defaultConfig.dynamic();
+  
   Basbosa('Config').setConfig(config);
 
   // Establish db Connection

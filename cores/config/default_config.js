@@ -7,11 +7,9 @@
  * @module BasbosaCoreServer
  */
 
-var BasbosaConfig = function() {
-  
-};
 
-BasbosaConfig.prototype = {
+module.exports.config = {
+  
 	/**
 	 * The environment the the application runs in. the default value is read from
 	 * process.env.NODE_ENV. In case process.env.NODE_ENV is not set will default to 
@@ -109,17 +107,19 @@ BasbosaConfig.prototype = {
 		currentTheme 				: 'none'
 	},
 	
-	dynamic : function() {
-	  //Dynamic config values
-	  process.env.NODE_ENV = this.env;
-	  this.debug = this.env == 'development';
-	  this.webRoot = this.httpProtocol + '://' + this.serverName + ':' + this.port;
-	  this.dialectHttp.port = this.port + 1;
-	  this.dialectHttp.dialect = this.dialect;
-	  this.test && (this.skipSocketAuth = true);
-	  this.testServer = 'http://' + this.serverName + ':' + this.port;
-	  this.requireOpt.optimize = this.skipOpt ? 'none' : 'uglify';
-	}
+	
 };
 
-module.exports = BasbosaConfig;
+module.exports.dynamic = function() {
+  //Dynamic config values
+  var c = Basbosa('Config');
+  process.env.NODE_ENV = c.get('env');
+  c.set('debug',  c.get('env') == 'development');
+  c.set('webRoot',  c.get('httpProtocol') + '://' + c.get('serverName') + ':' + c.get('port'));
+  c.set('dialectHttp.port', c.get('port') + 1);
+  c.set('dialectHttp.dialect', c.get('dialect'));
+  c.get('test') && c.set('skipSocketAuth', true);
+  c.set('testServer', 'http://' + c.get('serverName') + ':' + c.get('port'));
+  c.set('requireOpt.optimize', c.get('skipOpt') ? 'none' : 'uglify');
+  
+};

@@ -13,3 +13,6 @@
 [submodule "node_modules/basbosa-helpers"]
 	path = node_modules/basbosa-helpers
 	url = git@github.com:ygaras/basbosa-helpers.git
+[submodule "node_modules/basbosa-mongo"]
+	path = node_modules/basbosa-mongo
+	url = git@github.com:ygaras/basbosa-mongo.git

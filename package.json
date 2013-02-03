@@ -36,6 +36,7 @@
 		, "basbosa-mongo" : "https://github.com/ygaras/basbosa-mongo/tarball/master"
 		, "basbosa-assets" : "https://github.com/ygaras/basbosa-assets/tarball/master"
 		, "basbosa-helpers" : "https://github.com/ygaras/basbosa-helpers/tarball/master"
+		, "tmpl-precompile"	: "https://github.com/ygaras/tmpl-precompile/tarball/master"
 		, "connect-auth"	: "0.5.1"
 		, "mongodb"				: "1.2.2"
 		, "connect-mongodb"			: "1.1.4"

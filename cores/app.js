@@ -132,6 +132,23 @@ initServer = function(App) {
 	App.locals.Text = BasbosaHelpers.Text;
 	
 	/*
+	 * Populate client config
+	 * 
+	 */
+	App.locals.BasbosaConfig = {};
+	Basbosa('Config').get('clientConfig').forEach(function(varName) {
+	  App.locals.BasbosaConfig[varName] = Basbosa('Config').get(varName); 
+	});
+	
+	/*
+	 * Pre compile templates
+	 */
+	if (Basbosa('Config').get('tmplPrecompile')) {
+	  var tmplPrecompile = require('tmpl-precompile');
+	  tmplPrecompile.precompile(Basbosa('Config').get('tmplPrecompile'), APP_PATH);
+	}
+	
+	/*
 	 * Start listening on set port and respond to http and WebSocekt requests
 	 * 
 	 */
@@ -142,7 +159,7 @@ initServer = function(App) {
       // run tests if required
       if (Basbosa('Config').get('test')) {      require('./tests');
         var appTests = './../' + Basbosa('Config').get('app') + '/tests/index.js';
-        // Bug on with exsists Sync on windows
+        // Bug on with exists Sync on windows
         if (require('fs').existsSync(appTests) || 1) {
           require(appTests);
         } 

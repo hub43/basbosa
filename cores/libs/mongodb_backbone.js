@@ -69,19 +69,34 @@ var BackboneMongoStatic = {
            
       _.each(models, function(model) {
         modelIds.push(model[local_foreign_key]);
+
         //modelMap[model[local_foreign_key]] = model;
       });
-         
-      query['id'] = {$in : modelIds};
-        
+      
+      if (BelongsTo.skipMongoID) {
+        query['id'] = {$in : modelIds};
+      } else {
+        query['_id'] = {$in : modelIds};
+      }
+             
       Basbosa(foreignModelName + 'Model').search(query, function(err, results) {
 
         _.each(results, function(result) {
-          modelMap[result.id] = result;
+          if (BelongsTo.skipMongoID) {
+            modelMap[result.id] = result;
+          } else {
+            modelMap[result._id.toString()] = result;
+          }
+          
         });
         
         _.each(models, function(model) {
-          model[foreignModelName] = modelMap[model[local_foreign_key]];
+          if (BelongsTo.skipMongoID) {
+            model[foreignModelName] = modelMap[model[local_foreign_key]];
+          } else {
+            model[foreignModelName] = modelMap[model[local_foreign_key].toString()];
+          }
+          
         });    
         
         cb(err, results);
@@ -99,7 +114,7 @@ var BackboneMongoStatic = {
             relation = {
                 modelName : ModelName,
                 local_foreign_key : relations[ModelName].local_foreign_key,
-                foreign_key : relations[ModelName].foreign_key
+                foreign_key : relations[ModelName].foreign_key,
             };
             self['populate' + relationType](relation, models, function(err, results) {
               Basbosa(ModelName + 'Model').fetchContained(ModelContains, results, next, res);

@@ -61,16 +61,18 @@ _.each(Basbosa('Config').get('auth'), function(data, provider) {
 		));
 		return;
 	}
-	data.callbackURL = '/auth/' + provider + '/callback';
 	
-	passport.use(new strategy(data, function(accessToken, refreshToken, profile, done) {
-		var user = new User();
-		user.authFbUser(profile, accessToken, function (err, user) {
-			if (err) { return done(err); }
-			done(null, user);
-	  });
-
-	}));
+	data.callbackURL = data.callbackURL || '/auth/' + provider + '/callback';
+	data.cbFunction = data.cbFunction || function(accessToken, refreshToken, profile, done) {
+    var user = new User();
+    user.authFbUser(profile, accessToken, function (err, user) {
+      if (err) { return done(err); }
+      done(null, user);
+    });
+  };
+  
+	
+	passport.use(new strategy(data, data.cbFunction));
 });
 
 

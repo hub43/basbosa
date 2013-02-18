@@ -17,23 +17,24 @@ Basbosa.add('App', App);
  * @class CoresApp
  */
 initServer = function(App) {
+
 	var	Express 		= require('express')
-	, Passport 			= require('./controllers/components/passport').passport
+	//, Passport 			= require('./controllers/components/passport').passport
 	, Store					=	require('./libs').Store
-	, JadeCompiler	= require('./libs/').JadeCompiler
-	, Http 					= AppDirLoad(__dirname + '/controllers')
-	, SocketServer 	= require('./sockets/components/socket_server')
+	//, JadeCompiler	= require('./libs/').JadeCompiler
+	//, Http 					= AppDirLoad(__dirname + '/controllers')
+	//, SocketServer 	= require('./sockets/components/socket_server')
 	, Path					= require('path')
 	, flash					=	require('connect-flash')
 	, BasbosaAssets = require('basbosa-assets')
 	, BasbosaHelpers = require('basbosa-helpers');
-	
-	
+
+
 	// Init Socket	
-	SocketServer.init(App);
+	//SocketServer.init(App);
 	
 	// Load Sockets controllers
-	AppDirLoad(__dirname + '/sockets');
+	//AppDirLoad(__dirname + '/sockets');
 	
 	App.configure(function() {
 		App.set('views', APP_PATH); // tell express where our templates live
@@ -48,9 +49,10 @@ initServer = function(App) {
 			key : 'express.sid',
 			cookie : {httpOnly : false}
 		})); // should generate random key
-		App.use(Passport.initialize()); // initialize passport
-		App.use(Passport.session()); // setup its session handling
-		App.use(JadeCompiler);
+
+	//	App.use(Passport.initialize()); // initialize passport
+	//	App.use(Passport.session()); // setup its session handling
+	//	App.use(JadeCompiler);
 		App.use(flash());
 		App.use(App.router); // push our routing table to the stack
 		
@@ -61,7 +63,7 @@ initServer = function(App) {
 			App.use(function (req, res, next) {
 		    res.setHeader('Pragma-directive', 'no-cache');
 		    res.setHeader('Cache-directive', 'no-cache');
-		    res.setHeader('Cache-contro', 'no-cache');
+		    res.setHeader('Cache-control', 'no-cache');
 		    res.setHeader('Pragma', 'no-cache');
 		    res.setHeader('Expires', '0');
 		    next();
@@ -89,44 +91,47 @@ initServer = function(App) {
 		App.use(Express.errorHandler());
 	});
 
-	App.get('/*', Http.AppController.beforeAction);
-	App.post('/*', Http.AppController.beforeAction);
-	App.get('/addText/:locale/:text', Http.AppController.addText);
-	App.post('/', Http.ErrorsController.index);
-	App.get('/changeBrowser', Http.ErrorsController.changeBrowser);
-	App.get('/', Http.GroupsController.index);
-	App.post('/', Http.GroupsController.index);
-	App.get('/leaders', Http.UsersController.leaders);
-	App.get('/login', Http.UsersController.login);
-	App.post('/login', Passport.authenticate('local', {failureRedirect : '/login', failureFlash: true, 
-		successRedirect: Basbosa('Config').get('successLogin')}), Http.UsersController.postLogin);
-	App.get('/analytics', Http.AnalyticsController.index);
-	App.get('/analytics/getData', Http.AnalyticsController.getData);
-	App.get('/stats', Http.StatsController.index);
-	App.get('/search', Http.SearchController.index);
-	App.get('/countries', Http.CountriesController.getCountries);	
+//	App.get('/*', Http.AppController.beforeAction);
+//	App.post('/*', Http.AppController.beforeAction);
+//	App.get('/addText/:locale/:text', Http.AppController.addText);
+//	App.post('/', Http.ErrorsController.index);
+//	App.get('/changeBrowser', Http.ErrorsController.changeBrowser);
+//	App.get('/', Http.GroupsController.index);
+//	App.post('/', Http.GroupsController.index);
+//	App.get('/leaders', Http.UsersController.leaders);
+//	App.get('/login', Http.UsersController.login);
+//	App.post('/login', Passport.authenticate('local', {failureRedirect : '/login', failureFlash: true,
+//		successRedirect: Basbosa('Config').get('successLogin')}), Http.UsersController.postLogin);
+//	App.get('/analytics', Http.AnalyticsController.index);
+//	App.get('/analytics/getData', Http.AnalyticsController.getData);
+//	App.get('/stats', Http.StatsController.index);
+//	App.get('/search', Http.SearchController.index);
+//	App.get('/countries', Http.CountriesController.getCountries);
+//
+//	_.each(Basbosa('Config').get('auth'), function(data, provider){
+//		App.get('/auth/' + provider, Http.AuthController.storeUrl);
+//		App.get('/auth/' + provider, Http.AuthController[provider]);
+//		App.get('/auth/' + provider, function(req, res) { res.redirect('/'); } );
+//		App.get('/auth/' + provider + '/callback', Http.AuthController[provider + 'Cb']);
+//	});
 	
-	_.each(Basbosa('Config').get('auth'), function(data, provider){
-		App.get('/auth/' + provider, Http.AuthController.storeUrl);
-		App.get('/auth/' + provider, Http.AuthController[provider]);
-		App.get('/auth/' + provider, function(req, res) { res.redirect('/'); } );
-		App.get('/auth/' + provider + '/callback', Http.AuthController[provider + 'Cb']);
-	});
+
 	
-	App.get(/.*(png|jpg|svg|app|mp3|ogg\-opt|vendors)/, function(req, res, next) { 
-		// on production, cache files
-		if (Basbosa('Config').get('env') == 'production') {
-			if (!res.getHeader('Cache-Control')) res.setHeader('Cache-Control', 'public, max-age=1000');
-			if (!res.getHeader('Expires')) res.setHeader('Expires', 'Fri, 01 Mar 2013 20:51:01 GMT');
-		}
-		
-		next();
-	});
-	
-	App.get('/logout', Http.UsersController.logout);
-	App.get('/*', Http.AppController.beforeRender);
-	App.post('/*', Http.AppController.beforeRender);
-	
+//	App.get('/logout', Http.UsersController.logout);
+//	App.get('/*', Http.AppController.beforeRender);
+//	App.post('/*', Http.AppController.beforeRender);
+
+
+    App.get(/.*(png|jpg|svg|app|mp3|ogg\-opt|vendors)/, function(req, res, next) {
+        // on production, cache files
+        if (Basbosa('Config').get('env') == 'production') {
+            if (!res.getHeader('Cache-Control')) res.setHeader('Cache-Control', 'public, max-age=1000');
+            if (!res.getHeader('Expires')) res.setHeader('Expires', 'Fri, 01 Mar 2013 20:51:01 GMT');
+        }
+
+        next();
+    });
+
 	App.locals.bAssets = new BasbosaAssets(Basbosa('Config').get('requireJsOptions'));
 	App.locals.Html = BasbosaHelpers.Html;
 	App.locals.Text = BasbosaHelpers.Text;
@@ -152,8 +157,8 @@ initServer = function(App) {
 	 * Start listening on set port and respond to http and WebSocekt requests
 	 * 
 	 */
-	
-	Basbosa('Database').on('connected:default', function() {
+
+	Basbosa('Cm').on('connected:default', function() {
 	  App.server.listen(Basbosa('Config').get('port'), function() {
       Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
       // run tests if required

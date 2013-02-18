@@ -1,6 +1,7 @@
 /**
  * Parse command line arguments
  */
+var _ = require('underscore');
 
 module.exports = function(Config) {
 	var program = require('commander');

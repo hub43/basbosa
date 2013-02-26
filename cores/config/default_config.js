@@ -8,7 +8,7 @@
  */
 
 
-module.exports.config = {
+var config = {
   
 	/**
 	 * The environment the the application runs in. the default value is read from
@@ -30,6 +30,7 @@ module.exports.config = {
 	defaultGroup : '4fb212dd6c379e2810000000',
 	
 	enableFeedback : true,
+
 	feedbackUrl : 'https://docs.google.com/a/hub43.com/spreadsheet/viewform?pli=1&formkey=dFBqaTRDSGZyR2pfU1k1WGdXUWU3ekE6MQ#gid=0',
 	recordClientErros : false,
 	app : 'apps',
@@ -105,10 +106,11 @@ module.exports.config = {
 		// Gets populated after build
 		currentApp					: 'none',
 		currentTheme 				: 'none'
-	},
-	
-	
+	}
+
 };
+var pdn = require('path').dirname;
+config.appPath = pdn(pdn(pdn(pdn(pdn(__filename)))));
 
 module.exports.dynamic = function() {
   //Dynamic config values
@@ -123,3 +125,4 @@ module.exports.dynamic = function() {
   c.set('requireOpt.optimize', c.get('skipOpt') ? 'none' : 'uglify');
   
 };
+module.exports.config = config;

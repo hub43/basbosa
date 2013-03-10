@@ -1,39 +1,32 @@
 {
-    "name": "basbosa"
-  , "description": "Real-time scalable messaging framework based on Socket.io, Express and Backbone"
-  , "version": "0.0.2"
-  , "dependencies": {
-		  "express"			: "3.0.0rc3"
-		, "connect"			: "2.4.4"
-		, "cookie"			: "0.0.4"
-		, "underscore"		: "1.4.1"
-        , "underscore.string" : "2.3.1"
-		, "connect-flash"	:	"0.1.0"
-		, "async"				:	"0.1.22"
-		, "backbone"		: "0.9.10"
-		, "jade"			: "0.26.1"
-		, "stylus"			: "0.19.0"
-		, "nib"				: "0.2.0"
-		, "socket.io"		: "0.9.10"
-		, "socket.io-client"	: "0.9.10"
-		, "async"				: "0.1.22"
-		, "requirejs" 				: "2.0.4"
-		, "amdefine" 				: "0.0.2"
-		, "commander"		: "0.6.0"
-		, "dialect"			: "https://github.com/ygaras/dialect/tarball/master"
-		, "dialect-http"	: "https://github.com/ygaras/dialect-http/tarball/master"
-		, "basbosa-config"	: "https://github.com/ygaras/basbosa-config/tarball/master"
-		, "basbosa-logger"	: "https://github.com/ygaras/basbosa-logger/tarball/master"
-		, "basbosa-registry"	: "https://github.com/ygaras/basbosa-registry/tarball/master"
-		, "basbosa-validation" : "https://github.com/hub43/basbosa-validation/tarball/master"
-		, "basbosa-mongo" : "https://github.com/ygaras/basbosa-mongo/tarball/master"
-		, "basbosa-assets" : "https://github.com/ygaras/basbosa-assets/tarball/master"
-		, "basbosa-helpers" : "https://github.com/ygaras/basbosa-helpers/tarball/master"
-		, "tmpl-precompile"	: "https://github.com/ygaras/tmpl-precompile/tarball/master"
-		, "connect-auth"	: "0.5.1"
-		, "mongodb"				: "1.2.2"
-		, "connect-mongodb"			: "1.1.4"
-		, "useragent"				: "1.1.0"
-		,	"emailjs"					:	"0.3.3"
-    }
+  "name" : "basbosa",
+  "description" : "Real-time scalable messaging framework based on Socket.io, Express and Backbone",
+  "version" : "0.0.2",
+  "dependencies" : {
+    "express" : "3.0.0rc3",
+    "connect" : "2.4.4",
+    "cookie" : "0.0.4",
+    "underscore" : "1.4.1",
+    "underscore.string" : "2.3.1",
+    "async" : "0.1.22",
+    "backbone" : "0.9.10",
+    "jade" : "0.26.1",
+    "stylus" : "0.19.0",
+    "nib" : "0.2.0",
+    "async" : "0.1.22",
+    "requirejs" : "2.0.4",
+    "amdefine" : "0.0.2",
+    "commander" : "0.6.0",
+    "basbosa-config" : "https://github.com/ygaras/basbosa-config/tarball/master",
+    "basbosa-logger" : "https://github.com/ygaras/basbosa-logger/tarball/master",
+    "basbosa-registry" : "https://github.com/ygaras/basbosa-registry/tarball/master",
+    "basbosa-validation" : "https://github.com/hub43/basbosa-validation/tarball/master",
+    "basbosa-mongo" : "https://github.com/ygaras/basbosa-mongo/tarball/master",
+    "basbosa-assets" : "https://github.com/ygaras/basbosa-assets/tarball/master",
+    "basbosa-helpers" : "https://github.com/ygaras/basbosa-helpers/tarball/master",
+    "tmpl-precompile" : "https://github.com/ygaras/tmpl-precompile/tarball/master",
+    "connect-auth" : "0.5.1",
+    "mongodb" : "1.2.2",
+    "connect-mongodb" : "1.1.4"
+  }
 }

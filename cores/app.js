@@ -25,9 +25,9 @@ initServer = function(App) {
 	//, Http 					= AppDirLoad(__dirname + '/controllers')
 	//, SocketServer 	= require('./sockets/components/socket_server')
 	, Path					= require('path')
-	, flash					=	require('connect-flash')
 	, BasbosaAssets = require('basbosa-assets')
 	, BasbosaHelpers = require('basbosa-helpers');
+	require('basbosa-mongo');
 
 
 	// Init Socket	
@@ -53,7 +53,7 @@ initServer = function(App) {
 	//	App.use(Passport.initialize()); // initialize passport
 	//	App.use(Passport.session()); // setup its session handling
 	//	App.use(JadeCompiler);
-		App.use(flash());
+	//	App.use(flash());
 		App.use(App.router); // push our routing table to the stack
 		
 		// Blocking access to application files should be done here

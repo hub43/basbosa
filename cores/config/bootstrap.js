@@ -82,7 +82,7 @@ var Globals = function() {
   Basbosa('Config').setConfig(config);
 
   // Establish db Connection
-  require('basbosa-mongo').Cm.add('default', Basbosa('Config').get('db'));
+  //require('basbosa-mongo').Cm.add('default', Basbosa('Config').get('db'));
 
   // Logger
   require('basbosa-logger');
@@ -132,7 +132,7 @@ var Globals = function() {
 	GLOBAL.AppDirLoad	= function(path, loadOptions) {
 		var options = {
 			'ignore'	:	/svn|index/gi,
-			'replace'	: /_module|\.js/gi,
+			'replace'	: /_module|\.js/gi
 		}; 
 		var _modules = {};
 		_.extend(options, loadOptions);
@@ -163,7 +163,6 @@ var Globals = function() {
   
   
 	Basbosa.add('requireDir', AppDirLoad);
-
 };
 Globals();	
 

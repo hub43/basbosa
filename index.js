@@ -15,3 +15,4 @@ if (Basbosa('Config').get('enableDialectHttp')) {
   _.extend(DialectHttp.options, Basbosa('Config').get('dialectHttp'));
   DialectHttp.run();
 }
+module.exports = Basbosa;

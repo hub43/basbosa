@@ -81,14 +81,18 @@ var Globals = function() {
   
   Basbosa('Config').setConfig(config);
 
-  // Establish db Connection
-  require('basbosa-mongo').Cm.add('default', Basbosa('Config').get('db'));
-
   // Logger
   require('basbosa-logger');
 
-  
-	//_.mixin(_.str.exports());
+  // Mongo Db
+  require('basbosa-mongo')
+
+  // Establish db Connection
+  // require('basbosa-mongo').Cm.add('default', Basbosa('Config').get('db'));
+
+
+
+  //_.mixin(_.str.exports());
 	//_.str.include('Underscore.string', 'string');
 	
 

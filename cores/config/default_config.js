@@ -7,8 +7,9 @@
  * @module BasbosaCoreServer
  */
 
+var pdn = require('path').dirname;
 
-var config = {
+var BasbosaConfig = {
   
 	/**
 	 * The environment the the application runs in. the default value is read from
@@ -18,8 +19,10 @@ var config = {
 	 * @type {String}
 	 * @default process.env.NODE_ENV || 'development'
 	 * @property env 
-	 */ 
-	env : process.env.NODE_ENV || 'development',
+	 */
+  appPath : pdn(pdn(pdn(pdn(pdn(__filename))))),
+
+  env : process.env.NODE_ENV || 'development',
 	
 	logging : 3,
 	min : false,
@@ -106,13 +109,26 @@ var config = {
 		// Gets populated after build
 		currentApp					: 'none',
 		currentTheme 				: 'none'
-	}
+	},
+
+  commander : {
+    port : ['-p, --port <n>', 'main app port number', parseInt],
+    env : ['-e, --env <environment>', 'force run environment'],
+    test : ['-t, --test', 'run tests on server startup'],
+    min : ['-m, --min', 'use minifed client'],
+    app : ['-a, --app <app>', 'set default app to load'],
+    logging : ['-l, --logging <level>', 'set logging level'],
+    skipOpt: ['-s, --skip-opt', 'skip client optimization using uglify']
+  }
 
 };
-var pdn = require('path').dirname;
-config.appPath = pdn(pdn(pdn(pdn(pdn(__filename)))));
 
-module.exports.dynamic = function() {
+
+var dynamic = function() {
+
+
+
+
   //Dynamic config values
   var c = Basbosa('Config');
   process.env.NODE_ENV = c.get('env');
@@ -125,4 +141,8 @@ module.exports.dynamic = function() {
   c.set('requireOpt.optimize', c.get('skipOpt') ? 'none' : 'uglify');
   
 };
-module.exports.config = config;
+
+module.exports = {
+  BasbosaConfig : BasbosaConfig,
+  dynamic : dynamic
+};

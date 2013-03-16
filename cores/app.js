@@ -39,7 +39,7 @@ initServer = function(App) {
 	//AppDirLoad(__dirname + '/sockets');
 	
 	App.configure(function() {
-		App.set('views', APP_PATH); // tell express where our templates live
+		App.set('views', Basbosa('Config').get('appPath')); // tell express where our templates live
 		App.set('view engine', 'jade'); // we are using jade for as template engine
 		App.set('view options', {	layout : false }); // disable layouts by default
 		App.use(Express.bodyParser()); // prepare body parser middleware for http form posts parsing/ url params handling
@@ -76,8 +76,8 @@ initServer = function(App) {
 		}}));
 		
 		// Allow to server static files both from APP_PATH and from node_modules/basbosa
-		App.use(Express.static(APP_PATH)); // can't find a matching route, tell express where our statics live
-		App.use(Express.static(APP_PATH + '/appc/public'));
+		App.use(Express.static(Basbosa('Config').get('appPath'))); // can't find a matching route, tell express where our statics live
+		App.use(Express.static(Basbosa('Config').get('appPath') + '/appc/public'));
 		App.use(Express.static(Path.dirname(Path.dirname(__filename)))); 
 	});	
 	// development environment will throw errors

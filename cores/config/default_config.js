@@ -21,7 +21,7 @@ var config = {
 	 */ 
 	env : process.env.NODE_ENV || 'development',
 	
-	logging : 4,
+	logging : 3,
 	min : false,
 	
 	httpProtocol : 'http',

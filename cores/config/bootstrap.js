@@ -73,9 +73,20 @@ var Globals = function() {
 		
 		return _modules;
 	};
-	
 
-  
+  process.on('SIGTERM', function() {
+    Basbosa('Logger').info('Got SIGTERM signal... killing self');
+    Fs.unlink(Basbosa('Config').get('appPath') + '/pid', function(err) {
+      if (err) throw new Error(err);
+      process.exit();
+    });
+  });
+
+  Fs.writeFile(Basbosa('Config').get('appPath') + '/pid', process.pid, function(err) {
+    if (err) throw new Error(err);
+  });
+
+
 	Basbosa.add('requireDir', requireDir);
 
 };

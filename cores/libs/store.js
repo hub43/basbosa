@@ -1,7 +1,7 @@
 var Express = require('express'),
 		MongoStore = require('connect-mongodb');
 
-exports.sessionStore = new MongoStore(Basbosa('Cm').getDb('default'));
+exports.sessionStore = new MongoStore({url : Basbosa('Cm').getDbUrl('default')});
 
 exports.socketsData = {
   sockets : {},

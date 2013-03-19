@@ -23,8 +23,8 @@ var BasbosaConfig = {
   appPath : pdn(pdn(pdn(pdn(pdn(__filename))))),
 
   env : process.env.NODE_ENV || 'development',
-	
-	logging : 3,
+
+
 	min : false,
 	
 	httpProtocol : 'http',
@@ -111,13 +111,19 @@ var BasbosaConfig = {
 		currentTheme 				: 'none'
 	},
 
+  basbosaLogger : {
+    showTime : false,
+    showPath : true,
+    level : 3
+  },
+
   commander : {
     port : ['-p, --port <n>', 'main app port number', parseInt],
     env : ['-e, --env <environment>', 'force run environment'],
     test : ['-t, --test', 'run tests on server startup'],
-    min : ['-m, --min', 'use minifed client'],
+    min : ['-m, --min', 'use minified client'],
     app : ['-a, --app <app>', 'set default app to load'],
-    logging : ['-l, --logging <level>', 'set logging level'],
+    'basbosaLogger.level' : ['-l, --level <level>', 'set logging level'],
     skipOpt: ['-s, --skip-opt', 'skip client optimization using uglify']
   }
 

@@ -34,8 +34,6 @@ var Globals = function() {
 	// Hack due to bug in cloning arrays in Config.extend
 
   defaultConfig = require('./default_config');
-
-  
   Basbosa('Config').setConfig(defaultConfig.BasbosaConfig);
 
 	if (Fs.existsSync(Basbosa('Config').get('appPath') + '/apps/config/index.js')) {

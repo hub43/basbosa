@@ -3,13 +3,13 @@
  * set config and parse command lines
  */ 
 require('./config/bootstrap');
-require('basbosa-mongo');
+
 /* Loading express and Creating the main server instance */
 var App =  require('express')();
 App.server = require('http').createServer(App);
 
 Basbosa.add('App', App);
-Basbosa.add('async', require('async'));
+
 
 /**
  * Core Server Application

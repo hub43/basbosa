@@ -36,8 +36,8 @@ var Globals = function() {
   defaultConfig = require('./default_config');
   Basbosa('Config').setConfig(defaultConfig.BasbosaConfig);
 
-	if (Fs.existsSync(Basbosa('Config').get('appPath') + '/apps/config/index.js')) {
-    appConfig = require(Basbosa('Config').get('appPath') + '/apps/config/index.js');
+	if (Fs.existsSync(Basbosa('Config').get('appPath') + '/apps/config/core.js')) {
+    appConfig = require(Basbosa('Config').get('appPath') + '/apps/config/core.js');
     Basbosa('Config').set(appConfig.Config);
 	}
 
@@ -88,6 +88,8 @@ var Globals = function() {
 
 
 	Basbosa.add('requireDir', requireDir);
+  require('basbosa-mongo');
+  Basbosa.add('async', require('async'));
 
 };
 Globals();	

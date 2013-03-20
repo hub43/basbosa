@@ -1,13 +1,10 @@
-// Start Basbosa backend server and load handlers
-require('./cores/app');
-// Build client app
-//require('./cores/libs/require_opt');
+// Bootstrap Basbosa
+require('./cores/config/bootstrap');
 
-// Start Application backend server if it exists
-//if (require('fs').existsSync(SERVER_PATH + '/app.js')) {
-//	require('../../apps/app')();
-//}
-
+// Start Http Server if needed
+if (Basbosa('Config').get('skipHttpServer') === false) {
+  require('./cores/http')
+}
 
 // Start translation server if enabled
 if (Basbosa('Config').get('enableDialectHttp')) {

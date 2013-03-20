@@ -26,7 +26,9 @@ var BasbosaConfig = {
 
 
 	min : false,
-	
+
+  skipHttpServer : false,
+
 	httpProtocol : 'http',
 	serverName : 'localhost',
 	port : 3000,

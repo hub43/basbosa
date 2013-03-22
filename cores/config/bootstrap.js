@@ -74,7 +74,7 @@ var Globals = function() {
 		return _modules;
 	};
 
-  process.on('SIGTERM', function() {
+  process.on('SIGTERM22', function() {
     Basbosa('Logger').info('Got SIGTERM signal... killing self');
     Fs.unlink(Basbosa('Config').get('appPath') + '/pid', function(err) {
       if (err) throw new Error(err);

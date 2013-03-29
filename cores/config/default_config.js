@@ -46,7 +46,7 @@ var BasbosaConfig = {
 	testUsers : 5,
 	skipOpt : false,
 	//The configurations that are available to client 
-	clientConfig : ['debug', 'min', 'build', 'logging' ,'enableFeedback', 'feedbackUrl'],
+	clientConfig : ['debug', 'min', 'build', 'logging' ,'enableFeedback', 'feedbackUrl', 'webRoot'],
 	// Populated after client app is minified for each theme
 	build : {},
 	languages : {

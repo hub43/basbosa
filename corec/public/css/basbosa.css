@@ -1,0 +1,24 @@
+.basbosa-table {
+    margin:0 auto;
+    font-family:verdana;
+    font-size:12px;
+    margin-top:30px;
+}
+.basbosa-table td, .basbosa-table th{
+    border:1px solid #333;
+    width: 150px;
+    max-width:400px;
+    padding:5px 10px;
+    vertical-align: top;
+    word-wrap: break-word;
+}
+.basbosa-table td:last-child{
+    width:50px;
+}
+.basbosa-table td:first-child{
+    width:100px;
+}
+.basbosa-table th{
+    font-weight:bold;
+    background-color:#F9EDBE;
+}

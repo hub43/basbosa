@@ -19,3 +19,6 @@
 [submodule "node_modules/tmpl-precompile"]
 	path = node_modules/tmpl-precompile
 	url = git@github.com:ygaras/tmpl-precompile.git
+[submodule "node_modules/basbosa-rest"]
+	path = node_modules/basbosa-rest
+	url = git@github.com:ygaras/basbosa-rest.git

@@ -89,6 +89,7 @@ var Globals = function() {
 
 	Basbosa.add('requireDir', requireDir);
   require('basbosa-mongo');
+  require('basbosa-rest');
   Basbosa.add('async', require('async'));
 
 };

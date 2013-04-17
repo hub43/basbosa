@@ -39,10 +39,17 @@ initServer = function(App) {
 	//AppDirLoad(__dirname + '/sockets');
 	
 	App.configure(function() {
-		App.set('views', Basbosa('Config').get('appPath')); // tell express where our templates live
+
+    // Allow to server static files both from APP_PATH and from node_modules/basbosa
+    App.use(Express.static(Basbosa('Config').get('appPath'))); // can't find a matching route, tell express where our statics live
+    App.use(Express.static(Basbosa('Config').get('appPath') + '/appc/public'));
+    App.use(Express.static(Path.dirname(Path.dirname(__filename))));
+
+    App.set('views', Basbosa('Config').get('appPath')); // tell express where our templates live
 		App.set('view engine', 'jade'); // we are using jade for as template engine
 		App.set('view options', {	layout : false }); // disable layouts by default
-		App.use(Express.bodyParser()); // prepare body parser middleware for http form posts parsing/ url params handling
+
+    App.use(Express.bodyParser()); // prepare body parser middleware for http form posts parsing/ url params handling
 		App.use(Express.methodOverride()); // prepare http method override to support unsupported http methods ex: delete, put
 		App.use(Express.cookieParser()); // for parsing session cookies
 		App.use(Express.session({
@@ -75,11 +82,8 @@ initServer = function(App) {
 			return /json|text|javascript|xml/.test(res.getHeader('Content-Type'));
 		}}));
 		
-		// Allow to server static files both from APP_PATH and from node_modules/basbosa
-		App.use(Express.static(Basbosa('Config').get('appPath'))); // can't find a matching route, tell express where our statics live
-		App.use(Express.static(Basbosa('Config').get('appPath') + '/appc/public'));
-		App.use(Express.static(Path.dirname(Path.dirname(__filename)))); 
-	});	
+
+	});
 	// development environment will throw errors
 	App.configure('development', function() {
 		App.use(Express.errorHandler({

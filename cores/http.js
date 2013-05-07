@@ -68,7 +68,7 @@ initServer = function(App) {
 		// Blocking access to application files should be done here
 		
 		// On development, prevent caching to easy change files
-		if (Basbosa('Config').get('env') == 'development') {
+		if (Basbosa('Config').get('env').indexOf('development') > -1) {
 			App.use(function (req, res, next) {
 		    res.setHeader('Pragma-directive', 'no-cache');
 		    res.setHeader('Cache-directive', 'no-cache');
@@ -130,7 +130,7 @@ initServer = function(App) {
 
     App.get(/.*(png|jpg|svg|app|mp3|ogg\-opt|vendors)/, function(req, res, next) {
         // on production, cache files
-        if (Basbosa('Config').get('env') == 'production') {
+        if (Basbosa('Config').get('env').indexOf('production') > -1) {
             if (!res.getHeader('Cache-Control')) res.setHeader('Cache-Control', 'public, max-age=1000');
             if (!res.getHeader('Expires')) res.setHeader('Expires', 'Fri, 01 Mar 2013 20:51:01 GMT');
         }

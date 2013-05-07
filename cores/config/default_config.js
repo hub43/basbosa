@@ -140,7 +140,7 @@ var dynamic = function() {
   //Dynamic config values
   var c = Basbosa('Config');
   process.env.NODE_ENV = c.get('env');
-  c.set('debug',  c.get('env') == 'development');
+  c.set('debug',  c.get('env').indexOf('development') > 1);
   c.set('webRoot',  c.get('httpProtocol') + '://' + c.get('serverName') + ':' + c.get('port'));
   c.set('dialectHttp.port', c.get('port') + 1);
   c.set('dialectHttp.dialect', c.get('dialect'));

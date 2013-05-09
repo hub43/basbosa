@@ -25,6 +25,7 @@
     "basbosa-assets" : "https://github.com/ygaras/basbosa-assets/tarball/master",
     "basbosa-helpers" : "https://github.com/ygaras/basbosa-helpers/tarball/master",
     "tmpl-precompile" : "https://github.com/ygaras/tmpl-precompile/tarball/master",
+	"basbosa-rest" : "https://github.com/ygaras/basbosa-rest/tarball/master",
     "connect-auth" : "0.5.1",
     "connect-mongodb" : "1.1.4"
   }

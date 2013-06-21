@@ -378,6 +378,7 @@ define([
 		validate : function(callback) {
 			var self = this, validationResult = {}, hashPassword, options = {}, token;
 			var attributes = self.toJSON();
+			/* Breaks hawks
 			this._withCollection(function(error, collection) {
 				collection.ensureIndex({email: 1}, {unique: true}, function(err) {
 				  if (err) {
@@ -386,7 +387,7 @@ define([
 				  }
 				});
 			});
-			
+			*/
 			if (attributes.email !== undefined) {
 				_.each(self.validationRules, function(rules, fieldName) {
 					if (self.get(fieldName) !== undefined) {
@@ -411,7 +412,7 @@ define([
 							hashPassword = self.hash(self.get('password'));
 							attributes.token = self.generateActivationToken(self.get('email'));
 							self.set(attributes);
-							self.mailMessage.attachment.data = self.prepareMailContent({ url: Config.baseUrl + 'activate?email=' +  self.get('email') + '&token=' + attributes.token});
+							self.mailMessage.attachment.data = self.prepareMailContent({ url: Config.webRoot + 'activate?email=' +  self.get('email') + '&token=' + attributes.token});
 							self.mailMessage.to = self.get('email');
 							email.sendMail(self.mailMessage);
 							self.set('status', 'pending_activation');

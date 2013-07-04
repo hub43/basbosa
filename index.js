@@ -2,9 +2,8 @@
 require('./cores/config/bootstrap');
 
 // Start Http Server if needed
-if (Basbosa('Config').get('skipHttpServer') === false) {
-  require('./cores/http')
-}
+require('./cores/http');
+
 
 // Start translation server if enabled
 if (Basbosa('Config').get('enableDialectHttp')) {

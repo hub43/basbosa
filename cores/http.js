@@ -165,7 +165,8 @@ initServer = function(App) {
 	 */
 
 	Basbosa('Cm').on('connected:default', function() {
-	  App.server.listen(Basbosa('Config').get('port'), function() {
+    if (Basbosa('Config').get('skipHttpServer')) return;
+    App.server.listen(Basbosa('Config').get('port'), function() {
       Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
       // run tests if required
       if (Basbosa('Config').get('test')) {      require('./tests');

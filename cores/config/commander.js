@@ -16,7 +16,7 @@ module.exports = function(Config) {
     params[1] += ', default: ' + Config.get(name);
 
     paramFullNames.push({
-      paramName : _(params[0].match(/--([a-zA-Z0-9]+)/)[1]).camelize(),
+      paramName : _(params[0].match(/--([a-zA-Z0-9\-\.]+)/)[1]).camelize(),
       configName : name
     });
     program.option.apply(program, params);
@@ -26,7 +26,6 @@ module.exports = function(Config) {
 	program.parse(process.argv);
   _.forEach(paramFullNames, function(p) {
     if (program[p.paramName] !== undefined) Config.set(p.configName, program[p.paramName]);
-
   });
 	
 };

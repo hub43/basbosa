@@ -126,7 +126,8 @@ var BasbosaConfig = {
     min : ['-m, --min', 'use minified client'],
     app : ['-a, --app <app>', 'set default app to load'],
     'basbosaLogger.level' : ['-l, --level <level>', 'set logging level'],
-    skipOpt: ['-s, --skip-opt', 'skip client optimization using uglify']
+    skipOpt: ['-s, --skip-opt', 'skip client optimization using uglify'],
+    skipHttpServer: ['-h, --skip-http-server', 'skip auto start http server']
   }
 
 };

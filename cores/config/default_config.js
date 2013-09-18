@@ -27,7 +27,7 @@ var BasbosaConfig = {
 
 	min : false,
 
-  skipHttpServer : false,
+  skipHttpServer : true,
 
 	httpProtocol : 'http',
 	serverName : 'localhost',

@@ -2,7 +2,6 @@ var Path = require('path'),
     Fs = require('fs'),
     _ = require('underscore'),
     _str = require('underscore.string'),
-    BasbosaConfig,
     config;
 
 _.mixin(_str.exports());

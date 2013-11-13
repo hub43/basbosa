@@ -2,7 +2,6 @@ var Path = require('path'),
     Fs = require('fs'),
     _ = require('underscore'),
     _str = require('underscore.string'),
-    BasbosaConfig,
     config;
 
 _.mixin(_str.exports());
@@ -46,7 +45,7 @@ var Globals = function() {
 
   // Build dynamic Config values
   defaultConfig.dynamic();
-  if (typeof appConfig.dynamic === 'function') appConfig.dynamic();
+  if (appConfig && typeof appConfig.dynamic === 'function') appConfig.dynamic();
   
 
   // Logger

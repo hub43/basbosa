@@ -27,7 +27,7 @@ var BasbosaConfig = {
 
 	min : false,
 
-  skipHttpServer : false,
+  skipHttpServer : true,
 
 	httpProtocol : 'http',
 	serverName : 'localhost',
@@ -57,7 +57,7 @@ var BasbosaConfig = {
 	db : {
 		host : 'localhost',
 		port : 27017,
-		database : 'basbosa',
+		database : false,
 		username : '',
 		password : ''
 	},

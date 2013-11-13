@@ -72,6 +72,8 @@ var BasbosaConfig = {
 			}
 		}
 	},
+  enableSessions : true,
+  sessionDbConfig : 'default',
 
 	enableDialectHttp : false,
 	

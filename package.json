@@ -6,7 +6,7 @@
     "express" : "3.0.0rc3",
     "connect" : "2.4.4",
     "cookie" : "0.0.4",
-    "underscore" : "1.4.1",
+    "underscore" : "1.5.2",
     "underscore.string" : "2.3.1",
     "backbone" : "1.1.0",
     "jade" : "0.26.1",
@@ -24,7 +24,7 @@
     "basbosa-assets" : "https://github.com/ygaras/basbosa-assets/tarball/master",
     "basbosa-helpers" : "https://github.com/ygaras/basbosa-helpers/tarball/master",
     "tmpl-precompile" : "https://github.com/ygaras/tmpl-precompile/tarball/master",
-	"basbosa-rest" : "https://github.com/ygaras/basbosa-rest/tarball/master",
+    "basbosa-rest" : "https://github.com/ygaras/basbosa-rest/tarball/master",
     "connect-auth" : "0.5.1",
     "connect-mongodb" : "1.1.4"
   }

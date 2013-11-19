@@ -164,20 +164,19 @@ initServer = function(App) {
 	 * 
 	 */
 
-	Basbosa('Cm').on('connected:default', function() {
-    if (Basbosa('Config').get('skipHttpServer')) return;
-    App.server.listen(Basbosa('Config').get('port'), function() {
-      Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
-      // run tests if required
-      if (Basbosa('Config').get('test')) {      require('./tests');
-        var appTests = './../' + Basbosa('Config').get('app') + '/tests/index.js';
-        // Bug on with exists Sync on windows
-        if (require('fs').existsSync(appTests) || 1) {
-          require(appTests);
-        } 
-      }
-    });
-	});
+  if (!Basbosa('Config').get('skipHttpServer')) {
+    function startServer() {
+      App.server.listen(Basbosa('Config').get('port'), function() {
+        Basbosa('Logger').info('Server started on port ' + Basbosa('Config').get('port'));
+      });
+    }
+    if (Basbosa('Config').get('skipWaitForDb') || Basbosa('Config').get('useFsModel')) {
+      startServer();
+    } else {
+      Basbosa('Cm').on('connected:default', startServer);
+    }
+  }
+
 	
 	return App;
 };

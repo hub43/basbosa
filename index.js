@@ -5,10 +5,4 @@ require('./cores/config/bootstrap');
 require('./cores/http');
 
 
-// Start translation server if enabled
-if (Basbosa('Config').get('enableDialectHttp')) {
-  var DialectHttp = require('dialect-http');
-  _.extend(DialectHttp.options, Basbosa('Config').get('dialectHttp'));
-  DialectHttp.run();
-}
 module.exports = Basbosa;

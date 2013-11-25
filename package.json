@@ -17,6 +17,7 @@
     "basbosa-validation" : "https://github.com/hub43/basbosa-validation/tarball/master",
     "commander" : "0.6.0",
     "express" : "3.4.4",
+    "jade" : "0.35.0",
     "requirejs" : "2.1.9",
     "tmpl-precompile" : "https://github.com/ygaras/tmpl-precompile/tarball/master",
     "underscore" : "1.5.2",

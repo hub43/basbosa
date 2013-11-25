@@ -21,7 +21,6 @@ Basbosa.add('App', App);
 initServer = function(App) {
 
 	var	Express 		= require('express')
-    , Store					=	require('./libs').Store
     , Path					= require('path')
     , BasbosaAssets = require('basbosa-assets')
     , BasbosaHelpers = require('basbosa-helpers');
@@ -41,13 +40,6 @@ initServer = function(App) {
     App.use(Express.bodyParser()); // prepare body parser middleware for http form posts parsing/ url params handling
 		App.use(Express.methodOverride()); // prepare http method override to support unsupported http methods ex: delete, put
 		App.use(Express.cookieParser()); // for parsing session cookies
-		App.use(Express.session({
-			secret : "SOmeSecretHere",
-			store : Store.sessionStore,
-			key : 'express.sid',
-			cookie : {httpOnly : false}
-		})); // should generate random key
-
 		App.use(App.router); // push our routing table to the stack
 		
 		// Blocking access to application files should be done here

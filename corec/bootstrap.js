@@ -1,6 +1,6 @@
 require.config({
   paths : {
-    backbone : '/node_modules/basbosa/node_modules/backbone/backbone',
+    backbone : '/node_modules/basbosa/node_modules/basbosa-mongo/node_modules/backbone/backbone',
     underscore : '/node_modules/basbosa/node_modules/underscore/underscore',
     jquery : '/node_modules/basbosa/corec/vendors/jquery-2.0.3.min',
     basbosa : '/node_modules/basbosa/node_modules/basbosa-registry/index'
@@ -28,7 +28,7 @@ define([
   'underscore',
   'require'
 ], function(B, Logger, Backbone, _, require) {
-  if (!B.exists('Logger')) B.add('Logger', Logger);
+  if (!B.added('Logger')) B.add('Logger', Logger);
   B.add('Backbone', Backbone);
   B.add('_', _);
 

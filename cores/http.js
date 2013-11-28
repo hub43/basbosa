@@ -103,7 +103,7 @@ initServer = function(App) {
 	 */
 	if (Basbosa('Config').get('tmplPrecompile')) {
 	  var tmplPrecompile = require('tmpl-precompile');
-	  tmplPrecompile.precompile(Basbosa('Config').get('tmplPrecompile'), APP_PATH);
+	  tmplPrecompile.precompile(Basbosa('Config').get('tmplPrecompile'), Basbosa('Config').get('appPath'));
 	}
 	
 	/*

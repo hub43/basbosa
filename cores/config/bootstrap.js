@@ -44,15 +44,13 @@ var Globals = function() {
   require('./commander')(Basbosa('Config'));
 
   // Build dynamic Config values
-  defaultConfig.dynamic();
-  if (appConfig && typeof appConfig.dynamic === 'function') appConfig.dynamic();
-  
-
   // Logger
   require('basbosa-logger');
 
   // Mongo Db
-  require('basbosa-mongo')
+  require('basbosa-mongo');
+
+
 
 	// To load all modules in a directory
 	var requireDir	= function(path, loadOptions) {
@@ -87,7 +85,6 @@ var Globals = function() {
 
 
 	Basbosa.add('requireDir', requireDir);
-  require('basbosa-mongo');
   require('basbosa-rest');
 
 };

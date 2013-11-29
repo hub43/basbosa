@@ -23,35 +23,38 @@ var BasbosaConfig = {
   appPath : pdn(pdn(pdn(pdn(pdn(__filename))))),
 
   env : process.env.NODE_ENV || 'development',
-
-
 	min : false,
 
   skipHttpServer : true,
+  sessionsEnabled : true,
+  sessionsSecret : 'dFBqaTRDSGZyR2pfU1k1RDSG',
+
+  passport : {
+    enabled : false,
+    successRedirect : '/',
+    failureRedirect : '/login',
+    serializeUser : undefined,
+    deserializeUser : undefined,
+    loginUser : null,
+    auth : {
+
+    }
+
+  },
 
 	httpProtocol : 'http',
 	serverName : 'localhost',
 	port : 3000,
-	defaultGroup : '4fb212dd6c379e2810000000',
-	
-	enableFeedback : true,
 
-	feedbackUrl : 'https://docs.google.com/a/hub43.com/spreadsheet/viewform?pli=1&formkey=dFBqaTRDSGZyR2pfU1k1WGdXUWU3ekE6MQ#gid=0',
 	recordClientErros : false,
 	app : 'apps',
 	
-	
-	// Testing config
-	test : false,
+
 	testUsers : 5,
 	skipOpt : false,
 	//The configurations that are available to client 
 	clientConfig : ['debug', 'min', 'build', 'logging' ,'enableFeedback', 'feedbackUrl', 'webRoot'],
 	// Populated after client app is minified for each theme
-	build : {},
-	languages : {
-		
-	},
 	skipSocketAuth : false,
 	successLogin : '/',
 	db : {
@@ -62,41 +65,12 @@ var BasbosaConfig = {
 		password : ''
 	},
 
-	dialect : {
-		current_locale : 'a',
-		base_locale : '',
-		locales : [ ],
-		store : {
-			mongodb : {
-				database : 'hawks',
-			}
-		}
-	},
-  enableSessions : true,
+	enableSessions : true,
   sessionDbConfig : 'default',
 
 	enableDialectHttp : false,
 	
-	dialectHttp : {
-		users : [ {
-			username : 'admin',
-			password : 'jeeadmin'
-		} ]
-	},
-	
-	auth : {
-		facebook : {
-			clientID		: '112420018771592',
-			clientSecret: '5b3aa8efcc66e1616c835a2fbfddaef5'
-		},
-		
-		twitter: {
-			consumerKey		:	'u8LH73UmwLG46uMYPA8y5A',
-			consumerSecret: 'hcNSbu6cwJJSBOFzFDbw1jqGbZ0cG7Z50t1KbnFaLW4'
-		},
-		dummy	: null
-	},
-	
+
 	
 	requireOpt : {
 		baseUrl : (typeof APP_PATH !== 'undefined') ? APP_PATH : 'undefined',
@@ -134,26 +108,26 @@ var BasbosaConfig = {
 
 };
 
-
-var dynamic = function() {
-
-
-
-
-  //Dynamic config values
-  var c = Basbosa('Config');
-  process.env.NODE_ENV = c.get('env');
-  c.set('debug',  c.get('env').indexOf('development') > 1);
-  c.set('webRoot',  c.get('httpProtocol') + '://' + c.get('serverName') + ':' + c.get('port'));
-  c.set('dialectHttp.port', c.get('port') + 1);
-  c.set('dialectHttp.dialect', c.get('dialect'));
-  c.get('test') && c.set('skipSocketAuth', true);
-  c.set('testServer', 'http://' + c.get('serverName') + ':' + c.get('port'));
-  c.set('requireOpt.optimize', c.get('skipOpt') ? 'none' : 'uglify');
-  
-};
+//
+//var dynamic = function() {
+//
+//
+//
+//
+//  //Dynamic config values
+//  var c = Basbosa('Config');
+//  process.env.NODE_ENV = c.get('env');
+//  c.set('debug',  c.get('env').indexOf('development') > 1);
+//  c.set('webRoot',  c.get('httpProtocol') + '://' + c.get('serverName') + ':' + c.get('port'));
+//  c.set('dialectHttp.port', c.get('port') + 1);
+//  c.set('dialectHttp.dialect', c.get('dialect'));
+//  c.get('test') && c.set('skipSocketAuth', true);
+//  c.set('testServer', 'http://' + c.get('serverName') + ':' + c.get('port'));
+//  c.set('requireOpt.optimize', c.get('skipOpt') ? 'none' : 'uglify');
+//
+//};
 
 module.exports = {
   BasbosaConfig : BasbosaConfig,
-  dynamic : dynamic
+//  dynamic : dynamic
 };

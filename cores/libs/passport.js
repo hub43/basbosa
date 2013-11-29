@@ -13,7 +13,7 @@ module.exports = function(B) {
 
 
   passport.deserializeUser(B('Config').get('passport.deserializeUser') || function(id, done) {
-    B('AutoModels').getModel('User', function(err, User) {
+    B('AutoModels').getModel('UserModel', function(err, User) {
       B('Logger').trace('searching to deserializeUser user with id ' + id);
       User.find({_id : (new B('ObjectId'))(id)}, function(err, users) {
         if (err) {
@@ -37,7 +37,7 @@ module.exports = function(B) {
       callbackURL : '/auth/' + provider + '/callback',
 
       createOrSaveUser :B('Config').get('passport.createOrSaveUser') || function(accessToken, refreshToken, profile, done) {
-        B('AutoModels').getModel('User', function(err, User) {
+        B('AutoModels').getModel('UserModel', function(err, User) {
           B('Logger').trace('trying to find a user with id' , profile.id);
           B('Logger').trace('trying to find a user with profile' , profile);
           User.find({username : profile.username, provider : profile.provider}, function(err, users) {

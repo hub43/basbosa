@@ -1,26 +1,28 @@
 {
-  "name" : "basbosa",
-  "description" : "Real-time scalable messaging framework based on Socket.io, Express and Backbone",
-  "version" : "0.0.2",
+  "name": "basbosa",
+  "description": "Real-time scalable messaging framework based on Socket.io, Express and Backbone",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/hub43/basbosa/tarball/master"
   },
-  "dependencies" : {
-    "basbosa-assets" : "https://github.com/ygaras/basbosa-assets/tarball/master",
-    "basbosa-config" : "https://github.com/ygaras/basbosa-config/tarball/master",
-    "basbosa-helpers" : "https://github.com/ygaras/basbosa-helpers/tarball/master",
-    "basbosa-logger" : "https://github.com/ygaras/basbosa-logger/tarball/master",
-    "basbosa-mongo" : "https://github.com/ygaras/basbosa-mongo/tarball/master",
-    "basbosa-registry" : "https://github.com/ygaras/basbosa-registry/tarball/master",
-    "basbosa-rest" : "https://github.com/ygaras/basbosa-rest/tarball/master",
-    "basbosa-validation" : "https://github.com/hub43/basbosa-validation/tarball/master",
-    "commander" : "0.6.0",
-    "express" : "3.4.4",
-    "jade" : "0.35.0",
-    "requirejs" : "2.1.9",
-    "tmpl-precompile" : "https://github.com/ygaras/tmpl-precompile/tarball/master",
-    "underscore" : "1.5.2",
-    "underscore.string" : "2.3.1"
+  "dependencies": {
+    "basbosa-assets": "https://github.com/ygaras/basbosa-assets/tarball/master",
+    "basbosa-config": "https://github.com/ygaras/basbosa-config/tarball/master",
+    "basbosa-helpers": "https://github.com/ygaras/basbosa-helpers/tarball/master",
+    "basbosa-logger": "https://github.com/ygaras/basbosa-logger/tarball/master",
+    "basbosa-mongo": "https://github.com/ygaras/basbosa-mongo/tarball/master",
+    "basbosa-registry": "https://github.com/ygaras/basbosa-registry/tarball/master",
+    "basbosa-rest": "https://github.com/ygaras/basbosa-rest/tarball/master",
+    "basbosa-validation": "https://github.com/hub43/basbosa-validation/tarball/master",
+    "commander": "0.6.0",
+    "express": "3.4.4",
+    "jade": "0.35.0",
+    "requirejs": "2.1.9",
+    "primus": "1.5.0",
+    "tmpl-precompile": "https://github.com/ygaras/tmpl-precompile/tarball/master",
+    "underscore": "1.5.2",
+    "underscore.string": "2.3.1",
+    "ws": "~0.4.31"
   }
 }

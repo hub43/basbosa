@@ -52,11 +52,12 @@ var CreateHttpServer = function(B) {
       if (B('Config').get('passportEnabled')) {
         require('./libs/passport')(B);
       }
-
     }
 
-
-
+    // If we will use primus
+    if (B('Config').get('primus.enabled')) {
+      require('./libs/primus')(B);
+    }
 
     App.use(App.router); // push our routing table to the stack
 

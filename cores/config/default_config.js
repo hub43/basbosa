@@ -39,7 +39,9 @@ var BasbosaConfig = {
     auth : {
 
     }
-
+  },
+  primus : {
+    enabled : false
   },
 
 	httpProtocol : 'http',

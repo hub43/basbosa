@@ -26,8 +26,6 @@ var BasbosaConfig = {
 	min : false,
 
   skipHttpServer : true,
-  sessionsEnabled : true,
-  sessionsSecret : 'dFBqaTRDSGZyR2pfU1k1RDSG',
 
   passport : {
     enabled : false,
@@ -67,10 +65,12 @@ var BasbosaConfig = {
 		password : ''
 	},
 
-	enableSessions : true,
-  sessionDbConfig : 'default',
+  sessionsDbConfig : 'default',
+  sessionsEnabled : true,
+  sessionsSecret : 'dFBqaTRDSGZyR2pfU1k1RDSG',
 
-	enableDialectHttp : false,
+
+  enableDialectHttp : false,
 	
 
 	

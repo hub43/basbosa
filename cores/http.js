@@ -38,8 +38,8 @@ var CreateHttpServer = function(B) {
     App.use(Express.cookieParser()); // for parsing session cookies
 
     // Check if we will use session
-    if (B('Config').get('sessionsEnabled') && B('Config').get('db').database) {
-      B('Logger').trace('Using sessions in db', B('Cm').getDbUrl());
+    if (B('Config').get('sessionsEnabled')) {
+      B('Logger').trace('Using sessions in db', B('Cm').getDbUrl(B('Config').get('sessionsDbConfig')));
       var mongoStore = require('connect-mongo')(express);
       App.use(express.session({
         secret : B('Config').get('sessionsSecret'),
